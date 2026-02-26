@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+
 export default StyleSheet.create({
   container: {
     flex: 1,
@@ -8,8 +9,8 @@ export default StyleSheet.create({
   },
 
   logo: {
-    width: 160,
-    height: 160,
+    width: 140,
+    height: 140,
     alignSelf: "center",
     marginBottom: 25,
   },
@@ -55,7 +56,6 @@ export default StyleSheet.create({
   button: {
     borderRadius: 14,
     overflow: "hidden",
-    marginBottom: 25,
   },
 
   buttonGradient: {
@@ -68,10 +68,5 @@ export default StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
-  },
-
-  signup: {
-    textAlign: "center",
-    color: "#6B7280",
   },
 });
