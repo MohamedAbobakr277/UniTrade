@@ -15,7 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./styles2";
-
+import { signUp } from "./services/authService";
 export default function SignUpScreen() {
   const router = useRouter();
 
@@ -82,10 +82,24 @@ export default function SignUpScreen() {
     confirmPassword &&
     password === confirmPassword;
 
-  const handleSignUp = () => {
+  const handleSignUp =async () => {
     if (!isFormValid) return;
-    alert("Account created successfully!");
-  };
+    try {
+    const uid = await signUp(
+      firstName,
+      lastName,
+      email,
+      password,
+      university,
+      faculty,
+      phone
+    );
+    alert("Verification email sent! Check your inbox.");
+    router.push("/");
+  } catch (err: any) {
+    alert(err.message);
+  }
+};
 
   const filteredUniversities = universities.filter((uni) =>
     uni.toLowerCase().includes(university.toLowerCase())
