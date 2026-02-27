@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import styles from "./forgot-styles";
 
 // Import Firebase auth service
-import { forgotPassword } from "./services/auth"; // path حسب موقع auth.js في الموبايل
+import { forgotPassword } from "./services/auth"; 
 
 const ForgotPassword: React.FC = () => {
   const router = useRouter();
@@ -37,7 +37,7 @@ const ForgotPassword: React.FC = () => {
         "Success",
         "Password reset email sent. Check your inbox."
       );
-      router.push("/reset-password"); // تعديل حسب مسار صفحة reset-password
+      router.push("/reset-password"); // Redirect to reset-password
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {

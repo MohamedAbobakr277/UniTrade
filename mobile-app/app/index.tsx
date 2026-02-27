@@ -39,9 +39,9 @@ const LoginScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await login(email, password); // تستدعي auth.js الموجود جوا services
+      await login(email, password); // should return a promise that resolves on successful login
       Alert.alert("Success", "Login successful!");
-      router.push("/"); // تعديل حسب الصفحة الرئيسية
+      router.push("/"); // redirect to home page after successful login
     } catch (err: any) {
       Alert.alert("Login Failed", err.message || "Something went wrong.");
     } finally {
