@@ -8,13 +8,18 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { Feather } from "@expo/vector-icons";
 import styles from "./reset-styles";
 
 export default function ResetPassword() {
   const router = useRouter();
+
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = () => {
     if (!password || !confirm) {
@@ -34,21 +39,41 @@ export default function ResetPassword() {
 
       <Text style={styles.title}>Reset Password</Text>
 
-      <TextInput
-        placeholder="New Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-      />
+      {/* New Password */}
+      <View style={styles.inputBox}>
+        <TextInput
+          placeholder="New Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Feather
+            name={showPassword ? "eye" : "eye-off"}
+            size={20}
+            color="#2563EB"
+          />
+        </TouchableOpacity>
+      </View>
 
-      <TextInput
-        placeholder="Confirm Password"
-        secureTextEntry
-        value={confirm}
-        onChangeText={setConfirm}
-        style={styles.input}
-      />
+      {/* Confirm Password */}
+      <View style={styles.inputBox}>
+        <TextInput
+          placeholder="Confirm Password"
+          secureTextEntry={!showConfirm}
+          value={confirm}
+          onChangeText={setConfirm}
+          style={styles.input}
+        />
+        <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
+          <Feather
+            name={showConfirm ? "eye" : "eye-off"}
+            size={20}
+            color="#2563EB"
+          />
+        </TouchableOpacity>
+      </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 

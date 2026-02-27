@@ -69,4 +69,6 @@ export default StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
+  signup: { textAlign: "center", color: "#6B7280", },
+
 });

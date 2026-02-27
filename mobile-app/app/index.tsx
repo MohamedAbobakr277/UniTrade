@@ -77,6 +77,16 @@ export default function LoginScreen() {
         >
           <Text style={styles.buttonText}>Log In</Text>
         </LinearGradient>
+
+        <Text style={styles.signup}>
+       Don’t have an account?{" "}
+     <Text
+    style={{ color: "#2563EB", fontWeight: "600" }}
+    onPress={() => router.push("/signup")}
+     >
+    Sign Up
+  </Text>
+  </Text>
       </TouchableOpacity>
     </View>
   );
