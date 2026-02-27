@@ -73,7 +73,7 @@ const SignUpScreen: React.FC = () => {
     "Mass Communication",
   ];
 
-  // التعديل: التعبير النمطي للتحقق من الإيميل الجامعي المصري
+
   const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.edu\.eg$/;
 
   const isFormValid =
@@ -118,7 +118,7 @@ const SignUpScreen: React.FC = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView 
         contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled" // لضمان استجابة القوائم عند الضغط عليها
+        keyboardShouldPersistTaps="handled"
       >
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
@@ -205,7 +205,7 @@ const SignUpScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* الحل: استبدال FlatList بـ ScrollView و map لمنع تداخل القوائم */}
+        {/* scrollable list of universities */}
         {showUniversityList && filteredUniversities.length > 0 && (
           <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 10 }}>
             <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
@@ -258,7 +258,7 @@ const SignUpScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* الحل: استبدال FlatList بـ ScrollView و map */}
+        {/* scrollable list of faculties */}
         {showFacultyList && filteredFaculties.length > 0 && (
           <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 10 }}>
             <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
