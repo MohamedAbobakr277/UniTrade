@@ -1,7 +1,6 @@
-import app from "./firebase.js";
-
+// src/services/authService.js
+import { auth, db } from "../firebase";
 import {
-    getAuth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendEmailVerification,
@@ -10,41 +9,28 @@ import {
     signOut
 } from "firebase/auth";
 
-import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    deleteDoc
-} from "firebase/firestore";
+import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-
-export async function signUp(
-    firstName,
-    lastName,
-    email,
-    password,
-    faculty,
-    university,
-    phoneNumber
-) {
+/* ================= SIGN UP ================= */
+export async function signUp(firstName, lastName, email, password, faculty, university, phoneNumber) {
     try {
-
         if (!email.endsWith(".edu.eg")) {
             throw new Error("University email (.edu.eg) is required");
         }
 
-
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+        // إعداد رابط التحقق من الإيميل
+        const actionCodeSettings = {
+            url: "http://localhost:5177/login", // غيّره للرابط الرسمي في الإنتاج
+            handleCodeInApp: true
+        };
 
-        await sendEmailVerification(user);
+        // إرسال رسالة التحقق على الإيميل
+        await sendEmailVerification(user, actionCodeSettings);
 
-
+        // حفظ بيانات المستخدم في pendingUsers
         await setDoc(doc(db, "pendingUsers", user.uid), {
             firstName,
             lastName,
@@ -62,20 +48,20 @@ export async function signUp(
     }
 }
 
-
+/* ================= LOGIN ================= */
 export async function login(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-
+        // التحقق من Email Verified
         if (!user.emailVerified) {
             throw new Error("Please verify your email first.");
         }
 
+        // التحقق من وجود بيانات المستخدم في users
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-
 
         if (!userSnap.exists()) {
             const pendingRef = doc(db, "pendingUsers", user.uid);
@@ -87,36 +73,32 @@ export async function login(email, password) {
 
             const pendingData = pendingSnap.data();
 
-
+            // نقل المستخدم من pendingUsers → users
             await setDoc(userRef, {
                 ...pendingData,
                 role: "student",
                 createdAt: new Date()
             });
 
-
             await deleteDoc(pendingRef);
-
             console.log("User moved from pendingUsers → users");
         }
 
         console.log("Login successful");
         return user.uid;
-
     } catch (error) {
         console.error("Login Error:", error.message);
         throw error;
     }
 }
 
-
+/* ================= FORGOT PASSWORD ================= */
 export async function forgotPassword(email) {
     try {
         const actionCodeSettings = {
-            url: "https://your-app.com/reset-password",
+            url: "http://localhost:3000/reset-password", // رابط صفحة إعادة تعيين الباسورد
             handleCodeInApp: true
         };
-
         await sendPasswordResetEmail(auth, email, actionCodeSettings);
         console.log("Password reset email sent.");
     } catch (error) {
@@ -125,7 +107,7 @@ export async function forgotPassword(email) {
     }
 }
 
-
+/* ================= RESET PASSWORD ================= */
 export async function resetPasswordWithCode(oobCode, newPassword) {
     try {
         await confirmPasswordReset(auth, oobCode, newPassword);
@@ -135,8 +117,8 @@ export async function resetPasswordWithCode(oobCode, newPassword) {
         throw error;
     }
 }
-// test
 
+/* ================= LOGOUT ================= */
 export async function logout() {
     try {
         await signOut(auth);

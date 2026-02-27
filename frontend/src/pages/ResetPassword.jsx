@@ -1,3 +1,4 @@
+// src/pages/ResetPassword.jsx
 import React, { useState } from "react";
 import {
     Box,
@@ -10,8 +11,9 @@ import {
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { forgotPassword } from "../services/auth"; // استدعاء الفانكشن من auth.js
 
-/* ================= BACKGROUND ================= */
+/* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
@@ -74,25 +76,28 @@ const SoftButton = styled(Button)({
     },
 });
 
-/* ================= PAGE ================= */
+/* ================= PAGE COMPONENT ================= */
 
 export default function ResetPassword() {
     const navigate = useNavigate();
-
     const [email, setEmail] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState("");
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!email) {
             setError("Please enter your email.");
             return;
         }
 
         setError("");
-        setSubmitted(true);
 
-        // Later connect to backend API
+        try {
+            await forgotPassword(email); // إرسال الإيميل فعليًا من Firebase
+            setSubmitted(true);
+        } catch (err) {
+            setError(err.message); // عرض أي خطأ يحصل
+        }
     };
 
     return (
@@ -104,11 +109,7 @@ export default function ResetPassword() {
 
                 <GlassCard>
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-                        <img
-                            src={logo}
-                            alt="Logo"
-                            style={{ width: "200px" }}
-                        />
+                        <img src={logo} alt="Logo" style={{ width: "200px" }} />
                     </Box>
 
                     <Typography
@@ -171,6 +172,7 @@ export default function ResetPassword() {
                         <>
                             <Alert severity="success" sx={{ mb: 3 }}>
                                 We sent a password reset link to {email}.
+                                <br />
                                 Please check your inbox.
                             </Alert>
 
