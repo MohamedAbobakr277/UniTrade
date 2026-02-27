@@ -17,16 +17,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./styles2";
-<<<<<<< HEAD
-import { signUp } from "./services/authService";
-export default function SignUpScreen() {
-=======
 
 // Import auth service
 import { signUp } from "./services/auth";
 
 const SignUpScreen: React.FC = () => {
->>>>>>> c81c6c914d91df757f591ac707446901da0308d1
   const router = useRouter();
 
   const [firstName, setFirstName] = useState<string>("");
@@ -93,26 +88,6 @@ const SignUpScreen: React.FC = () => {
     confirmPassword &&
     password === confirmPassword;
 
-<<<<<<< HEAD
-  const handleSignUp =async () => {
-    if (!isFormValid) return;
-    try {
-    const uid = await signUp(
-      firstName,
-      lastName,
-      email,
-      password,
-      university,
-      faculty,
-      phone
-    );
-    alert("Verification email sent! Check your inbox.");
-    router.push("/");
-  } catch (err: any) {
-    alert(err.message);
-  }
-};
-=======
   const handleSignUp = async () => {
     if (!isFormValid) {
       Alert.alert("Error", "Please fill all fields correctly.");
@@ -124,14 +99,12 @@ const SignUpScreen: React.FC = () => {
       await signUp(firstName, lastName, email, password, faculty, university, phone);
       Alert.alert("Success", "Account created successfully! Please verify your email.");
       router.push("/");
-
     } catch (err: any) {
       Alert.alert("Sign Up Failed", err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
->>>>>>> c81c6c914d91df757f591ac707446901da0308d1
 
   const filteredUniversities = universities.filter((uni) =>
     uni.toLowerCase().includes(university.toLowerCase())
