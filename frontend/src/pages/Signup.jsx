@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+// src/pages/Signup.jsx
+import React, { useState } from "react";
 import {
     Box,
     Button,
@@ -14,8 +15,9 @@ import {
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { signUp } from "../services/auth"; // ربط الصفحة بالخدمة
 
-/* BACKGROUND */
+/* ================= BACKGROUND ================= */
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
@@ -78,10 +80,12 @@ const SoftButton = styled(Button)({
     },
 });
 
+/* ================= SIGNUP COMPONENT ================= */
+
 export default function Signup() {
     const navigate = useNavigate();
 
-    /* STATES */
+    /* ================= STATES ================= */
 
     const [formData, setFormData] = useState({
         firstName: "",
@@ -98,9 +102,7 @@ export default function Signup() {
 
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState("");
-
-    const [otp, setOtp] = useState(new Array(6).fill(""));
-    const inputsRef = useRef([]);
+    const [successMessage, setSuccessMessage] = useState("");
 
     /*HANDLERS*/
 
@@ -111,7 +113,7 @@ export default function Signup() {
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (
             !formData.firstName ||
             !formData.lastName ||
@@ -127,32 +129,25 @@ export default function Signup() {
         }
 
         setError("");
-        setSubmitted(true);
-    };
 
-    /* OTP Logic */
+        try {
+            await signUp(
+                formData.firstName,
+                formData.lastName,
+                formData.email,
+                formData.phone, // لو عايز تضيف password خلي هنا
+                selectedFaculty === "Other" ? customFaculty : selectedFaculty,
+                selectedUniversity === "Other" ? customUniversity : selectedUniversity,
+                formData.phone
+            );
 
-    const handleOtpChange = (element, index) => {
-        if (isNaN(element.value)) return;
-
-        const newOtp = [...otp];
-        newOtp[index] = element.value;
-        setOtp(newOtp);
-
-        if (element.value && index < 5) {
-            inputsRef.current[index + 1].focus();
+            setSuccessMessage(
+                `Verification email sent to ${formData.email}. Please check your inbox.`
+            );
+            setSubmitted(true);
+        } catch (err) {
+            setError(err.message);
         }
-    };
-
-    const handleVerify = () => {
-        const code = otp.join("");
-        if (code.length < 6) {
-            alert("Please enter full verification code.");
-            return;
-        }
-
-        alert("Account Verified Successfully!");
-        navigate("/login");
     };
 
     /* UI */
@@ -163,7 +158,6 @@ export default function Signup() {
             <PageWrapper>
                 <BlurTop />
                 <BlurBottom />
-
                 <GlassCard>
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                         <img src={logo} alt="Logo" style={{ width: "200px" }} />
@@ -180,11 +174,7 @@ export default function Signup() {
                                 Create Account
                             </Typography>
 
-                            {error && (
-                                <Alert severity="error" sx={{ mb: 3 }}>
-                                    {error}
-                                </Alert>
-                            )}
+                            {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
                             <Box display="flex" flexDirection="column" gap={3}>
                                 <TextField
@@ -226,15 +216,9 @@ export default function Signup() {
                                             setSelectedFaculty("");
                                         }}
                                     >
-                                        <MenuItem value="Cairo University">
-                                            Cairo University
-                                        </MenuItem>
-                                        <MenuItem value="Ain Shams University">
-                                            Ain Shams University
-                                        </MenuItem>
-                                        <MenuItem value="Alexandria University">
-                                            Alexandria University
-                                        </MenuItem>
+                                        <MenuItem value="Cairo University">Cairo University</MenuItem>
+                                        <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
+                                        <MenuItem value="Alexandria University">Alexandria University</MenuItem>
                                         <MenuItem value="Other">Other</MenuItem>
                                     </Select>
                                 </FormControl>
@@ -244,28 +228,19 @@ export default function Signup() {
                                         label="Enter Your University"
                                         fullWidth
                                         value={customUniversity}
-                                        onChange={(e) =>
-                                            setCustomUniversity(e.target.value)
-                                        }
+                                        onChange={(e) => setCustomUniversity(e.target.value)}
                                     />
                                 )}
 
                                 {/* Faculty */}
-                                <FormControl
-                                    fullWidth
-                                    disabled={!selectedUniversity}
-                                >
+                                <FormControl fullWidth disabled={!selectedUniversity}>
                                     <InputLabel>Faculty</InputLabel>
                                     <Select
                                         value={selectedFaculty}
                                         label="Faculty"
-                                        onChange={(e) =>
-                                            setSelectedFaculty(e.target.value)
-                                        }
+                                        onChange={(e) => setSelectedFaculty(e.target.value)}
                                     >
-                                        <MenuItem value="Engineering">
-                                            Engineering
-                                        </MenuItem>
+                                        <MenuItem value="Engineering">Engineering</MenuItem>
                                         <MenuItem value="Medicine">Medicine</MenuItem>
                                         <MenuItem value="Commerce">Commerce</MenuItem>
                                         <MenuItem value="Other">Other</MenuItem>
@@ -277,9 +252,7 @@ export default function Signup() {
                                         label="Enter Your Faculty"
                                         fullWidth
                                         value={customFaculty}
-                                        onChange={(e) =>
-                                            setCustomFaculty(e.target.value)
-                                        }
+                                        onChange={(e) => setCustomFaculty(e.target.value)}
                                     />
                                 )}
 
@@ -291,48 +264,20 @@ export default function Signup() {
                     ) : (
                         <>
                             <Typography
-                                variant="h4"
+                                variant="h5"
                                 textAlign="center"
                                 fontWeight={600}
                                 mb={2}
                             >
-                                Verify Your Email
+                                Check Your Email
                             </Typography>
-
-                            <Alert severity="success" sx={{ mb: 3 }}>
-                                We sent a verification code to {formData.email}
-                            </Alert>
-
-                            <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                gap={1}
-                                mb={3}
-                            >
-                                {otp.map((data, index) => (
-                                    <TextField
-                                        key={index}
-                                        inputRef={(el) =>
-                                            (inputsRef.current[index] = el)
-                                        }
-                                        value={data}
-                                        onChange={(e) =>
-                                            handleOtpChange(e.target, index)
-                                        }
-                                        inputProps={{
-                                            maxLength: 1,
-                                            style: {
-                                                textAlign: "center",
-                                                fontSize: "20px",
-                                            },
-                                        }}
-                                        sx={{ width: "50px" }}
-                                    />
-                                ))}
-                            </Box>
-
-                            <SoftButton fullWidth onClick={handleVerify}>
-                                Verify Account
+                            {successMessage && (
+                                <Alert severity="success" sx={{ mb: 3 }}>
+                                    {successMessage}
+                                </Alert>
+                            )}
+                            <SoftButton fullWidth onClick={() => navigate("/login")}>
+                                Go to Login
                             </SoftButton>
                         </>
                     )}

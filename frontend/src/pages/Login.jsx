@@ -1,3 +1,4 @@
+// src/pages/Login.jsx
 import React, { useState } from "react";
 import {
     Box,
@@ -9,14 +10,16 @@ import {
     Typography,
     InputAdornment,
     IconButton,
+    Alert,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { login } from "../services/auth"; // ربط بالخدمة
 
-/*  BACKGROUND */
+/* ================= BACKGROUND ================= */
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
@@ -53,7 +56,7 @@ const BlurBottom = styled(Box)({
     opacity: 0.4,
 });
 
-/* CARD */
+/* ================= CARD ================= */
 
 const GlassCard = styled(Box)({
     width: "420px",
@@ -72,7 +75,7 @@ const GlassCard = styled(Box)({
     },
 });
 
-/* BUTTON */
+/* ================= BUTTON ================= */
 
 const SoftButton = styled(Button)({
     background: "linear-gradient(90deg, #7db7ff, #5da9ff)",
@@ -92,14 +95,34 @@ const SoftButton = styled(Button)({
     },
 });
 
-/* PAGE*/
+/* ================= PAGE ================= */
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
     const navigate = useNavigate();
 
     const handleTogglePassword = () => {
         setShowPassword((prev) => !prev);
+    };
+
+    const handleLogin = async () => {
+        setError("");
+        if (!email || !password) {
+            setError("Please enter both email and password.");
+            return;
+        }
+
+        try {
+            await login(email, password);
+            alert("Login successful!");
+            navigate("/"); // تعديل حسب الصفحة الرئيسية
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     return (
@@ -133,12 +156,16 @@ export default function Login() {
                         Sign In
                     </Typography>
 
+                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
                     <Box display="flex" flexDirection="column" gap={3}>
                         <TextField
                             label="Email"
                             placeholder="youremail@example.com"
                             fullWidth
                             variant="outlined"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
 
                         <TextField
@@ -147,33 +174,21 @@ export default function Login() {
                             placeholder="*******"
                             fullWidth
                             variant="outlined"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={handleTogglePassword}
-                                            edge="end"
-                                        >
-                                            {showPassword ? (
-                                                <VisibilityOff />
-                                            ) : (
-                                                <Visibility />
-                                            )}
+                                        <IconButton onClick={handleTogglePassword} edge="end">
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
                                         </IconButton>
                                     </InputAdornment>
                                 ),
                             }}
                         />
 
-                        <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                        >
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label="Remember me"
-                            />
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <FormControlLabel control={<Checkbox />} label="Remember me" />
 
                             <Typography
                                 sx={{
@@ -188,7 +203,7 @@ export default function Login() {
                             </Typography>
                         </Box>
 
-                        <SoftButton fullWidth>
+                        <SoftButton fullWidth onClick={handleLogin}>
                             Sign In
                         </SoftButton>
 
