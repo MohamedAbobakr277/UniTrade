@@ -8,7 +8,6 @@ import {
   Image,
   StatusBar,
   ScrollView,
-  FlatList,
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
@@ -74,7 +73,8 @@ const SignUpScreen: React.FC = () => {
     "Mass Communication",
   ];
 
-  const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.edu\.eg$/;
 
   const isFormValid =
     firstName &&
@@ -90,7 +90,7 @@ const SignUpScreen: React.FC = () => {
 
   const handleSignUp = async () => {
     if (!isFormValid) {
-      Alert.alert("Error", "Please fill all fields correctly.");
+      Alert.alert("Error", "Please use your university email (.edu.eg) and fill all fields.");
       return;
     }
 
@@ -116,7 +116,10 @@ const SignUpScreen: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
         <Image
@@ -155,7 +158,7 @@ const SignUpScreen: React.FC = () => {
         <View style={styles.inputBox}>
           <Feather name="mail" size={18} color="#396cda" />
           <TextInput
-            placeholder="Email"
+            placeholder="University Email (e.g. name@cu.edu.eg)"
             value={email}
             onChangeText={setEmail}
             placeholderTextColor="#9CA3AF"
@@ -164,6 +167,11 @@ const SignUpScreen: React.FC = () => {
             autoCapitalize="none"
           />
         </View>
+        {email.length > 0 && !emailRegex.test(email) && (
+          <Text style={{ color: "red", fontSize: 12, marginBottom: 10, marginLeft: 10 }}>
+            Email must end with .edu.eg
+          </Text>
+        )}
 
         {/* University */}
         <View style={[styles.inputBox, { flexDirection: "row", alignItems: "center" }]}>
@@ -197,24 +205,24 @@ const SignUpScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
+        {/* scrollable list of universities */}
         {showUniversityList && filteredUniversities.length > 0 && (
-          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8 }}>
-            <FlatList
-              data={filteredUniversities}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
+          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 10 }}>
+            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+              {filteredUniversities.map((item) => (
                 <TouchableOpacity
+                  key={item}
                   onPress={() => {
                     setUniversity(item);
                     setShowUniversityList(false);
+                    Keyboard.dismiss();
                   }}
                   style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}
                 >
                   <Text style={{ fontSize: 16 }}>{item}</Text>
                 </TouchableOpacity>
-              )}
-              nestedScrollEnabled
-            />
+              ))}
+            </ScrollView>
           </View>
         )}
 
@@ -250,24 +258,24 @@ const SignUpScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
+        {/* scrollable list of faculties */}
         {showFacultyList && filteredFaculties.length > 0 && (
-          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8 }}>
-            <FlatList
-              data={filteredFaculties}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
+          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 10 }}>
+            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+              {filteredFaculties.map((item) => (
                 <TouchableOpacity
+                  key={item}
                   onPress={() => {
                     setFaculty(item);
                     setShowFacultyList(false);
+                    Keyboard.dismiss();
                   }}
                   style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}
                 >
                   <Text style={{ fontSize: 16 }}>{item}</Text>
                 </TouchableOpacity>
-              )}
-              nestedScrollEnabled
-            />
+              ))}
+            </ScrollView>
           </View>
         )}
 
@@ -334,7 +342,9 @@ const SignUpScreen: React.FC = () => {
             colors={["#3B82F6", "#2563EB"]}
             style={styles.buttonGradient}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}>
+              {loading ? "Creating Account..." : "Sign Up"}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
 
