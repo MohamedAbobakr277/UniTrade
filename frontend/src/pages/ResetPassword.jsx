@@ -11,7 +11,7 @@ import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
-/* ================= BACKGROUND ================= */
+/*BACKGROUND*/
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
@@ -74,7 +74,7 @@ const SoftButton = styled(Button)({
     },
 });
 
-/* ================= PAGE ================= */
+/*PAGE*/
 
 export default function ResetPassword() {
     const navigate = useNavigate();

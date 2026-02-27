@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
-/* ================= BACKGROUND ================= */
+/* BACKGROUND */
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
@@ -81,7 +81,7 @@ const SoftButton = styled(Button)({
 export default function Signup() {
     const navigate = useNavigate();
 
-    /* ================= STATES ================= */
+    /* STATES */
 
     const [formData, setFormData] = useState({
         firstName: "",
@@ -102,7 +102,7 @@ export default function Signup() {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const inputsRef = useRef([]);
 
-    /* ================= HANDLERS ================= */
+    /*HANDLERS*/
 
     const handleChange = (e) => {
         setFormData({
@@ -155,7 +155,7 @@ export default function Signup() {
         navigate("/login");
     };
 
-    /* ================= UI ================= */
+    /* UI */
 
     return (
         <>

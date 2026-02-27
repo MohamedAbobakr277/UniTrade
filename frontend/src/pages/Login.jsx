@@ -16,7 +16,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
-/* ================= BACKGROUND ================= */
+/*  BACKGROUND */
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
@@ -53,7 +53,7 @@ const BlurBottom = styled(Box)({
     opacity: 0.4,
 });
 
-/* ================= CARD ================= */
+/* CARD */
 
 const GlassCard = styled(Box)({
     width: "420px",
@@ -72,7 +72,7 @@ const GlassCard = styled(Box)({
     },
 });
 
-/* ================= BUTTON ================= */
+/* BUTTON */
 
 const SoftButton = styled(Button)({
     background: "linear-gradient(90deg, #7db7ff, #5da9ff)",
@@ -92,7 +92,7 @@ const SoftButton = styled(Button)({
     },
 });
 
-/* ================= PAGE ================= */
+/* PAGE*/
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
