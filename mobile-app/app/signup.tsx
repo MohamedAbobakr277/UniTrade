@@ -75,8 +75,8 @@ const SignUpScreen: React.FC = () => {
 
   const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.edu\.eg$/;
 
-  // ✅ Phone validation (Egyptian numbers)
-  const phoneRegex: RegExp = /^01[0-9]{9}$/;
+  //  Phone validation
+ const phoneRegex: RegExp = /^(010|011|012|015)[0-9]{8}$/;
 
   const isFormValid =
     firstName &&
