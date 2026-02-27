@@ -14,10 +14,11 @@ export default function ForgotPassword() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleNext = () => {
-    if (!email) {
-      setError("Please enter your email");
+    if (!email||!emailRegex.test(email)) {
+      setError("Please enter a valid email");
       return;
     }
     router.push({ pathname: "/reset-password", params: { email } });

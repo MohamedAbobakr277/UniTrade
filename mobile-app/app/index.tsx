@@ -17,6 +17,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   return (
     <View style={styles.container}>
@@ -36,6 +37,7 @@ export default function LoginScreen() {
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
+           keyboardType="email-address"
           placeholderTextColor="#9CA3AF"
           style={styles.input}
         />
@@ -70,12 +72,17 @@ export default function LoginScreen() {
           { opacity: email && password ? 1 : 0.6 },
         ]}
         disabled={!email || !password}
+
       >
         <LinearGradient
           colors={["#3B82F6", "#2563EB"]}
           style={styles.buttonGradient}
         >
-          <Text style={styles.buttonText}>Log In</Text>
+          {emailRegex.test(email) ? (
+            <Text style={styles.buttonText}>Log In</Text>
+          ) : (
+            <Text style={styles.buttonText}>Invalid Email</Text>
+          )}
         </LinearGradient>
 
         <Text style={styles.signup}>
