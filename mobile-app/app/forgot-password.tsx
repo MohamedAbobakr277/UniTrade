@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StatusBar,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -27,6 +28,12 @@ export default function ForgotPassword() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
+
+
+      <Image
+        source={require("../assets/images/logo.png")}
+        style={styles.logo}
+      />
 
       <Text style={styles.title}>Reset Password</Text>
 

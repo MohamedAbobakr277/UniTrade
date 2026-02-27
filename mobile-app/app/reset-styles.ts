@@ -57,4 +57,10 @@ export default StyleSheet.create({
     fontWeight: "700",
     fontSize: 20,
   },
+  logo: {
+    width: 140,
+    height: 140,
+    alignSelf: "center",
+    marginBottom: 25,
+  },
 });
