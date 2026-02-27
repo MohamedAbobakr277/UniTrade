@@ -11,59 +11,34 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    InputAdornment,
+    IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "../assets/logo.png";
-import { signUp } from "../services/auth"; // ربط الصفحة بالخدمة
+import { signUp } from "../services/auth";
 
-/* ================= BACKGROUND ================= */
+/* ================= STYLES ================= */
 
 const PageWrapper = styled(Box)({
     minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
     background:
         "linear-gradient(135deg, #e0ecff 0%, #c8dcff 40%, #b7d1ff 100%)",
 });
 
-const BlurTop = styled(Box)({
-    position: "absolute",
-    top: "-150px",
-    right: "-150px",
-    width: "400px",
-    height: "400px",
-    background: "#9ec5ff",
-    borderRadius: "50%",
-    filter: "blur(120px)",
-    opacity: 0.4,
-});
-
-const BlurBottom = styled(Box)({
-    position: "absolute",
-    bottom: "-150px",
-    left: "-150px",
-    width: "400px",
-    height: "400px",
-    background: "#b7d1ff",
-    borderRadius: "50%",
-    filter: "blur(120px)",
-    opacity: 0.4,
-});
-
 const GlassCard = styled(Box)({
-    width: "420px",
+    width: "450px",
     padding: "45px 40px",
     borderRadius: "24px",
     backdropFilter: "blur(20px)",
     background: "rgba(255,255,255,0.75)",
     boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
-    border: "1px solid rgba(255,255,255,0.4)",
-    position: "relative",
-    zIndex: 2,
 });
 
 const SoftButton = styled(Button)({
@@ -74,37 +49,35 @@ const SoftButton = styled(Button)({
     fontWeight: 600,
     textTransform: "none",
     fontSize: "16px",
-    boxShadow: "0 10px 20px rgba(93,169,255,0.3)",
     "&:hover": {
         background: "linear-gradient(90deg, #5da9ff, #3f95ff)",
     },
 });
 
-/* ================= SIGNUP COMPONENT ================= */
+/* ================= COMPONENT ================= */
 
 export default function Signup() {
     const navigate = useNavigate();
-
-    /* ================= STATES ================= */
 
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
         email: "",
         phone: "",
+        password: "",
+        confirmPassword: "",
     });
 
     const [selectedUniversity, setSelectedUniversity] = useState("");
     const [selectedFaculty, setSelectedFaculty] = useState("");
-
     const [customUniversity, setCustomUniversity] = useState("");
     const [customFaculty, setCustomFaculty] = useState("");
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-
-    /*HANDLERS*/
 
     const handleChange = (e) => {
         setFormData({
@@ -119,12 +92,19 @@ export default function Signup() {
             !formData.lastName ||
             !formData.email ||
             !formData.phone ||
+            !formData.password ||
+            !formData.confirmPassword ||
             !selectedUniversity ||
             !selectedFaculty ||
             (selectedUniversity === "Other" && !customUniversity) ||
             (selectedFaculty === "Other" && !customFaculty)
         ) {
             setError("Please fill all required fields.");
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match.");
             return;
         }
 
@@ -135,29 +115,24 @@ export default function Signup() {
                 formData.firstName,
                 formData.lastName,
                 formData.email,
-                formData.phone, // لو عايز تضيف password خلي هنا
+                formData.password,
                 selectedFaculty === "Other" ? customFaculty : selectedFaculty,
-                selectedUniversity === "Other" ? customUniversity : selectedUniversity,
+                selectedUniversity === "Other"
+                    ? customUniversity
+                    : selectedUniversity,
                 formData.phone
             );
 
-            setSuccessMessage(
-                `Verification email sent to ${formData.email}. Please check your inbox.`
-            );
             setSubmitted(true);
         } catch (err) {
             setError(err.message);
         }
     };
 
-    /* UI */
-
     return (
         <>
             <CssBaseline />
             <PageWrapper>
-                <BlurTop />
-                <BlurBottom />
                 <GlassCard>
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                         <img src={logo} alt="Logo" style={{ width: "200px" }} />
@@ -165,16 +140,15 @@ export default function Signup() {
 
                     {!submitted ? (
                         <>
-                            <Typography
-                                variant="h4"
-                                textAlign="center"
-                                fontWeight={600}
-                                mb={4}
-                            >
+                            <Typography variant="h4" textAlign="center" mb={4}>
                                 Create Account
                             </Typography>
 
-                            {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+                            {error && (
+                                <Alert severity="error" sx={{ mb: 2 }}>
+                                    {error}
+                                </Alert>
+                            )}
 
                             <Box display="flex" flexDirection="column" gap={3}>
                                 <TextField
@@ -216,9 +190,15 @@ export default function Signup() {
                                             setSelectedFaculty("");
                                         }}
                                     >
-                                        <MenuItem value="Cairo University">Cairo University</MenuItem>
-                                        <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
-                                        <MenuItem value="Alexandria University">Alexandria University</MenuItem>
+                                        <MenuItem value="Cairo University">
+                                            Cairo University
+                                        </MenuItem>
+                                        <MenuItem value="Ain Shams University">
+                                            Ain Shams University
+                                        </MenuItem>
+                                        <MenuItem value="Alexandria University">
+                                            Alexandria University
+                                        </MenuItem>
                                         <MenuItem value="Other">Other</MenuItem>
                                     </Select>
                                 </FormControl>
@@ -226,9 +206,9 @@ export default function Signup() {
                                 {selectedUniversity === "Other" && (
                                     <TextField
                                         label="Enter Your University"
-                                        fullWidth
                                         value={customUniversity}
                                         onChange={(e) => setCustomUniversity(e.target.value)}
+                                        fullWidth
                                     />
                                 )}
 
@@ -250,11 +230,57 @@ export default function Signup() {
                                 {selectedFaculty === "Other" && (
                                     <TextField
                                         label="Enter Your Faculty"
-                                        fullWidth
                                         value={customFaculty}
                                         onChange={(e) => setCustomFaculty(e.target.value)}
+                                        fullWidth
                                     />
                                 )}
+
+                                {/* Password */}
+                                <TextField
+                                    label="Password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+
+                                {/* Confirm Password */}
+                                <TextField
+                                    label="Confirm Password"
+                                    name="confirmPassword"
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={() =>
+                                                        setShowConfirmPassword(!showConfirmPassword)
+                                                    }
+                                                >
+                                                    {showConfirmPassword ? (
+                                                        <VisibilityOff />
+                                                    ) : (
+                                                        <Visibility />
+                                                    )}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
 
                                 <SoftButton fullWidth onClick={handleSubmit}>
                                     Sign Up
@@ -263,19 +289,27 @@ export default function Signup() {
                         </>
                     ) : (
                         <>
-                            <Typography
-                                variant="h5"
-                                textAlign="center"
-                                fontWeight={600}
-                                mb={2}
-                            >
-                                Check Your Email
+                            <Typography variant="h5" textAlign="center" mb={2}>
+                                Verify Your Email
                             </Typography>
-                            {successMessage && (
-                                <Alert severity="success" sx={{ mb: 3 }}>
-                                    {successMessage}
-                                </Alert>
-                            )}
+
+                            <Alert severity="success" sx={{ mb: 3 }}>
+                                We have sent a verification link to{" "}
+                                <strong>{formData.email}</strong>.
+                                <br />
+                                Please check your inbox and click the link to activate your
+                                account.
+                            </Alert>
+
+                            <Typography
+                                variant="body2"
+                                textAlign="center"
+                                color="text.secondary"
+                                mb={3}
+                            >
+                                If you don’t see the email, check your spam folder.
+                            </Typography>
+
                             <SoftButton fullWidth onClick={() => navigate("/login")}>
                                 Go to Login
                             </SoftButton>
