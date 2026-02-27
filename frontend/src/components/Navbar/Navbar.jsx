@@ -12,7 +12,6 @@ const Navbar = () => {
                 <li>mobile app</li>
                 <li>contact us</li>
                 <li>test</li>
-
             </ul>
             <dev className="navbar-right">
                 <img src={assets.search_icon} alt="" />
