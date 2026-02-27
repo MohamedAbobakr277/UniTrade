@@ -73,8 +73,10 @@ const SignUpScreen: React.FC = () => {
     "Mass Communication",
   ];
 
-
   const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.edu\.eg$/;
+
+  // ✅ Phone validation (Egyptian numbers)
+  const phoneRegex: RegExp = /^01[0-9]{9}$/;
 
   const isFormValid =
     firstName &&
@@ -84,20 +86,35 @@ const SignUpScreen: React.FC = () => {
     university &&
     faculty &&
     phone &&
+    phoneRegex.test(phone) &&
     password &&
     confirmPassword &&
     password === confirmPassword;
 
   const handleSignUp = async () => {
     if (!isFormValid) {
-      Alert.alert("Error", "Please use your university email (.edu.eg) and fill all fields.");
+      Alert.alert(
+        "Error",
+        "Please fill all fields correctly.\nUse university email (.edu.eg)\nPhone must be 11 digits and start with 01."
+      );
       return;
     }
 
     setLoading(true);
     try {
-      await signUp(firstName, lastName, email, password, faculty, university, phone);
-      Alert.alert("Success", "Account created successfully! Please verify your email.");
+      await signUp(
+        firstName,
+        lastName,
+        email,
+        password,
+        faculty,
+        university,
+        phone
+      );
+      Alert.alert(
+        "Success",
+        "Account created successfully! Please verify your email."
+      );
       router.push("/");
     } catch (err: any) {
       Alert.alert("Sign Up Failed", err.message || "Something went wrong.");
@@ -116,7 +133,7 @@ const SignUpScreen: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
@@ -167,6 +184,7 @@ const SignUpScreen: React.FC = () => {
             autoCapitalize="none"
           />
         </View>
+
         {email.length > 0 && !emailRegex.test(email) && (
           <Text style={{ color: "red", fontSize: 12, marginBottom: 10, marginLeft: 10 }}>
             Email must end with .edu.eg
@@ -174,110 +192,28 @@ const SignUpScreen: React.FC = () => {
         )}
 
         {/* University */}
-        <View style={[styles.inputBox, { flexDirection: "row", alignItems: "center" }]}>
+        <View style={styles.inputBox}>
           <Feather name="book" size={18} color="#396cda" />
           <TextInput
             placeholder="University"
             value={university}
-            onChangeText={(text) => {
-              setUniversity(text);
-              setShowUniversityList(true);
-            }}
+            onChangeText={setUniversity}
             placeholderTextColor="#9CA3AF"
-            style={[styles.input, { flex: 1 }]}
+            style={styles.input}
           />
-          <TouchableOpacity
-            onPress={() => setShowUniversityList(!showUniversityList)}
-            style={{
-              marginLeft: 5,
-              backgroundColor: "#e0e0e0",
-              padding: 6,
-              borderRadius: 20,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Feather
-              name={showUniversityList ? "chevron-up" : "chevron-down"}
-              size={20}
-              color="#396cda"
-            />
-          </TouchableOpacity>
         </View>
 
-        {/* scrollable list of universities */}
-        {showUniversityList && filteredUniversities.length > 0 && (
-          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 10 }}>
-            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
-              {filteredUniversities.map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  onPress={() => {
-                    setUniversity(item);
-                    setShowUniversityList(false);
-                    Keyboard.dismiss();
-                  }}
-                  style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}
-                >
-                  <Text style={{ fontSize: 16 }}>{item}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-
         {/* Faculty */}
-        <View style={[styles.inputBox, { flexDirection: "row", alignItems: "center" }]}>
+        <View style={styles.inputBox}>
           <Feather name="briefcase" size={18} color="#396cda" />
           <TextInput
             placeholder="Faculty"
             value={faculty}
-            onChangeText={(text) => {
-              setFaculty(text);
-              setShowFacultyList(true);
-            }}
+            onChangeText={setFaculty}
             placeholderTextColor="#9CA3AF"
-            style={[styles.input, { flex: 1 }]}
+            style={styles.input}
           />
-          <TouchableOpacity
-            onPress={() => setShowFacultyList(!showFacultyList)}
-            style={{
-              marginLeft: 5,
-              backgroundColor: "#e0e0e0",
-              padding: 6,
-              borderRadius: 20,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Feather
-              name={showFacultyList ? "chevron-up" : "chevron-down"}
-              size={20}
-              color="#396cda"
-            />
-          </TouchableOpacity>
         </View>
-
-        {/* scrollable list of faculties */}
-        {showFacultyList && filteredFaculties.length > 0 && (
-          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8, marginBottom: 10 }}>
-            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
-              {filteredFaculties.map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  onPress={() => {
-                    setFaculty(item);
-                    setShowFacultyList(false);
-                    Keyboard.dismiss();
-                  }}
-                  style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}
-                >
-                  <Text style={{ fontSize: 16 }}>{item}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
 
         {/* Phone */}
         <View style={styles.inputBox}>
@@ -285,12 +221,22 @@ const SignUpScreen: React.FC = () => {
           <TextInput
             placeholder="Phone Number"
             value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
+            onChangeText={(text) => {
+              const cleaned = text.replace(/[^0-9]/g, "");
+              setPhone(cleaned);
+            }}
+            keyboardType="number-pad"
+            maxLength={11}
             placeholderTextColor="#9CA3AF"
             style={styles.input}
           />
         </View>
+
+        {phone.length > 0 && !phoneRegex.test(phone) && (
+          <Text style={{ color: "red", fontSize: 12, marginBottom: 10, marginLeft: 10 }}>
+            Phone must be 11 digits and start with 01
+          </Text>
+        )}
 
         {/* Password */}
         <View style={styles.inputBox}>
@@ -299,8 +245,8 @@ const SignUpScreen: React.FC = () => {
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            placeholderTextColor="#9CA3AF"
             secureTextEntry={!showPassword}
+            placeholderTextColor="#9CA3AF"
             style={styles.input}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -319,8 +265,8 @@ const SignUpScreen: React.FC = () => {
             placeholder="Confirm Password"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            placeholderTextColor="#9CA3AF"
             secureTextEntry={!showConfirm}
+            placeholderTextColor="#9CA3AF"
             style={styles.input}
           />
           <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
