@@ -1,3 +1,4 @@
+// mobile-app/app/login.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -6,18 +7,47 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./styles";
 
-export default function LoginScreen() {
+// Import auth service from local services
+import { login } from "./services/auth";
+
+const LoginScreen: React.FC = () => {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password.");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Invalid email format.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(email, password); // تستدعي auth.js الموجود جوا services
+      Alert.alert("Success", "Login successful!");
+      router.push("/"); // تعديل حسب الصفحة الرئيسية
+    } catch (err: any) {
+      Alert.alert("Login Failed", err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -37,7 +67,7 @@ export default function LoginScreen() {
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
-           keyboardType="email-address"
+          keyboardType="email-address"
           placeholderTextColor="#9CA3AF"
           style={styles.input}
         />
@@ -67,34 +97,29 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          { opacity: email && password ? 1 : 0.6 },
-        ]}
-        disabled={!email || !password}
-
+        style={[styles.button, { opacity: email && password ? 1 : 0.6 }]}
+        disabled={!email || !password || loading}
+        onPress={handleLogin}
       >
         <LinearGradient
           colors={["#3B82F6", "#2563EB"]}
           style={styles.buttonGradient}
         >
-          {emailRegex.test(email) ? (
-            <Text style={styles.buttonText}>Log In</Text>
-          ) : (
-            <Text style={styles.buttonText}>Invalid Email</Text>
-          )}
+          <Text style={styles.buttonText}>Log In</Text>
         </LinearGradient>
-
-        <Text style={styles.signup}>
-       Don’t have an account?{" "}
-     <Text
-    style={{ color: "#2563EB", fontWeight: "600" }}
-    onPress={() => router.push("/signup")}
-     >
-    Sign Up
-  </Text>
-  </Text>
       </TouchableOpacity>
+
+      <Text style={styles.signup}>
+        Don’t have an account?{" "}
+        <Text
+          style={{ color: "#2563EB", fontWeight: "600" }}
+          onPress={() => router.push("/signup")}
+        >
+          Sign Up
+        </Text>
+      </Text>
     </View>
   );
-}
+};
+
+export default LoginScreen;

@@ -1,3 +1,4 @@
+// mobile-app/app/signup.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -10,28 +11,33 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./styles2";
 
-export default function SignUpScreen() {
+// Import auth service
+import { signUp } from "./services/auth";
+
+const SignUpScreen: React.FC = () => {
   const router = useRouter();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [university, setUniversity] = useState("");
-  const [faculty, setFaculty] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [university, setUniversity] = useState<string>("");
+  const [faculty, setFaculty] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [showUniversityList, setShowUniversityList] = useState(false);
-  const [showFacultyList, setShowFacultyList] = useState(false);
+  const [showUniversityList, setShowUniversityList] = useState<boolean>(false);
+  const [showFacultyList, setShowFacultyList] = useState<boolean>(false);
 
   const universities = [
     "Cairo University",
@@ -68,7 +74,7 @@ export default function SignUpScreen() {
     "Mass Communication",
   ];
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const isFormValid =
     firstName &&
@@ -82,9 +88,23 @@ export default function SignUpScreen() {
     confirmPassword &&
     password === confirmPassword;
 
-  const handleSignUp = () => {
-    if (!isFormValid) return;
-    alert("Account created successfully!");
+  const handleSignUp = async () => {
+    if (!isFormValid) {
+      Alert.alert("Error", "Please fill all fields correctly.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await signUp(firstName, lastName, email, password, faculty, university, phone);
+      Alert.alert("Success", "Account created successfully! Please verify your email.");
+      router.push("/");
+
+    } catch (err: any) {
+      Alert.alert("Sign Up Failed", err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredUniversities = universities.filter((uni) =>
@@ -168,11 +188,6 @@ export default function SignUpScreen() {
               borderRadius: 20,
               justifyContent: "center",
               alignItems: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.2,
-              shadowRadius: 1.5,
-              elevation: 2,
             }}
           >
             <Feather
@@ -182,22 +197,9 @@ export default function SignUpScreen() {
             />
           </TouchableOpacity>
         </View>
+
         {showUniversityList && filteredUniversities.length > 0 && (
-          <View
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: 8,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-              maxHeight: 200,
-              marginBottom: 10,
-              borderWidth: 1,
-              borderColor: "#ddd",
-            }}
-          >
+          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8 }}>
             <FlatList
               data={filteredUniversities}
               keyExtractor={(item) => item}
@@ -207,18 +209,12 @@ export default function SignUpScreen() {
                     setUniversity(item);
                     setShowUniversityList(false);
                   }}
-                  activeOpacity={0.6}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 15,
-                    borderBottomWidth: 1,
-                    borderBottomColor: "#f0f0f0",
-                  }}
+                  style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}
                 >
-                  <Text style={{ fontSize: 16, color: "#333" }}>{item}</Text>
+                  <Text style={{ fontSize: 16 }}>{item}</Text>
                 </TouchableOpacity>
               )}
-              nestedScrollEnabled={true}
+              nestedScrollEnabled
             />
           </View>
         )}
@@ -245,11 +241,6 @@ export default function SignUpScreen() {
               borderRadius: 20,
               justifyContent: "center",
               alignItems: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.2,
-              shadowRadius: 1.5,
-              elevation: 2,
             }}
           >
             <Feather
@@ -259,22 +250,9 @@ export default function SignUpScreen() {
             />
           </TouchableOpacity>
         </View>
+
         {showFacultyList && filteredFaculties.length > 0 && (
-          <View
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: 8,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-              maxHeight: 200,
-              marginBottom: 10,
-              borderWidth: 1,
-              borderColor: "#ddd",
-            }}
-          >
+          <View style={{ backgroundColor: "#fff", maxHeight: 200, borderWidth: 1, borderColor: "#ddd", borderRadius: 8 }}>
             <FlatList
               data={filteredFaculties}
               keyExtractor={(item) => item}
@@ -284,18 +262,12 @@ export default function SignUpScreen() {
                     setFaculty(item);
                     setShowFacultyList(false);
                   }}
-                  activeOpacity={0.6}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 15,
-                    borderBottomWidth: 1,
-                    borderBottomColor: "#f0f0f0",
-                  }}
+                  style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}
                 >
-                  <Text style={{ fontSize: 16, color: "#333" }}>{item}</Text>
+                  <Text style={{ fontSize: 16 }}>{item}</Text>
                 </TouchableOpacity>
               )}
-              nestedScrollEnabled={true}
+              nestedScrollEnabled
             />
           </View>
         )}
@@ -353,10 +325,10 @@ export default function SignUpScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Button */}
+        {/* Sign Up Button */}
         <TouchableOpacity
           style={[styles.button, { opacity: isFormValid ? 1 : 0.6 }]}
-          disabled={!isFormValid}
+          disabled={!isFormValid || loading}
           onPress={handleSignUp}
         >
           <LinearGradient
@@ -379,4 +351,6 @@ export default function SignUpScreen() {
       </ScrollView>
     </TouchableWithoutFeedback>
   );
-}
+};
+
+export default SignUpScreen;
