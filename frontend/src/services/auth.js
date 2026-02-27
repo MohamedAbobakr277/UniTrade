@@ -6,10 +6,13 @@ import {
     sendEmailVerification,
     sendPasswordResetEmail,
     confirmPasswordReset,
-    signOut
+    signOut,
 } from "firebase/auth";
 
 import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+
+/* ================= DYNAMIC BASE URL ================= */
+const baseUrl = window.location.origin; // URL ديناميكي حسب البيئة
 
 /* ================= SIGN UP ================= */
 export async function signUp(firstName, lastName, email, password, faculty, university, phoneNumber) {
@@ -22,8 +25,8 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
         const user = userCredential.user;
 
         const actionCodeSettings = {
-            url: "http://localhost:5177/login",
-            handleCodeInApp: true
+            url: `${baseUrl}/login`,
+            handleCodeInApp: true,
         };
 
         await sendEmailVerification(user, actionCodeSettings);
@@ -35,7 +38,7 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
             faculty,
             university,
             phoneNumber,
-            createdAt: new Date()
+            createdAt: new Date(),
         });
 
     } catch (error) {
@@ -84,7 +87,7 @@ export async function login(email, password) {
             await setDoc(userRef, {
                 ...pendingData,
                 role: "student",
-                createdAt: new Date()
+                createdAt: new Date(),
             });
 
             await deleteDoc(pendingRef);
@@ -117,13 +120,14 @@ export async function login(email, password) {
 /* ================= FORGOT PASSWORD ================= */
 export async function forgotPassword(email) {
     try {
-        // لا نعمل query على Firestore، نرسل reset email لأي إيميل
         const actionCodeSettings = {
-            url: "http://localhost:5177/reset-password",
-            handleCodeInApp: true
+            url: `${baseUrl}/reset-password`,
+            handleCodeInApp: true,
         };
+
         await sendPasswordResetEmail(auth, email, actionCodeSettings);
         console.log("Password reset email sent.");
+
     } catch (error) {
         console.error("FORGOT PASSWORD ERROR:", error);
 
