@@ -68,6 +68,7 @@ export default function Signup() {
         confirmPassword: "",
     });
 
+
     const [selectedUniversity, setSelectedUniversity] = useState("");
     const [selectedFaculty, setSelectedFaculty] = useState("");
     const [customUniversity, setCustomUniversity] = useState("");
@@ -78,6 +79,8 @@ export default function Signup() {
 
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState("");
+
+    const phoneRegex = /^(010|011|012|015)[0-9]{8}$/;
 
     const handleChange = (e) => {
         setFormData({
@@ -97,7 +100,7 @@ export default function Signup() {
             !selectedUniversity ||
             !selectedFaculty ||
             (selectedUniversity === "Other" && !customUniversity) ||
-            (selectedFaculty === "Other" && !customFaculty)
+            (selectedFaculty === "Other" && !customFaculty)            
         ) {
             setError("Please fill all required fields.");
             return;
@@ -105,6 +108,11 @@ export default function Signup() {
 
         if (formData.password !== formData.confirmPassword) {
             setError("Passwords do not match.");
+            return;
+        }
+
+        if (!phoneRegex.test(formData.phone)) {
+            setError("Please enter a valid phone number.");
             return;
         }
 
