@@ -1,4 +1,4 @@
-// src/services/authService.js
+// src/services/auth.js
 import { auth, db } from "../firebase";
 import {
     createUserWithEmailAndPassword,
@@ -9,7 +9,16 @@ import {
     signOut
 } from "firebase/auth";
 
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import {
+    doc,
+    setDoc,
+    getDoc,
+    deleteDoc,
+    query,
+    collection,
+    where,
+    getDocs
+} from "firebase/firestore";
 
 /* ================= SIGN UP ================= */
 export async function signUp(firstName, lastName, email, password, faculty, university, phoneNumber) {
@@ -21,16 +30,13 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // إعداد رابط التحقق من الإيميل
         const actionCodeSettings = {
-            url: "http://localhost:5177/login", // غيّره للرابط الرسمي في الإنتاج
+            url: "http://localhost:5177/login",
             handleCodeInApp: true
         };
 
-        // إرسال رسالة التحقق على الإيميل
         await sendEmailVerification(user, actionCodeSettings);
 
-        // حفظ بيانات المستخدم في pendingUsers
         await setDoc(doc(db, "pendingUsers", user.uid), {
             firstName,
             lastName,
@@ -41,10 +47,25 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
             createdAt: new Date()
         });
 
-        console.log("Verification email sent. User stored in pendingUsers.");
     } catch (error) {
-        console.error("Sign Up Error:", error.message);
-        throw error;
+        console.error("SIGNUP ERROR:", error);
+
+        if (error.code) {
+            switch (error.code) {
+                case "auth/email-already-in-use":
+                    throw new Error("This email is already registered.");
+                case "auth/invalid-email":
+                    throw new Error("The email address is not valid.");
+                case "auth/weak-password":
+                    throw new Error("Password should be at least 6 characters.");
+            }
+        }
+
+        if (error.message) {
+            throw new Error(error.message);
+        }
+
+        throw new Error("Sign up failed. Please try again.");
     }
 }
 
@@ -54,12 +75,10 @@ export async function login(email, password) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // التحقق من Email Verified
         if (!user.emailVerified) {
-            throw new Error("Please verify your email first.");
+            throw new Error("Please verify your email before logging in.");
         }
 
-        // التحقق من وجود بيانات المستخدم في users
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
@@ -68,12 +87,11 @@ export async function login(email, password) {
             const pendingSnap = await getDoc(pendingRef);
 
             if (!pendingSnap.exists()) {
-                throw new Error("User data not found in pendingUsers.");
+                throw new Error("No account exists with this email. Please sign up first.");
             }
 
             const pendingData = pendingSnap.data();
 
-            // نقل المستخدم من pendingUsers → users
             await setDoc(userRef, {
                 ...pendingData,
                 role: "student",
@@ -81,29 +99,71 @@ export async function login(email, password) {
             });
 
             await deleteDoc(pendingRef);
-            console.log("User moved from pendingUsers → users");
         }
 
-        console.log("Login successful");
         return user.uid;
+
     } catch (error) {
-        console.error("Login Error:", error.message);
-        throw error;
+        console.error("LOGIN ERROR:", error);
+
+        if (error.code) {
+            switch (error.code) {
+                case "auth/invalid-email":
+                    throw new Error("The email address is not valid.");
+                case "auth/user-not-found":
+                    throw new Error("No account found with this email.");
+                case "auth/wrong-password":
+                    throw new Error("Incorrect password. Please try again.");
+                case "auth/too-many-requests":
+                    throw new Error("Too many attempts. Please try again later.");
+                case "auth/invalid-credential":
+                    throw new Error("Invalid email or password.");
+            }
+        }
+
+        if (error.message) {
+            throw new Error(error.message);
+        }
+
+        throw new Error("Something went wrong. Please try again.");
     }
 }
 
 /* ================= FORGOT PASSWORD ================= */
 export async function forgotPassword(email) {
     try {
+        const usersCollection = collection(db, "users");
+        const q = query(usersCollection, where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            throw new Error("No account exists with this email.");
+        }
+
         const actionCodeSettings = {
-            url: "http://localhost:3000/reset-password", // رابط صفحة إعادة تعيين الباسورد
+            url: "http://localhost:5177/reset-password",
             handleCodeInApp: true
         };
+
         await sendPasswordResetEmail(auth, email, actionCodeSettings);
-        console.log("Password reset email sent.");
+
     } catch (error) {
-        console.error("Forgot Password Error:", error.message);
-        throw error;
+        console.error("FORGOT PASSWORD ERROR:", error);
+
+        if (error.code) {
+            switch (error.code) {
+                case "auth/invalid-email":
+                    throw new Error("The email address is not valid.");
+                case "auth/user-not-found":
+                    throw new Error("No account found with this email.");
+            }
+        }
+
+        if (error.message) {
+            throw new Error(error.message);
+        }
+
+        throw new Error("Unable to send password reset email.");
     }
 }
 
@@ -111,10 +171,21 @@ export async function forgotPassword(email) {
 export async function resetPasswordWithCode(oobCode, newPassword) {
     try {
         await confirmPasswordReset(auth, oobCode, newPassword);
-        console.log("Password updated successfully!");
     } catch (error) {
-        console.error("Reset Password Error:", error.message);
-        throw error;
+        console.error("RESET PASSWORD ERROR:", error);
+
+        if (error.code) {
+            switch (error.code) {
+                case "auth/expired-action-code":
+                    throw new Error("Reset link has expired. Please request a new one.");
+                case "auth/invalid-action-code":
+                    throw new Error("Invalid or already used reset link.");
+                case "auth/weak-password":
+                    throw new Error("Password should be at least 6 characters.");
+            }
+        }
+
+        throw new Error("Failed to reset password.");
     }
 }
 
@@ -122,9 +193,8 @@ export async function resetPasswordWithCode(oobCode, newPassword) {
 export async function logout() {
     try {
         await signOut(auth);
-        console.log("User logged out successfully.");
     } catch (error) {
-        console.error("Logout Error:", error.message);
-        throw error;
+        console.error("LOGOUT ERROR:", error);
+        throw new Error("Failed to logout. Please try again.");
     }
 }
