@@ -119,7 +119,7 @@ export default function Login() {
         try {
             await login(email, password);
             alert("Login successful!");
-            navigate("/"); // تعديل حسب الصفحة الرئيسية
+            navigate("/home");
         } catch (err) {
             setError(err.message);
         }
