@@ -1,8 +1,11 @@
 import { AppBar, Toolbar, Box, IconButton, Avatar } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+    const navigate = useNavigate();
+
     return (
         <AppBar
             position="static"
@@ -25,7 +28,11 @@ export default function Navbar() {
                     <IconButton>
                         <NotificationsNoneIcon sx={{ color: "#333" }} />
                     </IconButton>
-                    <Avatar src="https://i.pravatar.cc/40" />
+
+                    <Avatar src="https://i.pravatar.cc/40"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => navigate("/profile")}
+                    />
                 </Box>
             </Toolbar>
         </AppBar>
