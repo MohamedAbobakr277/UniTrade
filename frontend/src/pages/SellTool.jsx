@@ -14,6 +14,11 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState, useRef } from "react";
+import { db, auth } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
+
+const CLOUD_NAME = "dstfo8pxq";
+const UPLOAD_PRESET = "unitrade_upload";
 
 export default function SellTool() {
     const fileInputRef = useRef(null);
@@ -35,6 +40,40 @@ export default function SellTool() {
 
     const MAX_FILES = 5;
     const MAX_SIZE_MB = 5;
+    // Upload image to Cloudinary and return the URL
+    const uploadImage = async (file) => {
+
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", UPLOAD_PRESET);
+
+    const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+            method: "POST",
+            body: data
+        }
+    );
+
+    const result = await res.json();
+
+    return result.secure_url;
+};
+ // Upload all images and return their URLs
+const uploadImages = async () => {
+
+    const urls = [];
+
+    for (let img of images) {
+
+        const url = await uploadImage(img.file);
+
+        urls.push(url);
+
+    }
+
+    return urls;
+};
 
     /* ================= FORM HANDLER ================= */
 
@@ -99,17 +138,43 @@ export default function SellTool() {
         }, 200);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (images.length === 0) {
             setError("Please upload at least one image.");
             return;
         }
+        
+        try {
 
-        simulateUpload();
+    setUploadProgress(10);
 
-        console.log("Form Data:", form);
-        console.log("Images:", images);
-    };
+    const imageUrls = await uploadImages();
+
+    setUploadProgress(70);
+
+    await addDoc(collection(db, "products"), {
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        university: form.university,
+        condition: form.condition,
+        price: Number(e.target.value),
+        images: imageUrls,
+        ownerId: auth.currentUser.uid,
+        createdAt: new Date()
+    });
+
+    setUploadProgress(100);
+
+    alert("Product posted successfully");
+
+} catch (err) {
+
+    console.error(err);
+    setError("Error posting item");
+
+}
+};  
 
     /* ================= UI ================= */
 

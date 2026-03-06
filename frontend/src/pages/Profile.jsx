@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -42,36 +42,63 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import logo from '../assets/logo.png';
-
-// Mock user data
-const mockUser = {
-    firstName: "Alex",
-    lastName: "Johnson",
-    email: "alex.j@university.edu.eg",
-    phone: "+20 1012345678",
-    university: "Stanford University",
-    faculty: "Faculty of Engineering",
-    major: "Engineering Major",
-    profilePhoto: "https://images.unsplash.com/photo-1633332755192-727a05c4013d"
-};
-
-const userItems = [
-    { id: 1, title: "Intro to Thermodynamics", price: 45, status: "Active", postedDate: "3d ago", image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f" },
-    { id: 2, title: "Sony WH-1000XM4", price: 120, status: "Active", postedDate: "Just now", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e" },
-];
+import { auth, db } from '../firebase';
+import { doc, getDoc, setDoc, updateDoc ,collection, query, where, getDocs, deleteDoc} from 'firebase/firestore';
+import { updatePassword } from 'firebase/auth';
 
 const universities = ["Cairo University", "Ain Shams University", "Alexandria University", "Stanford University", "Other"];
 const faculties = ["Engineering", "Medicine", "Commerce", "Other"];
 
 export default function Profile() {
-    const [user, setUser] = useState(mockUser);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
-    const [editData, setEditData] = useState({ ...user });
-    const [showPassword, setShowPassword] = useState(false);
-    const [passwords, setPasswords] = useState({ new: '', confirm: '' });
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+const [userItems, setUserItems] = useState([]);
+const [user, setUser] = useState(null);
 
+const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+const [editData, setEditData] = useState({});
+const [showPassword, setShowPassword] = useState(false);
+const [passwords, setPasswords] = useState({ new: '', confirm: '' });
+const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
+const [currentEditItem, setCurrentEditItem] = useState(null);
+
+const handleOpenEditListing = (item) => {
+  setCurrentEditItem(item);
+  setIsEditListingModalOpen(true);
+};
+        useEffect(() => {
+
+    const fetchUserData = async () => {
+
+        if (!auth.currentUser) return;
+
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            setUser(userSnap.data());
+        }
+
+        /* تحميل منتجات المستخدم */
+
+        const q = query(
+            collection(db, "products"),
+            where("ownerId", "==", auth.currentUser.uid)
+        );
+
+        const snapshot = await getDocs(q);
+
+        const items = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        setUserItems(items);
+    };
+
+    fetchUserData();
+
+}, []);
     const fileInputRef = useRef(null);
 
     const handleInputChange = (e) => {
@@ -90,22 +117,71 @@ export default function Profile() {
         }
     };
 
-    const handleSaveProfile = () => {
-        setUser(editData);
-        setIsEditModalOpen(false);
-        setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
-    };
+const handleSaveProfile = async () => {
+  try {
+    const userRef = doc(db, 'users', auth.currentUser.uid);
+    await setDoc(userRef, editData, { merge: true }); // merge: true عشان ما يمسحش باقي البيانات
+    setUser(editData);
+    setIsEditModalOpen(false);
+    setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    setSnackbar({ open: true, message: 'Failed to update profile', severity: 'error' });
+  }
+};
+const handleResetPassword = async () => {
+  if (passwords.new !== passwords.confirm) {
+    setSnackbar({ open: true, message: 'Passwords do not match!', severity: 'error' });
+    return;
+  }
 
-    const handleResetPassword = () => {
-        if (passwords.new !== passwords.confirm) {
-            setSnackbar({ open: true, message: 'Passwords do not match!', severity: 'error' });
-            return;
-        }
-        setIsResetModalOpen(false);
-        setPasswords({ new: '', confirm: '' });
-        setSnackbar({ open: true, message: 'Password updated successfully!', severity: 'success' });
-    };
+  try {
+    await updatePassword(auth.currentUser, passwords.new);
+    setIsResetModalOpen(false);
+    setPasswords({ new: '', confirm: '' });
+    setSnackbar({ open: true, message: 'Password updated successfully!', severity: 'success' });
+  } catch (error) {
+    console.error(error);
+    setSnackbar({ open: true, message: 'Failed to update password', severity: 'error' });
+  }
+};
+const handleSaveListing = async () => {
+  try {
+    const itemRef = doc(db, "items", currentEditItem.id);
+    await setDoc(itemRef, currentEditItem, { merge: true });
 
+    setUserItems(prev =>
+      prev.map(item => (item.id === currentEditItem.id ? currentEditItem : item))
+    );
+
+    setIsEditListingModalOpen(false);
+    setSnackbar({
+      open: true,
+      message: "Listing updated successfully",
+      severity: "success",
+    });
+  } catch (error) {
+    console.error(error);
+    setSnackbar({
+      open: true,
+      message: "Failed to update listing",
+      severity: "error",
+    });
+  }
+};
+const handleDeleteListing = async (itemId) => {
+  if (!auth.currentUser) return; // لازم يكون مستخدم متسجل
+  const docRef = doc(db, 'items', itemId); // لازم 'items' تطابق collection في rules
+  try {
+    await deleteDoc(docRef);
+    setUserItems(prev => prev.filter(item => item.id !== itemId));
+  } catch (error) {
+    console.error("Error deleting listing:", error);
+  }
+};
+    if (!user) {
+  return <Typography sx={{ p:5 }}>Loading profile...</Typography>;
+}
     return (
         <Box sx={{ backgroundColor: '#f5f7fb', minHeight: '100vh' }}>
             <Box sx={{ bgcolor: '#f5f6f8', borderBottom: '1px solid #e0e0e0', px: 5, py: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -171,7 +247,7 @@ export default function Profile() {
                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Personal Information</Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                                         <InfoItem icon={<EmailIcon />} label="Email Address" value={user.email} />
-                                        <InfoItem icon={<PhoneIcon />} label="Phone Number" value={user.phone} />
+                                        <InfoItem icon={<PhoneIcon />} label="Phone Number" value={user.phoneNumber} />
                                         <InfoItem icon={<SchoolIcon />} label="Faculty" value={user.faculty} />
                                         <InfoItem icon={<BusinessIcon />} label="University" value={user.university} />
                                     </Box>
@@ -196,16 +272,16 @@ export default function Profile() {
                                 {userItems.map((item) => (
                                     <Grid item xs={12} sm={6} key={item.id}>
                                         <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', position: 'relative' }}>
-                                            <CardMedia component="img" height="180" image={item.image} />
+                                            <CardMedia component="img" height="180" image={item.image?.[0] || ""} />
                                             <CardContent sx={{ p: 2 }}>
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{item.title}</Typography>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                                                    <Typography variant="h6" color="primary" sx={{ fontWeight: 800 }}>${item.price.toFixed(2)}</Typography>
+                                                    <Typography variant="h6" color="primary" sx={{ fontWeight: 800 }}>${Number(item.price || 0).toFixed(2)}</Typography>
                                                     <Typography variant="caption" color="text.secondary">Posted {item.postedDate}</Typography>
                                                 </Box>
                                                 <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                                    <Button fullWidth variant="outlined" size="small" startIcon={<EditIcon />} sx={{ borderRadius: 2, textTransform: 'none' }}>Edit</Button>
-                                                    <IconButton size="small" sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }}><DeleteIcon fontSize="small" /></IconButton>
+                                                    <Button fullWidth variant="outlined" size="small" startIcon={<EditIcon />} sx={{ borderRadius: 2, textTransform: 'none' }}  onClick={() => handleOpenEditListing(item)}>Edit</Button>
+                                                    <IconButton size="small" sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }}onClick={() => handleDeleteListing(item.id)}><DeleteIcon fontSize="small" /></IconButton>
                                                 </Box>
                                             </CardContent>
                                         </Card>
@@ -234,7 +310,7 @@ export default function Profile() {
                             <Grid item xs={6}><TextField fullWidth label="First Name" name="firstName" value={editData.firstName} onChange={handleInputChange} /></Grid>
                             <Grid item xs={6}><TextField fullWidth label="Last Name" name="lastName" value={editData.lastName} onChange={handleInputChange} /></Grid>
                         </Grid>
-                        <TextField fullWidth label="Phone Number" name="phone" value={editData.phone} onChange={handleInputChange} />
+                        <TextField fullWidth label="Phone Number" name="phoneNumber" value={editData.phoneNumber} onChange={handleInputChange} />
                         <TextField select fullWidth label="University" name="university" value={editData.university} onChange={handleInputChange}>
                             {universities.map((uni) => <MenuItem key={uni} value={uni}>{uni}</MenuItem>)}
                         </TextField>
@@ -248,6 +324,30 @@ export default function Profile() {
                     <Button variant="contained" onClick={handleSaveProfile} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700 }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
+            {/*edit listing modal*/}
+            <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>Edit Listing</DialogTitle>
+                <DialogContent>
+                <TextField
+                  fullWidth
+                  label="Title"
+                  value={currentEditItem?.title || ''}
+                  onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))}
+                  sx={{ mb: 2 }}
+                />
+                <TextField
+                 fullWidth
+                label="Price"
+                type="number"
+                value={currentEditItem?.price || ''}
+                onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                />
+        </DialogContent>
+        <DialogActions>
+           <Button onClick={() => setIsEditListingModalOpen(false)}>Cancel</Button>
+           <Button variant="contained" onClick={handleSaveListing}>Save</Button>
+         </DialogActions>
+        </Dialog>
 
             {/* Reset Password Modal (Same Design as Edit Profile) */}
             <Dialog open={isResetModalOpen} onClose={() => setIsResetModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
