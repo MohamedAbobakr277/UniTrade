@@ -9,21 +9,25 @@ TouchableOpacity,
 Image,
 ScrollView,
 Alert,
-ActivityIndicator
+ActivityIndicator,
+StyleSheet
 } from "react-native";
 
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
-import { db, storage, auth } from "./firebase";
+import { db, auth } from "./firebase";
 import { addDoc, collection } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+/* ================= CLOUDINARY ================= */
+
+const CLOUD_NAME = "dstfo8pxq";
+const UPLOAD_PRESET = "unitrade_upload";
 
 /* ================= DATA ================= */
 
 const categories = ["Books","Calculators","Laptops","Engineering","Medical"];
-
 const conditions = ["Good","Fair","Poor"];
 
 const universities = [
@@ -93,9 +97,9 @@ return;
 }
 
 const result = await ImagePicker.launchImageLibraryAsync({
-mediaTypes: ImagePicker.MediaTypeOptions.Images,
-allowsMultipleSelection: true,
-selectionLimit: 10,
+mediaTypes: ['images'],
+allowsMultipleSelection:true,
+selectionLimit:10,
 quality:0.7
 });
 
@@ -125,28 +129,43 @@ setImages(newImages);
 
 };
 
-/* ================= UPLOAD IMAGES ================= */
+/* ================= CLOUDINARY UPLOAD ================= */
 
-const uploadImages = async ()=>{
+const uploadImage = async (imageUri:string) => {
+
+const data = new FormData();
+
+data.append("file",{
+uri:imageUri,
+type:"image/jpeg",
+name:"upload.jpg"
+} as any);
+
+data.append("upload_preset",UPLOAD_PRESET);
+
+const res = await fetch(
+`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+{
+method:"POST",
+body:data
+}
+);
+
+const file = await res.json();
+
+return file.secure_url;
+
+};
+
+const uploadImages = async () => {
 
 const urls:string[] = [];
 
-for(let i=0;i<images.length;i++){
+for(const img of images){
 
-const uri = images[i];
+const url = await uploadImage(img);
 
-const response = await fetch(uri);
-const blob = await response.blob();
-
-const fileName = `product_${Date.now()}_${i}.jpg`;
-
-const storageRef = ref(storage,"products/"+fileName);
-
-await uploadBytes(storageRef,blob);
-
-const downloadURL = await getDownloadURL(storageRef);
-
-urls.push(downloadURL);
+urls.push(url);
 
 }
 
@@ -198,7 +217,7 @@ router.replace("/home");
 }catch(e){
 
 console.log(e);
-Alert.alert("Error",String(e));
+Alert.alert("Error posting product");
 
 }finally{
 
@@ -220,8 +239,6 @@ return(
 Sell Your Item
 </Text>
 
-{/* MAIN IMAGE */}
-
 {images.length>0 && (
 
 <Image
@@ -236,11 +253,10 @@ marginBottom:10
 
 )}
 
-{/* THUMBNAILS */}
-
 <View style={{flexDirection:"row",flexWrap:"wrap"}}>
 
 {images.map((img,index)=>(
+
 <View key={index} style={{marginRight:10}}>
 
 <Image
@@ -263,10 +279,13 @@ borderRadius:20,
 paddingHorizontal:6
 }}
 >
+
 <Text style={{color:"white"}}>X</Text>
+
 </TouchableOpacity>
 
 </View>
+
 ))}
 
 </View>
@@ -282,35 +301,32 @@ borderRadius:10,
 alignItems:"center"
 }}
 >
-<Text>Add Images</Text>
-</TouchableOpacity>
 
-{/* TITLE */}
+<Text>Add Images</Text>
+
+</TouchableOpacity>
 
 <TextInput
 placeholder="Title"
 value={title}
 onChangeText={setTitle}
-style={input}
+style={styles.input}
 />
-
-{/* DESCRIPTION */}
 
 <TextInput
 placeholder="Description"
 value={description}
 onChangeText={setDescription}
-style={[input,{height:80}]}
+style={[styles.input,{height:80}]}
 multiline
 />
 
-{/* CATEGORY */}
-
-<Text style={label}>Category</Text>
+<Text style={styles.label}>Category</Text>
 
 <View style={{flexDirection:"row",flexWrap:"wrap",marginBottom:15}}>
 
 {categories.map((cat)=>(
+
 <TouchableOpacity
 key={cat}
 onPress={()=>setCategory(cat)}
@@ -323,21 +339,23 @@ marginRight:8,
 marginBottom:8
 }}
 >
+
 <Text style={{color:category===cat?"white":"black"}}>
 {cat}
 </Text>
+
 </TouchableOpacity>
+
 ))}
 
 </View>
 
-{/* CONDITION */}
-
-<Text style={label}>Condition</Text>
+<Text style={styles.label}>Condition</Text>
 
 <View style={{flexDirection:"row",marginBottom:15}}>
 
 {conditions.map((c)=>(
+
 <TouchableOpacity
 key={c}
 onPress={()=>setCondition(c)}
@@ -350,75 +368,80 @@ marginRight:8,
 alignItems:"center"
 }}
 >
+
 <Text style={{color:condition===c?"white":"black"}}>
 {c}
 </Text>
+
 </TouchableOpacity>
+
 ))}
 
 </View>
-
-{/* UNIVERSITY */}
 
 <TextInput
 placeholder="University"
 value={university}
 onFocus={()=>setShowUniversity(true)}
-style={input}
+style={styles.input}
 />
 
 {showUniversity &&(
 
-<View style={dropdown}>
+<View style={styles.dropdown}>
 
 {universities.map(u=>(
+
 <TouchableOpacity
 key={u}
 onPress={()=>{
 setUniversity(u);
 setShowUniversity(false);
 }}
-style={item}
+style={styles.item}
 >
+
 <Text>{u}</Text>
+
 </TouchableOpacity>
+
 ))}
 
 </View>
 
 )}
 
-{/* FACULTY */}
-
 <TextInput
 placeholder="Faculty"
 value={faculty}
 onFocus={()=>setShowFaculty(true)}
-style={input}
+style={styles.input}
 />
 
 {showFaculty &&(
 
-<View style={dropdown}>
+<View style={styles.dropdown}>
 
 {faculties.map(f=>(
+
 <TouchableOpacity
 key={f}
 onPress={()=>{
 setFaculty(f);
 setShowFaculty(false);
 }}
-style={item}
+style={styles.item}
 >
+
 <Text>{f}</Text>
+
 </TouchableOpacity>
+
 ))}
 
 </View>
 
 )}
-
-{/* PRICE */}
 
 <TextInput
 placeholder="Price"
@@ -428,10 +451,8 @@ const clean = t.replace(/[^0-9]/g,"");
 setPrice(clean);
 }}
 keyboardType="numeric"
-style={input}
+style={styles.input}
 />
-
-{/* BUTTON */}
 
 <TouchableOpacity
 onPress={handlePost}
@@ -462,35 +483,33 @@ Post Item
 
 /* ================= STYLES ================= */
 
-import { StyleSheet } from "react-native";
-
 const styles = StyleSheet.create({
-input: {
+
+input:{
 borderWidth:1,
 borderColor:"#ddd",
 padding:12,
 borderRadius:10,
 marginBottom:12
 },
-label: {
-fontWeight:"bold" as const,
+
+label:{
+fontWeight:"bold",
 marginBottom:8
 },
-dropdown: {
+
+dropdown:{
 backgroundColor:"#fff",
 borderWidth:1,
 borderColor:"#ddd",
 borderRadius:8,
 marginBottom:10
 },
-item: {
+
+item:{
 padding:12,
 borderBottomWidth:1,
 borderBottomColor:"#eee"
 }
-});
 
-const input = styles.input;
-const label = styles.label;
-const dropdown = styles.dropdown;
-const item = styles.item;
+});

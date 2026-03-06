@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  StyleSheet
+View,
+Text,
+FlatList,
+Image,
+TouchableOpacity,
+TextInput,
+ScrollView,
+StyleSheet
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,165 +20,195 @@ import { db } from "./firebase";
 
 import BottomNav from "../components/BottomNav";
 
-export default function HomeScreen() {
+export default function HomeScreen(){
 
-  const [search, setSearch] = useState("");
-  const [items, setItems] = useState<any[]>([]);
+const [search,setSearch] = useState("");
+const [items,setItems] = useState<any[]>([]);
+const [selectedCategory,setSelectedCategory] = useState("All");
 
-  /* ================= FIREBASE PRODUCTS ================= */
+/* ================= FIREBASE ================= */
 
-  useEffect(() => {
+useEffect(()=>{
 
-    const unsubscribe = onSnapshot(
-      collection(db, "products"),
-      (snapshot) => {
+const unsubscribe = onSnapshot(
+collection(db,"products"),
+(snapshot)=>{
 
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+const data = snapshot.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}));
 
-        setItems(data);
+setItems(data);
 
-      }
-    );
+}
+);
 
-    return unsubscribe;
+return unsubscribe;
 
-  }, []);
+},[]);
 
-  /* ================= CATEGORIES ================= */
+/* ================= CATEGORIES ================= */
 
-  const categories = [
-    { name: "All", icon: "home" },
-    { name: "Books", icon: "book" },
-    { name: "Calculators", icon: "hash" },
-    { name: "Laptops", icon: "monitor" },
-    { name: "Engineering", icon: "tool" },
-    { name: "Medical", icon: "plus-square" }
-  ];
+const categories = [
+{ name:"All", icon:"home" },
+{ name:"Books", icon:"book" },
+{ name:"Calculators", icon:"hash" },
+{ name:"Laptops", icon:"monitor" },
+{ name:"Engineering", icon:"tool" },
+{ name:"Medical", icon:"plus-square" }
+];
 
-  /* ================= PRODUCT CARD ================= */
+/* ================= FILTER ================= */
 
-  const renderItem = ({ item }: any) => (
+const filteredItems = items.filter(item=>{
 
-    <TouchableOpacity style={styles.card}>
+const matchSearch =
+item.title?.toLowerCase().includes(search.toLowerCase());
 
-      <Image
-        source={{ uri: item.image || "https://via.placeholder.com/150" }}
-        style={styles.image}
-      />
+const matchCategory =
+selectedCategory === "All" ||
+item.category === selectedCategory;
 
-      <View style={styles.cardContent}>
+return matchSearch && matchCategory;
 
-        <Text style={styles.title}>
-          {item.title}
-        </Text>
+});
 
-        <Text style={styles.price}>
-          {item.price} EGP
-        </Text>
+/* ================= PRODUCT CARD ================= */
 
-        <Text style={styles.meta}>
-          {item.university}
-        </Text>
+const renderItem = ({item}:any)=>{
 
-        <Text style={styles.meta}>
-          {item.condition}
-        </Text>
+const imageUrl =
+Array.isArray(item.images) && item.images.length > 0
+? item.images[0]
+: "https://via.placeholder.com/150";
 
-      </View>
+return(
 
-    </TouchableOpacity>
+<TouchableOpacity style={styles.card}>
 
-  );
+<Image
+source={{uri:imageUrl}}
+style={styles.image}
+resizeMode="cover"
+/>
 
-  /* ================= UI ================= */
+<View style={styles.cardContent}>
 
-  return (
+<Text style={styles.title}>
+{item.title}
+</Text>
 
-    <SafeAreaView edges={["top"]} style={styles.container}>
+<Text style={styles.price}>
+{item.price} EGP
+</Text>
 
-      {/* HEADER */}
+<Text style={styles.meta}>
+{item.university}
+</Text>
 
-      <View style={styles.headerRow}>
+<Text style={styles.meta}>
+{item.condition}
+</Text>
 
-        <Text style={styles.header}>
-          Marketplace
-        </Text>
+</View>
 
-        <Image
-          source={require("../assets/images/logo.png")}
-          style={styles.logo}
-        />
+</TouchableOpacity>
 
-      </View>
+);
 
-      {/* SEARCH */}
+};
 
-      <View style={styles.searchBox}>
+/* ================= UI ================= */
 
-        <Feather name="search" size={18} color="gray" />
+return(
 
-        <TextInput
-          placeholder="Search for tools..."
-          value={search}
-          onChangeText={setSearch}
-          style={styles.searchInput}
-        />
+<SafeAreaView edges={["top"]} style={styles.container}>
 
-      </View>
+{/* HEADER */}
 
-      {/* CATEGORIES */}
+<View style={styles.headerRow}>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categories}
-      >
+<Text style={styles.header}>
+Marketplace
+</Text>
 
-        {categories.map((cat, index) => (
+<Image
+source={require("../assets/images/logo.png")}
+style={styles.logo}
+/>
 
-          <TouchableOpacity
-            key={index}
-            style={styles.categoryCard}
-          >
+</View>
 
-            <Feather
-              name={cat.icon as any}
-              size={20}
-              color="white"
-              style={{ marginBottom: 6 }}
-            />
+{/* SEARCH */}
 
-            <Text style={styles.categoryText}>
-              {cat.name}
-            </Text>
+<View style={styles.searchBox}>
 
-          </TouchableOpacity>
+<Feather name="search" size={18} color="gray"/>
 
-        ))}
+<TextInput
+placeholder="Search products..."
+value={search}
+onChangeText={setSearch}
+style={styles.searchInput}
+/>
 
-      </ScrollView>
+</View>
 
-      {/* PRODUCTS */}
+{/* CATEGORIES */}
 
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        showsVerticalScrollIndicator={false}
-      />
+<ScrollView
+horizontal
+showsHorizontalScrollIndicator={false}
+style={styles.categories}
+>
 
-      {/* BOTTOM NAV */}
+{categories.map((cat,index)=>(
 
-      <BottomNav />
+<TouchableOpacity
+key={index}
+onPress={()=>setSelectedCategory(cat.name)}
+style={[
+styles.categoryCard,
+selectedCategory===cat.name && {backgroundColor:"#1E40AF"}
+]}
+>
 
-    </SafeAreaView>
+<Feather
+name={cat.icon as any}
+size={20}
+color="white"
+style={{marginBottom:6}}
+/>
 
-  );
+<Text style={styles.categoryText}>
+{cat.name}
+</Text>
+
+</TouchableOpacity>
+
+))}
+
+</ScrollView>
+
+{/* PRODUCTS */}
+
+<FlatList
+data={filteredItems}
+keyExtractor={(item)=>item.id}
+renderItem={renderItem}
+numColumns={2}
+columnWrapperStyle={{justifyContent:"space-between"}}
+showsVerticalScrollIndicator={false}
+/>
+
+{/* BOTTOM NAV */}
+
+<BottomNav/>
+
+</SafeAreaView>
+
+);
 
 }
 
@@ -186,101 +216,101 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
 
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f7fb",
-    paddingHorizontal: 15,
-    paddingBottom: 80
-  },
+container:{
+flex:1,
+backgroundColor:"#f5f7fb",
+paddingHorizontal:15,
+paddingBottom:80
+},
 
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 12
-  },
+headerRow:{
+flexDirection:"row",
+alignItems:"center",
+justifyContent:"space-between",
+marginTop:10,
+marginBottom:12
+},
 
-  header: {
-    fontSize: 24,
-    fontWeight: "700"
-  },
+header:{
+fontSize:24,
+fontWeight:"700"
+},
 
-  logo: {
-    width: 40,
-    height: 40,
-    resizeMode: "contain"
-  },
+logo:{
+width:40,
+height:40,
+resizeMode:"contain"
+},
 
-  searchBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "white",
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    height: 45,
-    marginBottom: 10,
-    elevation: 2
-  },
+searchBox:{
+flexDirection:"row",
+alignItems:"center",
+backgroundColor:"white",
+paddingHorizontal:12,
+borderRadius:12,
+height:45,
+marginBottom:10,
+elevation:2
+},
 
-  searchInput: {
-    marginLeft: 10,
-    flex: 1
-  },
+searchInput:{
+marginLeft:10,
+flex:1
+},
 
-  categories: {
-    marginBottom: 8
-  },
+categories:{
+marginBottom:8
+},
 
-  categoryCard: {
-    backgroundColor: "#2563EB",
-    width: 85,
-    height: 85,
-    borderRadius: 14,
-    marginRight: 10,
-    alignItems: "center",
-    justifyContent: "center"
-  },
+categoryCard:{
+backgroundColor:"#2563EB",
+width:85,
+height:85,
+borderRadius:14,
+marginRight:10,
+alignItems:"center",
+justifyContent:"center"
+},
 
-  categoryText: {
-    color: "white",
-    fontWeight: "600",
-    fontSize: 11,
-    textAlign: "center"
-  },
+categoryText:{
+color:"white",
+fontWeight:"600",
+fontSize:11,
+textAlign:"center"
+},
 
-  card: {
-    backgroundColor: "white",
-    borderRadius: 14,
-    width: "48%",
-    marginBottom: 12,
-    overflow: "hidden",
-    elevation: 3
-  },
+card:{
+backgroundColor:"white",
+borderRadius:14,
+width:"48%",
+marginBottom:12,
+overflow:"hidden",
+elevation:3
+},
 
-  image: {
-    width: "100%",
-    height: 120
-  },
+image:{
+width:"100%",
+height:120
+},
 
-  cardContent: {
-    padding: 10
-  },
+cardContent:{
+padding:10
+},
 
-  title: {
-    fontSize: 14,
-    fontWeight: "600"
-  },
+title:{
+fontSize:14,
+fontWeight:"600"
+},
 
-  price: {
-    color: "#2563EB",
-    fontWeight: "700",
-    marginTop: 4
-  },
+price:{
+color:"#2563EB",
+fontWeight:"700",
+marginTop:4
+},
 
-  meta: {
-    fontSize: 12,
-    color: "gray"
-  }
+meta:{
+fontSize:12,
+color:"gray"
+}
 
 });
