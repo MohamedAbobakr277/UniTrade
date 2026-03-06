@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -9,14 +10,18 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import SellTool from "./pages/SellTool";
 import Profile from "./pages/Profile";
 
-
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
+      {/* Default redirect to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
+      {/* Auth pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Protected user routes */}
       <Route
         path="/home"
         element={
@@ -25,11 +30,30 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/sell"
+        element={
+          <ProtectedRoute>
+            <SellTool />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected admin routes */}
       <Route element={<ProtectedAdminRoute />}>
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admindashboard" element={<AdminDashboard />} />
       </Route>
-      <Route path="/sell" element={<SellTool />} />
-      <Route path="/profile" element={<Profile />} />
+
+      {/* Catch all: redirect unknown paths to login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

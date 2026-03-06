@@ -11,13 +11,14 @@ import {
     InputAdornment,
     IconButton,
     Alert,
+    CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/auth"; // ربط بالخدمة
+import { login } from "../services/auth";
 
 /* ================= BACKGROUND ================= */
 
@@ -102,6 +103,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -111,17 +113,26 @@ export default function Login() {
 
     const handleLogin = async () => {
         setError("");
+
         if (!email || !password) {
             setError("Please enter both email and password.");
             return;
         }
 
         try {
-            await login(email, password);
-            alert("Login successful!");
-            navigate("/home");
+            setLoading(true);
+
+            const result = await login(email, password);
+
+            if (result.role === "admin") {
+                navigate("/admindashboard");
+            } else {
+                navigate("/home");
+            }
         } catch (err) {
             setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -156,7 +167,11 @@ export default function Login() {
                         Sign In
                     </Typography>
 
-                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
 
                     <Box display="flex" flexDirection="column" gap={3}>
                         <TextField
@@ -203,8 +218,16 @@ export default function Login() {
                             </Typography>
                         </Box>
 
-                        <SoftButton fullWidth onClick={handleLogin}>
-                            Sign In
+                        <SoftButton
+                            fullWidth
+                            onClick={handleLogin}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <CircularProgress size={22} sx={{ color: "#fff" }} />
+                            ) : (
+                                "Sign In"
+                            )}
                         </SoftButton>
 
                         <Box textAlign="center" mt={2}>
