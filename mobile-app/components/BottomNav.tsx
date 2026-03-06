@@ -1,85 +1,117 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+// mobile-app/components/BottomNav.tsx
+
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet
+} from "react-native";
+
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-export default function BottomNav() {
+export default function BottomNav(){
 
-const router = useRouter();
+  const router = useRouter();
 
-return (
+  return(
 
-<View style={styles.container}>
+    <View style={styles.container}>
 
-<TouchableOpacity
-style={styles.tab}
-onPress={()=>router.push("/home")}
->
+      {/* HOME */}
 
-<Feather name="home" size={22} color="#2563EB"/>
-<Text style={styles.label}>Home</Text>
+      <TouchableOpacity
+        style={styles.item}
+        onPress={()=>router.push("/home")}
+      >
 
-</TouchableOpacity>
+        <Feather name="home" size={22} color="#2563EB"/>
 
-<TouchableOpacity
-style={styles.tab}
-onPress={()=>router.push("/sell")}
->
+        <Text style={styles.text}>
+          Home
+        </Text>
 
-<Feather name="plus-circle" size={22} color="#2563EB"/>
-<Text style={styles.label}>Sell</Text>
+      </TouchableOpacity>
 
-</TouchableOpacity>
 
-<TouchableOpacity
-style={styles.tab}
-onPress={()=>router.push("../ads")}
->
+      {/* SELL */}
 
-<Feather name="list" size={22} color="#2563EB"/>
-<Text style={styles.label}>My Ads</Text>
+      <TouchableOpacity
+        style={styles.item}
+        onPress={()=>router.push("/sell")}
+      >
 
-</TouchableOpacity>
+        <Feather name="plus-circle" size={22} color="#2563EB"/>
 
-<TouchableOpacity
-style={styles.tab}
-onPress={()=>router.push("../account")}
->
+        <Text style={styles.text}>
+          Sell
+        </Text>
 
-<Feather name="user" size={22} color="#2563EB"/>
-<Text style={styles.label}>Account</Text>
+      </TouchableOpacity>
 
-</TouchableOpacity>
 
-</View>
+      {/* FAVORITES */}
 
-);
+      <TouchableOpacity
+        style={styles.item}
+        onPress={()=>router.push("/my-favorites")}
+      >
+
+        <Feather name="heart" size={22} color="#2563EB"/>
+
+        <Text style={styles.text}>
+          Favorites
+        </Text>
+
+      </TouchableOpacity>
+
+
+      {/* ACCOUNT */}
+
+      <TouchableOpacity
+        style={styles.item}
+        onPress={()=>router.push("/profile")}
+      >
+
+        <Feather name="user" size={22} color="#2563EB"/>
+
+        <Text style={styles.text}>
+          Account
+        </Text>
+
+      </TouchableOpacity>
+
+    </View>
+
+  );
 
 }
 
 const styles = StyleSheet.create({
 
-container:{
-position:"absolute",
-bottom:0,
-left:0,
-right:0,
-height:70,
-backgroundColor:"white",
-flexDirection:"row",
-justifyContent:"space-around",
-alignItems:"center",
-borderTopWidth:1,
-borderColor:"#eee",
-elevation:10
-},
+  container:{
+    position:"absolute",
+    bottom:0,
+    left:0,
+    right:0,
+    height:70,
+    backgroundColor:"white",
+    flexDirection:"row",
+    justifyContent:"space-around",
+    alignItems:"center",
+    borderTopWidth:1,
+    borderColor:"#eee"
+  },
 
-tab:{
-alignItems:"center"
-},
+  item:{
+    alignItems:"center"
+  },
 
-label:{
-fontSize:12,
-marginTop:3
-}
+  text:{
+    fontSize:12,
+    color:"#2563EB",
+    marginTop:3
+  }
 
 });

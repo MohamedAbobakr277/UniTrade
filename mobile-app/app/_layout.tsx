@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
+import { FavoriteProvider } from "../constants/FavoriteContext";
 
 export default function Layout() {
+
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: "slide_from_right",
-      }}
-    />
+    <FavoriteProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </FavoriteProvider>
   );
+
 }
