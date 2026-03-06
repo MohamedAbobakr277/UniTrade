@@ -242,8 +242,8 @@ export default function Profile() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.resetBtn}
-            onPress={() => router.push("/reset-password")}
+         style={styles.resetBtn}
+             onPress={() => router.push("/forgot-password")}
           >
 
             <Feather name="lock" size={16} color="white" />
