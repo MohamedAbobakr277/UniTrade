@@ -1,5 +1,6 @@
 // mobile-app/app/login.tsx
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,51 +8,88 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
-  Alert,
+  Alert
 } from "react-native";
+
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+
 import styles from "./styles";
 
-// Import auth service from local services
 import { login } from "./services/auth";
 
-const LoginScreen: React.FC = () => {
-  const router = useRouter();
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 
-  const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const LoginScreen: React.FC = () => {
+
+  const router = useRouter();
+
+  const [showPassword,setShowPassword] = useState(false);
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [loading,setLoading] = useState(false);
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  /* ================= AUTO LOGIN ================= */
+
+  useEffect(() => {
+
+    const unsubscribe = onAuthStateChanged(auth,(user)=>{
+
+      if(user){
+        router.replace("/home");
+      }
+
+    });
+
+    return unsubscribe;
+
+  },[router]);
+
+  /* ================= LOGIN FUNCTION ================= */
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter both email and password.");
+
+    if(!email || !password){
+      Alert.alert("Error","Please enter email and password");
       return;
     }
 
-    if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Invalid email format.");
+    if(!emailRegex.test(email)){
+      Alert.alert("Error","Invalid email format");
       return;
     }
 
-    setLoading(true);
-    try {
-      await login(email, password); // should return a promise that resolves on successful login
-      Alert.alert("Success", "Login successful!");
-      router.push("/"); // redirect to home page after successful login
-    } catch (err: any) {
-      Alert.alert("Login Failed", err.message || "Something went wrong.");
-    } finally {
+    try{
+
+      setLoading(true);
+
+      await login(email,password);
+
+      router.replace("/home");
+
+    }catch(err:any){
+
+      Alert.alert("Login Failed",err.message);
+
+    }finally{
+
       setLoading(false);
+
     }
+
   };
 
+  /* ================= UI ================= */
+
   return (
+
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      <StatusBar barStyle="dark-content" backgroundColor="#fff"/>
 
       <Image
         source={require("../assets/images/logo.png")}
@@ -61,65 +99,103 @@ const LoginScreen: React.FC = () => {
       <Text style={styles.title}>Welcome Back</Text>
       <Text style={styles.subtitle}>Sign in to your account</Text>
 
+      {/* EMAIL */}
+
       <View style={styles.inputBox}>
-        <Feather name="mail" size={18} color="#396cda" />
+
+        <Feather name="mail" size={18} color="#396cda"/>
+
         <TextInput
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
+          autoCapitalize="none"
           placeholderTextColor="#9CA3AF"
           style={styles.input}
         />
+
       </View>
 
+      {/* PASSWORD */}
+
       <View style={styles.inputBox}>
-        <Feather name="lock" size={18} color="#4b76d2" />
+
+        <Feather name="lock" size={18} color="#4b76d2"/>
+
         <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
-          placeholderTextColor="#9CA3AF"
           secureTextEntry={!showPassword}
+          placeholderTextColor="#9CA3AF"
           style={styles.input}
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+
+        <TouchableOpacity onPress={()=>setShowPassword(!showPassword)}>
+
           <Feather
             name={showPassword ? "eye" : "eye-off"}
             size={18}
             color="#2563EB"
           />
+
         </TouchableOpacity>
+
       </View>
 
-      <TouchableOpacity onPress={() => router.push("/forgot-password")}>
+      {/* FORGOT PASSWORD */}
+
+      <TouchableOpacity onPress={()=>router.push("/forgot-password")}>
+
         <Text style={styles.forgot}>Forgot Password?</Text>
+
       </TouchableOpacity>
 
+      {/* LOGIN BUTTON */}
+
       <TouchableOpacity
-        style={[styles.button, { opacity: email && password ? 1 : 0.6 }]}
+        style={[styles.button,{opacity: email && password ? 1 : 0.6}]}
         disabled={!email || !password || loading}
         onPress={handleLogin}
       >
+
         <LinearGradient
-          colors={["#3B82F6", "#2563EB"]}
+          colors={["#3B82F6","#2563EB"]}
           style={styles.buttonGradient}
         >
-          <Text style={styles.buttonText}>Log In</Text>
+
+          <Text style={styles.buttonText}>
+
+            {loading ? "Logging in..." : "Log In"}
+
+          </Text>
+
         </LinearGradient>
+
       </TouchableOpacity>
 
+      {/* SIGNUP */}
+
       <Text style={styles.signup}>
+
         Don’t have an account?{" "}
+
         <Text
-          style={{ color: "#2563EB", fontWeight: "600" }}
-          onPress={() => router.push("/signup")}
+          style={{color:"#2563EB",fontWeight:"600"}}
+          onPress={()=>router.push("/signup")}
         >
+
           Sign Up
+
         </Text>
+
       </Text>
+
     </View>
+
   );
+
 };
 
 export default LoginScreen;

@@ -17,7 +17,6 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./styles2";
 
-// Import auth service
 import { signUp } from "./services/auth";
 
 const SignUpScreen: React.FC = () => {
@@ -31,6 +30,7 @@ const SignUpScreen: React.FC = () => {
   const [phone, setPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -75,46 +75,33 @@ const SignUpScreen: React.FC = () => {
 
   const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.edu\.eg$/;
 
-  //  Phone validation
- const phoneRegex: RegExp = /^(010|011|012|015)[0-9]{8}$/;
+  const phoneRegex: RegExp = /^(010|011|012|015)[0-9]{8}$/;
 
   const isFormValid =
-    firstName &&
-    lastName &&
-    email &&
+    firstName.length > 0 &&
+    lastName.length > 0 &&
     emailRegex.test(email) &&
-    university &&
-    faculty &&
-    phone &&
+    university.length > 0 &&
+    faculty.length > 0 &&
     phoneRegex.test(phone) &&
-    password &&
-    confirmPassword &&
+    password.length > 0 &&
+    confirmPassword.length > 0 &&
     password === confirmPassword;
 
   const handleSignUp = async () => {
     if (!isFormValid) {
       Alert.alert(
         "Error",
-        "Please fill all fields correctly.\nUse university email (.edu.eg)\nPhone must be 11 digits and start with 01."
+        "Please use a valid university email and Egyptian phone number."
       );
       return;
     }
 
     setLoading(true);
     try {
-      await signUp(
-        firstName,
-        lastName,
-        email,
-        password,
-        faculty,
-        university,
-        phone
-      );
-      Alert.alert(
-        "Success",
-        "Account created successfully! Please verify your email."
-      );
+      await signUp(firstName, lastName, email, password, faculty, university, phone);
+
+      Alert.alert("Success", "Account created successfully! Please verify your email.");
       router.push("/");
     } catch (err: any) {
       Alert.alert("Sign Up Failed", err.message || "Something went wrong.");
@@ -192,28 +179,132 @@ const SignUpScreen: React.FC = () => {
         )}
 
         {/* University */}
-        <View style={styles.inputBox}>
+        <View style={[styles.inputBox, { flexDirection: "row", alignItems: "center" }]}>
           <Feather name="book" size={18} color="#396cda" />
           <TextInput
             placeholder="University"
             value={university}
-            onChangeText={setUniversity}
+            onChangeText={(text) => {
+              setUniversity(text);
+              setShowUniversityList(true);
+            }}
             placeholderTextColor="#9CA3AF"
-            style={styles.input}
+            style={[styles.input, { flex: 1 }]}
           />
+          <TouchableOpacity
+            onPress={() => setShowUniversityList(!showUniversityList)}
+            style={{
+              marginLeft: 5,
+              backgroundColor: "#e0e0e0",
+              padding: 6,
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Feather
+              name={showUniversityList ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="#396cda"
+            />
+          </TouchableOpacity>
         </View>
 
+        {showUniversityList && filteredUniversities.length > 0 && (
+          <View style={{
+            backgroundColor:"#fff",
+            maxHeight:180,
+            borderWidth:1,
+            borderColor:"#ddd",
+            borderRadius:8,
+            marginBottom:10,
+            overflow:"hidden"
+          }}>
+            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+              {filteredUniversities.map((item)=>(
+                <TouchableOpacity
+                  key={item}
+                  onPress={()=>{
+                    setUniversity(item);
+                    setShowUniversityList(false);
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    padding:12,
+                    borderBottomWidth:1,
+                    borderBottomColor:"#f0f0f0"
+                  }}
+                >
+                  <Text style={{fontSize:16}}>{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
         {/* Faculty */}
-        <View style={styles.inputBox}>
+        <View style={[styles.inputBox, { flexDirection: "row", alignItems: "center" }]}>
           <Feather name="briefcase" size={18} color="#396cda" />
           <TextInput
             placeholder="Faculty"
             value={faculty}
-            onChangeText={setFaculty}
+            onChangeText={(text) => {
+              setFaculty(text);
+              setShowFacultyList(true);
+            }}
             placeholderTextColor="#9CA3AF"
-            style={styles.input}
+            style={[styles.input, { flex: 1 }]}
           />
+          <TouchableOpacity
+            onPress={() => setShowFacultyList(!showFacultyList)}
+            style={{
+              marginLeft: 5,
+              backgroundColor: "#e0e0e0",
+              padding: 6,
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Feather
+              name={showFacultyList ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="#396cda"
+            />
+          </TouchableOpacity>
         </View>
+
+        {showFacultyList && filteredFaculties.length > 0 && (
+          <View style={{
+            backgroundColor:"#fff",
+            maxHeight:180,
+            borderWidth:1,
+            borderColor:"#ddd",
+            borderRadius:8,
+            marginBottom:10,
+            overflow:"hidden"
+          }}>
+            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+              {filteredFaculties.map((item)=>(
+                <TouchableOpacity
+                  key={item}
+                  onPress={()=>{
+                    setFaculty(item);
+                    setShowFacultyList(false);
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    padding:12,
+                    borderBottomWidth:1,
+                    borderBottomColor:"#f0f0f0"
+                  }}
+                >
+                  <Text style={{fontSize:16}}>{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         {/* Phone */}
         <View style={styles.inputBox}>
@@ -223,9 +314,9 @@ const SignUpScreen: React.FC = () => {
             value={phone}
             onChangeText={(text) => {
               const cleaned = text.replace(/[^0-9]/g, "");
-              setPhone(cleaned);
+              if (cleaned.length <= 11) setPhone(cleaned);
             }}
-            keyboardType="number-pad"
+            keyboardType="phone-pad"
             maxLength={11}
             placeholderTextColor="#9CA3AF"
             style={styles.input}
@@ -234,7 +325,7 @@ const SignUpScreen: React.FC = () => {
 
         {phone.length > 0 && !phoneRegex.test(phone) && (
           <Text style={{ color: "red", fontSize: 12, marginBottom: 10, marginLeft: 10 }}>
-            Phone must be 11 digits and start with 01
+            Phone must start with 010, 011, 012 or 015 and be 11 digits
           </Text>
         )}
 
@@ -245,8 +336,8 @@ const SignUpScreen: React.FC = () => {
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={!showPassword}
             placeholderTextColor="#9CA3AF"
+            secureTextEntry={!showPassword}
             style={styles.input}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -265,8 +356,8 @@ const SignUpScreen: React.FC = () => {
             placeholder="Confirm Password"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            secureTextEntry={!showConfirm}
             placeholderTextColor="#9CA3AF"
+            secureTextEntry={!showConfirm}
             style={styles.input}
           />
           <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
@@ -303,6 +394,7 @@ const SignUpScreen: React.FC = () => {
             Log In
           </Text>
         </Text>
+
       </ScrollView>
     </TouchableWithoutFeedback>
   );
