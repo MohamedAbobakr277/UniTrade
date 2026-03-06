@@ -16,6 +16,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState, useRef } from "react";
 import { db, auth } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
@@ -37,6 +38,7 @@ export default function SellTool() {
     const [images, setImages] = useState([]);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const MAX_FILES = 5;
     const MAX_SIZE_MB = 5;
@@ -167,6 +169,7 @@ export default function SellTool() {
             setUploadProgress(100);
 
             alert("Product posted successfully");
+            navigate("/home");
 
         } catch (err) {
 
