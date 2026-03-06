@@ -23,7 +23,6 @@ import {
 /* ================= SIGN UP ================= */
 
 export async function signUp(firstName, lastName, email, password, faculty, university, phoneNumber) {
-
   try {
 
     if (!email.endsWith(".edu.eg")) {
@@ -34,8 +33,13 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
 
     const user = userCredential.user;
 
+    // تحديث بيانات المستخدم من Firebase
+    await user.reload();
+
+    // إرسال رسالة التحقق
     await sendEmailVerification(user);
 
+    // حفظ بياناته مؤقتاً
     await setDoc(doc(db, "pendingUsers", user.uid), {
       firstName,
       lastName,
@@ -49,30 +53,9 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
     return user.uid;
 
   } catch (error) {
-
     console.error("SIGNUP ERROR:", error);
-
-    if (error.code) {
-
-      switch (error.code) {
-
-        case "auth/email-already-in-use":
-          throw new Error("This email is already registered.");
-
-        case "auth/invalid-email":
-          throw new Error("Invalid email address.");
-
-        case "auth/weak-password":
-          throw new Error("Password must be at least 6 characters.");
-
-      }
-
-    }
-
     throw new Error(error.message || "Sign up failed.");
-
   }
-
 }
 
 

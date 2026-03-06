@@ -33,14 +33,21 @@ const LoginScreen: React.FC = () => {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+
   /* ================= AUTO LOGIN ================= */
 
   useEffect(() => {
 
-    const unsubscribe = onAuthStateChanged(auth,(user)=>{
+    const unsubscribe = onAuthStateChanged(auth, async (user)=>{
 
       if(user){
-        router.replace("/home");
+
+        await user.reload(); // تحديث حالة المستخدم
+
+        if(user.emailVerified){
+          router.replace("/home");
+        }
+
       }
 
     });
@@ -48,6 +55,7 @@ const LoginScreen: React.FC = () => {
     return unsubscribe;
 
   },[router]);
+
 
   /* ================= LOGIN FUNCTION ================= */
 
@@ -69,7 +77,7 @@ const LoginScreen: React.FC = () => {
 
       await login(email,password);
 
-      router.replace("/home");
+      // التحويل يتم تلقائيا من onAuthStateChanged
 
     }catch(err:any){
 
@@ -82,6 +90,7 @@ const LoginScreen: React.FC = () => {
     }
 
   };
+
 
   /* ================= UI ================= */
 
@@ -98,6 +107,7 @@ const LoginScreen: React.FC = () => {
 
       <Text style={styles.title}>Welcome Back</Text>
       <Text style={styles.subtitle}>Sign in to your account</Text>
+
 
       {/* EMAIL */}
 
@@ -116,6 +126,7 @@ const LoginScreen: React.FC = () => {
         />
 
       </View>
+
 
       {/* PASSWORD */}
 
@@ -144,6 +155,7 @@ const LoginScreen: React.FC = () => {
 
       </View>
 
+
       {/* FORGOT PASSWORD */}
 
       <TouchableOpacity onPress={()=>router.push("/forgot-password")}>
@@ -151,6 +163,7 @@ const LoginScreen: React.FC = () => {
         <Text style={styles.forgot}>Forgot Password?</Text>
 
       </TouchableOpacity>
+
 
       {/* LOGIN BUTTON */}
 
@@ -166,14 +179,13 @@ const LoginScreen: React.FC = () => {
         >
 
           <Text style={styles.buttonText}>
-
             {loading ? "Logging in..." : "Log In"}
-
           </Text>
 
         </LinearGradient>
 
       </TouchableOpacity>
+
 
       {/* SIGNUP */}
 
