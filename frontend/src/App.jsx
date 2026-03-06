@@ -4,7 +4,10 @@ import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import SellTool from "./pages/SellTool";
+import Profile from "./pages/Profile";
 
 
 export default function App() {
@@ -22,8 +25,11 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      <Route element={<ProtectedAdminRoute />}>
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Route>
       <Route path="/sell" element={<SellTool />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
-
   );
 }
