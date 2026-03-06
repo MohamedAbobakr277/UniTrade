@@ -83,7 +83,7 @@ export default function Profile() {
 
             const q = query(
                 collection(db, "products"),
-                where("ownerId", "==", auth.currentUser.uid)
+                where("userId", "==", auth.currentUser.uid)
             );
 
             const snapshot = await getDocs(q);

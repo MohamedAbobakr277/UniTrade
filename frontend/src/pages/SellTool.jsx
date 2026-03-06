@@ -43,37 +43,37 @@ export default function SellTool() {
     // Upload image to Cloudinary and return the URL
     const uploadImage = async (file) => {
 
-    const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", UPLOAD_PRESET);
+        const data = new FormData();
+        data.append("file", file);
+        data.append("upload_preset", UPLOAD_PRESET);
 
-    const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        {
-            method: "POST",
-            body: data
+        const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            {
+                method: "POST",
+                body: data
+            }
+        );
+
+        const result = await res.json();
+
+        return result.secure_url;
+    };
+    // Upload all images and return their URLs
+    const uploadImages = async () => {
+
+        const urls = [];
+
+        for (let img of images) {
+
+            const url = await uploadImage(img.file);
+
+            urls.push(url);
+
         }
-    );
 
-    const result = await res.json();
-
-    return result.secure_url;
-};
- // Upload all images and return their URLs
-const uploadImages = async () => {
-
-    const urls = [];
-
-    for (let img of images) {
-
-        const url = await uploadImage(img.file);
-
-        urls.push(url);
-
-    }
-
-    return urls;
-};
+        return urls;
+    };
 
     /* ================= FORM HANDLER ================= */
 
@@ -143,38 +143,38 @@ const uploadImages = async () => {
             setError("Please upload at least one image.");
             return;
         }
-        
+
         try {
 
-    setUploadProgress(10);
+            setUploadProgress(10);
 
-    const imageUrls = await uploadImages();
+            const imageUrls = await uploadImages();
 
-    setUploadProgress(70);
+            setUploadProgress(70);
 
-    await addDoc(collection(db, "products"), {
-        title: form.title,
-        description: form.description,
-        category: form.category,
-        university: form.university,
-        condition: form.condition,
-        price: Number(e.target.value),
-        images: imageUrls,
-        ownerId: auth.currentUser.uid,
-        createdAt: new Date()
-    });
+            await addDoc(collection(db, "products"), {
+                title: form.title,
+                description: form.description,
+                category: form.category,
+                university: form.university,
+                condition: form.condition,
+                price: Number(form.price),
+                images: imageUrls,
+                userId: auth.currentUser.uid,
+                createdAt: new Date()
+            });
 
-    setUploadProgress(100);
+            setUploadProgress(100);
 
-    alert("Product posted successfully");
+            alert("Product posted successfully");
 
-} catch (err) {
+        } catch (err) {
 
-    console.error(err);
-    setError("Error posting item");
+            console.error(err);
+            setError("Error posting item");
 
-}
-};  
+        }
+    };
 
     /* ================= UI ================= */
 
