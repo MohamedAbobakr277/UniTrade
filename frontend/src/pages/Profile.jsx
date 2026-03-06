@@ -304,7 +304,7 @@ export default function Profile() {
                                 {userItems.map((item) => (
                                     <Grid item xs={12} sm={6} key={item.id}>
                                         <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', position: 'relative' }}>
-                                            <CardMedia component="img" height="180" image={item.image?.[0] || ""} />
+                                            <CardMedia component="img" height="180" image={item.images?.[0] || ""} />
                                             <CardContent sx={{ p: 2 }}>
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{item.title}</Typography>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
