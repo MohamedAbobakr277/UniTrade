@@ -43,62 +43,62 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import logo from '../assets/logo.png';
 import { auth, db } from '../firebase';
-import { doc, getDoc, setDoc, updateDoc ,collection, query, where, getDocs, deleteDoc} from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
 
 const universities = ["Cairo University", "Ain Shams University", "Alexandria University", "Stanford University", "Other"];
 const faculties = ["Engineering", "Medicine", "Commerce", "Other"];
 
 export default function Profile() {
-const [userItems, setUserItems] = useState([]);
-const [user, setUser] = useState(null);
+    const [userItems, setUserItems] = useState([]);
+    const [user, setUser] = useState(null);
 
-const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-const [isResetModalOpen, setIsResetModalOpen] = useState(false);
-const [editData, setEditData] = useState({});
-const [showPassword, setShowPassword] = useState(false);
-const [passwords, setPasswords] = useState({ new: '', confirm: '' });
-const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
-const [currentEditItem, setCurrentEditItem] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+    const [editData, setEditData] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const [passwords, setPasswords] = useState({ new: '', confirm: '' });
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
+    const [currentEditItem, setCurrentEditItem] = useState(null);
 
-const handleOpenEditListing = (item) => {
-  setCurrentEditItem(item);
-  setIsEditListingModalOpen(true);
-};
-        useEffect(() => {
-
-    const fetchUserData = async () => {
-
-        if (!auth.currentUser) return;
-
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            setUser(userSnap.data());
-        }
-
-        /* تحميل منتجات المستخدم */
-
-        const q = query(
-            collection(db, "products"),
-            where("ownerId", "==", auth.currentUser.uid)
-        );
-
-        const snapshot = await getDocs(q);
-
-        const items = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-
-        setUserItems(items);
+    const handleOpenEditListing = (item) => {
+        setCurrentEditItem(item);
+        setIsEditListingModalOpen(true);
     };
+    useEffect(() => {
 
-    fetchUserData();
+        const fetchUserData = async () => {
 
-}, []);
+            if (!auth.currentUser) return;
+
+            const userRef = doc(db, 'users', auth.currentUser.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                setUser(userSnap.data());
+            }
+
+            /* تحميل منتجات المستخدم */
+
+            const q = query(
+                collection(db, "products"),
+                where("ownerId", "==", auth.currentUser.uid)
+            );
+
+            const snapshot = await getDocs(q);
+
+            const items = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            setUserItems(items);
+        };
+
+        fetchUserData();
+
+    }, []);
     const fileInputRef = useRef(null);
 
     const handleInputChange = (e) => {
@@ -117,71 +117,103 @@ const handleOpenEditListing = (item) => {
         }
     };
 
-const handleSaveProfile = async () => {
-  try {
-    const userRef = doc(db, 'users', auth.currentUser.uid);
-    await setDoc(userRef, editData, { merge: true }); // merge: true عشان ما يمسحش باقي البيانات
-    setUser(editData);
-    setIsEditModalOpen(false);
-    setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    setSnackbar({ open: true, message: 'Failed to update profile', severity: 'error' });
-  }
-};
-const handleResetPassword = async () => {
-  if (passwords.new !== passwords.confirm) {
-    setSnackbar({ open: true, message: 'Passwords do not match!', severity: 'error' });
-    return;
-  }
+    const handleSaveProfile = async () => {
+        try {
+            const userRef = doc(db, 'users', auth.currentUser.uid);
+            await setDoc(userRef, editData, { merge: true }); // merge: true عشان ما يمسحش باقي البيانات
+            setUser(editData);
+            setIsEditModalOpen(false);
+            setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            setSnackbar({ open: true, message: 'Failed to update profile', severity: 'error' });
+        }
+    };
+    const handleResetPassword = async () => {
+        if (passwords.new !== passwords.confirm) {
+            setSnackbar({ open: true, message: 'Passwords do not match!', severity: 'error' });
+            return;
+        }
 
-  try {
-    await updatePassword(auth.currentUser, passwords.new);
-    setIsResetModalOpen(false);
-    setPasswords({ new: '', confirm: '' });
-    setSnackbar({ open: true, message: 'Password updated successfully!', severity: 'success' });
-  } catch (error) {
-    console.error(error);
-    setSnackbar({ open: true, message: 'Failed to update password', severity: 'error' });
-  }
-};
-const handleSaveListing = async () => {
-  try {
-    const itemRef = doc(db, "items", currentEditItem.id);
-    await setDoc(itemRef, currentEditItem, { merge: true });
+        try {
+            await updatePassword(auth.currentUser, passwords.new);
+            setIsResetModalOpen(false);
+            setPasswords({ new: '', confirm: '' });
+            setSnackbar({ open: true, message: 'Password updated successfully!', severity: 'success' });
+        } catch (error) {
+            console.error(error);
+            setSnackbar({ open: true, message: 'Failed to update password', severity: 'error' });
+        }
+    };
+    const handleSaveListing = async () => {
+        try {
 
-    setUserItems(prev =>
-      prev.map(item => (item.id === currentEditItem.id ? currentEditItem : item))
-    );
+            const itemRef = doc(db, "products", currentEditItem.id);
 
-    setIsEditListingModalOpen(false);
-    setSnackbar({
-      open: true,
-      message: "Listing updated successfully",
-      severity: "success",
-    });
-  } catch (error) {
-    console.error(error);
-    setSnackbar({
-      open: true,
-      message: "Failed to update listing",
-      severity: "error",
-    });
-  }
-};
-const handleDeleteListing = async (itemId) => {
-  if (!auth.currentUser) return; // لازم يكون مستخدم متسجل
-  const docRef = doc(db, 'items', itemId); // لازم 'items' تطابق collection في rules
-  try {
-    await deleteDoc(docRef);
-    setUserItems(prev => prev.filter(item => item.id !== itemId));
-  } catch (error) {
-    console.error("Error deleting listing:", error);
-  }
-};
+            await setDoc(itemRef, currentEditItem, { merge: true });
+
+            setUserItems(prev =>
+                prev.map(item =>
+                    item.id === currentEditItem.id ? currentEditItem : item
+                )
+            );
+
+            setIsEditListingModalOpen(false);
+
+            setSnackbar({
+                open: true,
+                message: "Listing updated successfully",
+                severity: "success",
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            setSnackbar({
+                open: true,
+                message: "Failed to update listing",
+                severity: "error",
+            });
+
+        }
+    };
+    const handleDeleteListing = async (itemId) => {
+
+        if (!auth.currentUser) return;
+
+        const docRef = doc(db, "products", itemId);
+
+        try {
+
+            await deleteDoc(docRef);
+
+            setUserItems(prev =>
+                prev.filter(item => item.id !== itemId)
+            );
+
+            setSnackbar({
+                open: true,
+                message: "Listing deleted successfully",
+                severity: "success",
+            });
+
+        } catch (error) {
+
+            console.error("Error deleting listing:", error);
+
+            setSnackbar({
+                open: true,
+                message: "Failed to delete listing",
+                severity: "error",
+            });
+
+        }
+
+    };
     if (!user) {
-  return <Typography sx={{ p:5 }}>Loading profile...</Typography>;
-}
+        return <Typography sx={{ p: 5 }}>Loading profile...</Typography>;
+    }
     return (
         <Box sx={{ backgroundColor: '#f5f7fb', minHeight: '100vh' }}>
             <Box sx={{ bgcolor: '#f5f6f8', borderBottom: '1px solid #e0e0e0', px: 5, py: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -280,8 +312,8 @@ const handleDeleteListing = async (itemId) => {
                                                     <Typography variant="caption" color="text.secondary">Posted {item.postedDate}</Typography>
                                                 </Box>
                                                 <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                                    <Button fullWidth variant="outlined" size="small" startIcon={<EditIcon />} sx={{ borderRadius: 2, textTransform: 'none' }}  onClick={() => handleOpenEditListing(item)}>Edit</Button>
-                                                    <IconButton size="small" sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }}onClick={() => handleDeleteListing(item.id)}><DeleteIcon fontSize="small" /></IconButton>
+                                                    <Button fullWidth variant="outlined" size="small" startIcon={<EditIcon />} sx={{ borderRadius: 2, textTransform: 'none' }} onClick={() => handleOpenEditListing(item)}>Edit</Button>
+                                                    <IconButton size="small" sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }} onClick={() => handleDeleteListing(item.id)}><DeleteIcon fontSize="small" /></IconButton>
                                                 </Box>
                                             </CardContent>
                                         </Card>
@@ -328,26 +360,26 @@ const handleDeleteListing = async (itemId) => {
             <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Edit Listing</DialogTitle>
                 <DialogContent>
-                <TextField
-                  fullWidth
-                  label="Title"
-                  value={currentEditItem?.title || ''}
-                  onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                 fullWidth
-                label="Price"
-                type="number"
-                value={currentEditItem?.price || ''}
-                onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
-                />
-        </DialogContent>
-        <DialogActions>
-           <Button onClick={() => setIsEditListingModalOpen(false)}>Cancel</Button>
-           <Button variant="contained" onClick={handleSaveListing}>Save</Button>
-         </DialogActions>
-        </Dialog>
+                    <TextField
+                        fullWidth
+                        label="Title"
+                        value={currentEditItem?.title || ''}
+                        onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Price"
+                        type="number"
+                        value={currentEditItem?.price || ''}
+                        onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsEditListingModalOpen(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveListing}>Save</Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Reset Password Modal (Same Design as Edit Profile) */}
             <Dialog open={isResetModalOpen} onClose={() => setIsResetModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
