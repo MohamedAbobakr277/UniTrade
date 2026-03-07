@@ -78,13 +78,14 @@ export default function ItemCard({ item }) {
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Avatar src="https://i.pravatar.cc/40" sx={{ width: 36, height: 36 }} />
             <Box>
-              <Typography sx={{ fontSize: 14, fontWeight: 500 }}>Ahmed Saleh</Typography>
+              <Typography sx={{ fontSize: 14, fontWeight: 500 }}>{item.sellerName}</Typography>
             </Box>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, backgroundColor: "#f3f4f6", px: 1.5, py: 0.5, borderRadius: 2, fontSize: 13, color: "gray" }}>
             <AccessTimeIcon sx={{ fontSize: 16 }} />
-            1 hour ago
-          </Box>
+          {item.createdAt
+          ? new Date(item.createdAt.seconds * 1000).toLocaleString(): "Just now"}       
+            </Box>
         </Box>
       </CardContent>
     </Card>
