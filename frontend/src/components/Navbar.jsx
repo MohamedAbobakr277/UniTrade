@@ -2,9 +2,24 @@ import { AppBar, Toolbar, Box, IconButton, Avatar } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../firebase";
+
 
 export default function Navbar() {
     const navigate = useNavigate();
+    const [editData, setEditData] = useState(null);
+    useEffect(() => {
+    const fetchUserData = async () => {
+      if (!auth.currentUser) return;
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      setEditData(userSnap.exists() ? userSnap.data() : {});
+    };
+
+    fetchUserData();
+  }, [auth.currentUser]);
 
     return (
         <AppBar
@@ -20,7 +35,7 @@ export default function Navbar() {
                 <img
                     src={logo}
                     alt="UniTrade"
-                    style={{ height: "36px" }}
+                    style={{ height: "80px" }}
                 />
 
                 {/* RIGHT ICONS */}
@@ -29,7 +44,7 @@ export default function Navbar() {
                         <NotificationsNoneIcon sx={{ color: "#333" }} />
                     </IconButton>
 
-                    <Avatar src="https://i.pravatar.cc/40"
+                    <Avatar src={editData?.profilePhoto || "/default-avatar.png"}
                         sx={{ cursor: 'pointer' }}
                         onClick={() => navigate("/profile")}
                     />

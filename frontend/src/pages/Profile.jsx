@@ -121,7 +121,7 @@ export default function Profile() {
     const handleSaveProfile = async () => {
         try {
             const userRef = doc(db, 'users', auth.currentUser.uid);
-            await setDoc(userRef, editData, { merge: true }); // merge: true عشان ما يمسحش باقي البيانات
+            await setDoc(userRef, editData, { merge: true }); // merge: true للحفاظ على البيانات الأخرى
             setUser(editData);
             setIsEditModalOpen(false);
             setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
@@ -218,7 +218,7 @@ export default function Profile() {
     return (
         <Box sx={{ backgroundColor: '#f5f7fb', minHeight: '100vh' }}>
             <Box sx={{ bgcolor: '#f5f6f8', borderBottom: '1px solid #e0e0e0', px: 5, py: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <img src={logo} alt="UniTrade Logo" style={{ height: '60px' }} />
+                <img src={logo} alt="UniTrade Logo" style={{ height: 'px' }} />
                 <Typography variant="h4" sx={{ fontWeight: 800, color: '#1a202c', letterSpacing: '-0.02em' }}>UniTrade</Typography>
             </Box>
 

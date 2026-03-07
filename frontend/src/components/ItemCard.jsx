@@ -10,8 +10,22 @@ import {
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../firebase";
 
 export default function ItemCard({ item }) {
+    const [editData, setEditData] = useState(null);
+useEffect(() => {
+  const fetchUserData = async () => {
+    if (!item.userId) return; // بيانات البائع موجودة في item.userId
+    const userRef = doc(db, "users", item.userId);
+    const userSnap = await getDoc(userRef);
+    setEditData(userSnap.exists() ? userSnap.data() : {});
+  };
+
+  fetchUserData();
+}, [item.userId]);
   const imageUrl =
     Array.isArray(item.images) && item.images.length > 0
       ? item.images[0]
@@ -76,7 +90,7 @@ export default function ItemCard({ item }) {
         {/* Seller section */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Avatar src="https://i.pravatar.cc/40" sx={{ width: 36, height: 36 }} />
+            <Avatar src={editData?.profilePhoto || "/default-avatar.png"} sx={{ width: 36, height: 36 }} />
             <Box>
               <Typography sx={{ fontSize: 14, fontWeight: 500 }}>{item.sellerName}</Typography>
             </Box>

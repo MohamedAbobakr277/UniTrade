@@ -141,6 +141,17 @@ export default function SellTool() {
     };
 
     const handleSubmit = async () => {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        let userName = "User";
+        let userPhoto = "";
+
+        if (userSnap.exists()) {
+        const data = userSnap.data();
+        userName = data.name || "User";
+        userPhoto = data.photo || "";
+        }
         if (images.length === 0) {
             setError("Please upload at least one image.");
             return;
@@ -165,7 +176,8 @@ export default function SellTool() {
                 price: Number(form.price),
                 images: imageUrls,
                 userId: auth.currentUser.uid,
-                 sellerName: userName,
+                sellerName: userName,
+                sellerPhoto: userPhoto,
                 createdAt: new Date()
             });
 
