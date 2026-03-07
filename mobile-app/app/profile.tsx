@@ -233,14 +233,19 @@ setEditVisible(false);
 
 /* ================= LOGOUT ================= */
 
-const handleLogout = async ()=>{
+const handleLogout = async () => {
+  try {
 
-await signOut(auth);
+    setItems([]); // يوقف عرض المنتجات
 
-router.replace("/");
+    await signOut(auth);
 
+    router.replace("/");
+
+  } catch (error) {
+    console.log(error);
+  }
 };
-
 
 return(
 
@@ -334,11 +339,11 @@ Personal Information
 <Feather name="map-pin" size={18} color="#2563EB"/>
 <Text style={styles.infoText}>{user?.university}</Text>
 </View>
+
 </View>
 
-{/* ================= MY LISTINGS ================= */}
-
 <View style={styles.listingsHeader}>
+
 <Feather name="grid" size={18} color="#2563EB"/>
 
 <Text style={styles.sectionTitle}>
@@ -409,8 +414,6 @@ onPress={()=>deleteProduct(item.id)}
 </View>
 
 
-{/* SIGN OUT */}
-
 <TouchableOpacity
 style={styles.logoutBtn}
 onPress={handleLogout}
@@ -424,8 +427,6 @@ Sign Out
 
 </TouchableOpacity>
 
-
-{/* EDIT PROFILE MODAL */}
 
 <Modal visible={editVisible} animationType="slide">
 
@@ -455,9 +456,6 @@ value={phone}
 onChangeText={setPhone}
 style={styles.input}
 />
-
-
-{/* UNIVERSITY */}
 
 <TextInput
 placeholder="University"
@@ -501,9 +499,6 @@ borderColor:"#eee"
 
 }
 
-
-{/* FACULTY */}
-
 <TextInput
 placeholder="Faculty"
 value={faculty}
@@ -545,7 +540,6 @@ borderColor:"#eee"
 </ScrollView>
 
 }
-
 
 <View style={styles.modalButtons}>
 
