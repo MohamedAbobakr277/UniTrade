@@ -45,6 +45,7 @@ import logo from '../assets/logo.png';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 const universities = ["Cairo University", "Ain Shams University", "Alexandria University", "Stanford University", "Other"];
 const faculties = ["Engineering", "Medicine", "Commerce", "Other"];
@@ -61,7 +62,7 @@ export default function Profile() {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
     const [currentEditItem, setCurrentEditItem] = useState(null);
-
+    const navigate = useNavigate();
     const handleOpenEditListing = (item) => {
         setCurrentEditItem(item);
         setIsEditListingModalOpen(true);
@@ -242,7 +243,17 @@ export default function Profile() {
                         <Divider sx={{ my: 3 }} />
                         <List>
                             <ListItem disablePadding>
-                                <ListItemButton sx={{ borderRadius: 2, color: '#ef4444' }}>
+                                <ListItemButton
+                                    sx={{ borderRadius: 2, color: '#ef4444' }}
+                                    onClick={async () => {
+                                        try {
+                                            await auth.signOut(); // يسجل خروج المستخدم
+                                            navigate('/login');   // يرجعك لصفحة login
+                                        } catch (error) {
+                                            console.error("Logout failed:", error);
+                                        }
+                                    }}
+                                >
                                     <ListItemIcon><LogoutIcon sx={{ color: 'inherit' }} /></ListItemIcon>
                                     <ListItemText primary="Logout" />
                                 </ListItemButton>
