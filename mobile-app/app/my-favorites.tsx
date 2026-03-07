@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
 View,
 Text,
@@ -9,40 +9,67 @@ StyleSheet
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {collection,onSnapshot} from "firebase/firestore";
-import {db} from "./firebase";
+import {
+collection,
+onSnapshot,
+query,
+where
+} from "firebase/firestore";
 
-import {useFavorites} from "../constants/FavoriteContext";
+import { auth, db } from "./firebase";
 
 export default function MyFavorites(){
 
-const {favorites} = useFavorites();
-
-const [items,setItems] = useState<any[]>([]);
+const [favorites,setFavorites] = useState<any[]>([]);
 
 useEffect(()=>{
 
-const unsub = onSnapshot(collection(db,"products"),(snapshot)=>{
+const uid = auth.currentUser?.uid;
 
-const data = snapshot.docs.map(doc=>({
+if(!uid) return;
+
+const q = query(
+collection(db,"favorites"),
+where("userId","==",uid)
+);
+
+const unsubscribe = onSnapshot(q,(snapshot)=>{
+
+const data = snapshot.docs.map(doc=>doc.data().productId);
+
+loadProducts(data);
+
+});
+
+return unsubscribe;
+
+},[]);
+
+
+
+const loadProducts = (ids:string[])=>{
+
+const unsubscribe = onSnapshot(collection(db,"products"),(snapshot)=>{
+
+const allProducts = snapshot.docs.map(doc=>({
 id:doc.id,
 ...doc.data()
 }));
 
-setItems(data);
+const favProducts = allProducts.filter(item=>ids.includes(item.id));
+
+setFavorites(favProducts);
 
 });
 
-return unsub;
+};
 
-},[]);
 
-const favProducts = items.filter(item=>favorites.includes(item.id));
 
 const renderItem = ({item}:any)=>{
 
-const image =
-Array.isArray(item.images)&&item.images.length>0
+const imageUrl =
+Array.isArray(item.images) && item.images.length>0
 ? item.images[0]
 :"https://via.placeholder.com/150";
 
@@ -50,7 +77,10 @@ return(
 
 <View style={styles.card}>
 
-<Image source={{uri:image}} style={styles.image}/>
+<Image
+source={{uri:imageUrl}}
+style={styles.image}
+/>
 
 <View style={styles.cardContent}>
 
@@ -74,22 +104,22 @@ return(
 
 };
 
+
+
 return(
 
-<SafeAreaView edges={["top"]} style={styles.container}>
+<SafeAreaView style={styles.container}>
 
 <Text style={styles.header}>
 My Favorites
 </Text>
 
 <FlatList
-data={favProducts}
-renderItem={renderItem}
+data={favorites}
 keyExtractor={(item)=>item.id}
+renderItem={renderItem}
 numColumns={2}
 columnWrapperStyle={styles.row}
-contentContainerStyle={{paddingBottom:100}}
-showsVerticalScrollIndicator={false}
 />
 
 </SafeAreaView>
@@ -97,6 +127,8 @@ showsVerticalScrollIndicator={false}
 );
 
 }
+
+
 
 const styles = StyleSheet.create({
 
