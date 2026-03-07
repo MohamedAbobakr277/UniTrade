@@ -15,7 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState, useRef } from "react";
 import { db, auth } from "../firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection , doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 const CLOUD_NAME = "dstfo8pxq";
@@ -153,7 +153,9 @@ export default function SellTool() {
             const imageUrls = await uploadImages();
 
             setUploadProgress(70);
-
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            const userName = userSnap.exists() ? userSnap.data().firstName + " " + userSnap.data().lastName : "User";
             await addDoc(collection(db, "products"), {
                 title: form.title,
                 description: form.description,
@@ -163,6 +165,7 @@ export default function SellTool() {
                 price: Number(form.price),
                 images: imageUrls,
                 userId: auth.currentUser.uid,
+                 sellerName: userName,
                 createdAt: new Date()
             });
 
