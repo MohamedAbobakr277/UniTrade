@@ -1,5 +1,3 @@
-// src/services/auth.js
-
 import { auth, db } from "../firebase";
 
 import {
@@ -22,24 +20,31 @@ import {
 
 /* ================= SIGN UP ================= */
 
-export async function signUp(firstName, lastName, email, password, faculty, university, phoneNumber) {
+export async function signUp(
+  firstName,
+  lastName,
+  email,
+  password,
+  faculty,
+  university,
+  phoneNumber
+) {
   try {
 
     if (!email.endsWith(".edu.eg")) {
-      throw new Error("You must use a university email (.edu.eg).");
+      throw new Error("Use university email (.edu.eg)");
     }
 
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
     const user = userCredential.user;
 
-    // تحديث بيانات المستخدم من Firebase
-    await user.reload();
-
-    // إرسال رسالة التحقق
     await sendEmailVerification(user);
 
-    // حفظ بياناته مؤقتاً
     await setDoc(doc(db, "pendingUsers", user.uid), {
       firstName,
       lastName,
@@ -53,8 +58,17 @@ export async function signUp(firstName, lastName, email, password, faculty, univ
     return user.uid;
 
   } catch (error) {
-    console.error("SIGNUP ERROR:", error);
-    throw new Error(error.message || "Sign up failed.");
+
+    if (error.code === "auth/email-already-in-use")
+      throw new Error("Email already used");
+
+    if (error.code === "auth/invalid-email")
+      throw new Error("Invalid email");
+
+    if (error.code === "auth/weak-password")
+      throw new Error("Weak password");
+
+    throw new Error(error.message);
   }
 }
 
@@ -65,26 +79,21 @@ export async function login(email, password) {
 
   try {
 
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
     const user = userCredential.user;
 
-
-    /* ===== VERIFY EMAIL ===== */
-
     if (!user.emailVerified) {
-
-      throw new Error("Please verify your email before logging in.");
-
+      throw new Error("Verify your email first");
     }
-
-
-    /* ===== CHECK USER IN USERS COLLECTION ===== */
 
     const userRef = doc(db, "users", user.uid);
 
     const userSnap = await getDoc(userRef);
-
 
     if (!userSnap.exists()) {
 
@@ -92,16 +101,11 @@ export async function login(email, password) {
 
       const pendingSnap = await getDoc(pendingRef);
 
-
       if (!pendingSnap.exists()) {
-
-        throw new Error("Account data not found. Please sign up again.");
-
+        throw new Error("Account not found");
       }
 
-
       const pendingData = pendingSnap.data();
-
 
       await setDoc(userRef, {
         ...pendingData,
@@ -109,44 +113,21 @@ export async function login(email, password) {
         createdAt: serverTimestamp()
       });
 
-
       await deleteDoc(pendingRef);
-
     }
 
-    return {
-      uid: user.uid,
-      email: user.email
-    };
+    return user;
 
   } catch (error) {
 
-    console.error("LOGIN ERROR:", error);
+    if (error.code === "auth/user-not-found")
+      throw new Error("User not found");
 
-    if (error.code) {
+    if (error.code === "auth/wrong-password")
+      throw new Error("Wrong password");
 
-      switch (error.code) {
-
-        case "auth/invalid-email":
-          throw new Error("Invalid email.");
-
-        case "auth/user-not-found":
-          throw new Error("User not found.");
-
-        case "auth/wrong-password":
-          throw new Error("Incorrect password.");
-
-        case "auth/too-many-requests":
-          throw new Error("Too many attempts. Try later.");
-
-      }
-
-    }
-
-    throw new Error(error.message || "Login failed.");
-
+    throw new Error(error.message);
   }
-
 }
 
 
@@ -160,24 +141,20 @@ export async function forgotPassword(email) {
 
   } catch (error) {
 
-    console.error("FORGOT PASSWORD ERROR:", error);
+    if (error.code === "auth/invalid-email")
+      throw new Error("Invalid email");
 
-    if (error.code === "auth/invalid-email") {
-
-      throw new Error("Invalid email address.");
-
-    }
-
-    throw new Error("Unable to send reset email.");
-
+    throw new Error("Cannot send reset email");
   }
-
 }
 
 
 /* ================= RESET PASSWORD ================= */
 
-export async function resetPasswordWithCode(oobCode, newPassword) {
+export async function resetPasswordWithCode(
+  oobCode,
+  newPassword
+) {
 
   try {
 
@@ -185,24 +162,14 @@ export async function resetPasswordWithCode(oobCode, newPassword) {
 
   } catch (error) {
 
-    console.error("RESET PASSWORD ERROR:", error);
+    if (error.code === "auth/expired-action-code")
+      throw new Error("Link expired");
 
-    if (error.code === "auth/expired-action-code") {
+    if (error.code === "auth/weak-password")
+      throw new Error("Weak password");
 
-      throw new Error("Reset link expired.");
-
-    }
-
-    if (error.code === "auth/weak-password") {
-
-      throw new Error("Password must be at least 6 characters.");
-
-    }
-
-    throw new Error("Password reset failed.");
-
+    throw new Error("Reset failed");
   }
-
 }
 
 
@@ -216,10 +183,6 @@ export async function logout() {
 
   } catch (error) {
 
-    console.error("LOGOUT ERROR:", error);
-
-    throw new Error("Logout failed.");
-
+    throw new Error("Logout failed");
   }
-
 }
