@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
+import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import {
     Box,
     Typography,
@@ -38,11 +40,7 @@ import logo from '../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/auth';
 
-// --- MOCK DATA ---
-const initialStats = [
-    { label: "Total Listings", value: "1,284", change: "+12.5%", color: "#3b82f6" },
-    { label: "Active Users", value: "856", change: "+5.2%", color: "#8b5cf6" },
-];
+// Mocked Initial Data (will be replaced by Firestore data)
 
 const initialListings = [
     { id: "LST-7729", title: "MacBook Pro 2021", description: "M1 Max, 32GB RAM, 1TB SSD. Space Gray.", price: 1200, category: "Electronics", user: "Alex Chen", condition: "Like New", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8" },
@@ -59,9 +57,32 @@ const categories = ["Electronics", "Books", "Furniture", "Sports", "Fashion", "O
 const conditions = ["New", "Like New", "Good", "Fair", "Poor"];
 
 export default function AdminDashboard() {
+    const [listings, setListings] = useState([]);
+    const [users, setUsers] = useState([]);
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [listings, setListings] = useState(initialListings);
-    const [users, setUsers] = useState(initialUsers);
+    
+    const stats = [
+        {
+        label:"Total Listings",
+        value:listings.length
+        }
+    ]
+    // Real-time Firestore Listeners
+    useEffect(() => {
+        const unsubProducts = onSnapshot(collection(db,"products"),snapshot=>{
+        setListings(snapshot.docs.map(doc=>({id:doc.id,...doc.data()})))
+        })
+
+    const unsubUsers = onSnapshot(collection(db,"users"),snapshot=>{
+        setUsers(snapshot.docs.map(doc=>({id:doc.id,...doc.data()})))
+    })
+
+    return ()=>{
+        unsubProducts()
+        unsubUsers()
+    }
+
+    },[]);
 
     // Modal States
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -80,32 +101,54 @@ export default function AdminDashboard() {
         setIsEditModalOpen(true);
     };
 
-    const handleSaveEdit = () => {
-        setListings(prev => prev.map(item => item.id === selectedItem.id ? { ...item, ...editForm, price: parseFloat(editForm.price) } : item));
-        setIsEditModalOpen(false);
-    };
+    const handleSaveEdit = async () => {
+  try {
+    const ref = doc(db, "products", selectedItem.id);
+
+    await updateDoc(ref, {
+      title: editForm.title,
+      description: editForm.description,
+      category: editForm.category,
+      price: Number(editForm.price)
+    });
+
+    setIsEditModalOpen(false);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
     const handleOpenAdd = () => {
         setAddForm({ title: '', description: '', category: 'Electronics', price: '', condition: 'New' });
         setIsAddModalOpen(true);
     };
 
-    const handleSaveAdd = () => {
-        const newId = `LST-${Math.floor(1000 + Math.random() * 9000)}`;
-        const newItem = {
-            ...addForm,
-            id: newId,
-            price: parseFloat(addForm.price) || 0,
-            user: "Admin",
-            image: "https://images.unsplash.com/photo-1581093588401-22f7c1b3e9b5"
-        };
-        setListings(prev => [newItem, ...prev]);
-        setIsAddModalOpen(false);
-    };
+    const handleSaveAdd = async () => {
+  try {
+    await addDoc(collection(db, "products"), {
+      title: addForm.title,
+      description: addForm.description,
+      category: addForm.category,
+      price: Number(addForm.price),
+      condition: addForm.condition,
+      user: "Admin",
+      image: "https://images.unsplash.com/photo-1581093588401-22f7c1b3e9b5",
+      createdAt: new Date()
+    });
 
-    const handleConfirmDelete = () => {
-        setListings(prev => prev.filter(item => item.id !== itemToDelete.id));
-        setIsDeleteModalOpen(false);
+    setIsAddModalOpen(false);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+    const handleConfirmDelete = async () => {
+        try {
+            await deleteDoc(doc(db, "products", itemToDelete.id));
+            setIsDeleteModalOpen(false);
+            } catch (err) {
+            console.error(err);
+            }
     };
 
     const navigate = useNavigate();
@@ -126,7 +169,7 @@ export default function AdminDashboard() {
             <Typography color="text.secondary" sx={{ mb: 4 }}>Monitor and manage all campus trade activities.</Typography>
 
             <Grid container spacing={3} sx={{ mb: 5 }}>
-                {initialStats.map((stat, index) => (
+                {stats.map((stat, index) => (
                     <Grid item xs={12} md={6} key={index}>
                         <Paper sx={{ p: 4, borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #eef2f6' }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -156,7 +199,7 @@ export default function AdminDashboard() {
                                 <TableRow key={item.id}>
                                     <TableCell>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Avatar src={item.image} variant="rounded" sx={{ width: 40, height: 40 }} />
+                                            <Avatar src={item.images?.[0]} variant="rounded" sx={{ width: 40, height: 40 }} />
                                             <Typography sx={{ fontWeight: 600 }}>{item.title}</Typography>
                                         </Box>
                                     </TableCell>
@@ -164,7 +207,7 @@ export default function AdminDashboard() {
                                     <TableCell>
                                         <Chip label="ACTIVE" size="small" sx={{ bgcolor: '#eff6ff', color: '#2563eb', fontWeight: 700, fontSize: '0.65rem' }} />
                                     </TableCell>
-                                    <TableCell color="text.secondary">Oct 24, 2023</TableCell>
+                                    <TableCell color="text.secondary">{item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString(): "Just now"}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -199,14 +242,14 @@ export default function AdminDashboard() {
                                 <TableRow key={item.id} hover>
                                     <TableCell>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Avatar src={item.image} variant="rounded" />
+                                            <Avatar src={item.images?.[0]} variant="rounded" />
                                             <Box>
                                                 <Typography sx={{ fontWeight: 700 }}>{item.title}</Typography>
                                                 <Typography variant="caption" color="text.secondary">ID: {item.id}</Typography>
                                             </Box>
                                         </Box>
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 800, color: '#2563eb' }}>${item.price.toFixed(2)}</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, color: '#2563eb' }}>${Number(item.price || 0).toFixed(2)}</TableCell>
                                     <TableCell><Chip label={item.category} size="small" sx={{ bgcolor: '#f1f5f9', fontWeight: 600 }} /></TableCell>
                                     <TableCell>{item.user}</TableCell>
                                     <TableCell align="right">
