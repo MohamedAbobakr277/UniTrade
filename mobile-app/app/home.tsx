@@ -38,8 +38,6 @@ const [favorites,setFavorites] = useState<string[]>([]);
 const [users,setUsers] = useState<any>({});
 const [selectedCategory,setSelectedCategory] = useState("All");
 
-
-
 /* ================= GET PRODUCTS ================= */
 
 useEffect(()=>{
@@ -51,7 +49,7 @@ const data = snapshot.docs
 id:doc.id,
 ...doc.data()
 }))
-.filter((item:any)=>!item.sold); // المنتجات المباعة تختفي
+.filter((item:any)=>!item.sold);
 
 setItems(data);
 
@@ -60,8 +58,6 @@ setItems(data);
 return unsubscribe;
 
 },[]);
-
-
 
 /* ================= GET USERS ================= */
 
@@ -82,8 +78,6 @@ setUsers(data);
 return unsubscribe;
 
 },[]);
-
-
 
 /* ================= LOAD FAVORITES ================= */
 
@@ -111,8 +105,6 @@ setFavorites(favIds);
 loadFavorites();
 
 },[]);
-
-
 
 /* ================= TOGGLE FAVORITE ================= */
 
@@ -151,8 +143,6 @@ setFavorites(favorites.filter(id=>id!==productId));
 
 };
 
-
-
 /* ================= CATEGORIES ================= */
 
 const categories = [
@@ -163,8 +153,6 @@ const categories = [
 {name:"Engineering",icon:"tool"},
 {name:"Medical",icon:"plus-square"},
 ];
-
-
 
 /* ================= FILTER ================= */
 
@@ -181,8 +169,6 @@ return matchSearch && matchCategory;
 
 });
 
-
-
 /* ================= PRODUCT CARD ================= */
 
 const renderItem = ({item}:any)=>{
@@ -193,6 +179,10 @@ Array.isArray(item.images) && item.images.length>0
 :"https://via.placeholder.com/150";
 
 const sellerName = users[item.userId]?.firstName || "Unknown";
+
+const sellerPhoto =
+users[item.userId]?.profilePhoto ||
+"https://images.unsplash.com/photo-1633332755192-727a05c4013d";
 
 const createdAt = item.createdAt?.toDate?.();
 
@@ -207,17 +197,11 @@ const diff = Math.floor(
 );
 
 if(diff < 60){
-
 timeText = `${diff} min ago`;
-
 }else if(diff < 1440){
-
 timeText = `${Math.floor(diff/60)} h ago`;
-
 }else{
-
 timeText = `${Math.floor(diff/1440)} d ago`;
-
 }
 
 }
@@ -274,13 +258,32 @@ color={isFav ? "red" : "white"}
 {item.condition}
 </Text>
 
-<Text style={styles.seller}>
-Sold by: {sellerName}
+<View style={styles.sellerRow}>
+
+<View style={{flexDirection:"row",alignItems:"center"}}>
+
+<Image
+source={{uri:sellerPhoto}}
+style={styles.sellerImage}
+/>
+
+<Text style={styles.sellerName}>
+{sellerName}
 </Text>
+
+</View>
+
+<View style={{flexDirection:"row",alignItems:"center"}}>
+
+<Feather name="clock" size={14} color="#94a3b8"/>
 
 <Text style={styles.time}>
 {timeText}
 </Text>
+
+</View>
+
+</View>
 
 </View>
 
@@ -289,8 +292,6 @@ Sold by: {sellerName}
 );
 
 };
-
-
 
 /* ================= UI ================= */
 
@@ -328,8 +329,6 @@ style={styles.searchInput}
 
 </View>
 
-
-
 <View style={{height:95}}>
 
 <ScrollView
@@ -364,8 +363,6 @@ color="white"
 
 </View>
 
-
-
 <FlatList
 data={filteredItems}
 keyExtractor={(item)=>item.id}
@@ -376,8 +373,6 @@ contentContainerStyle={styles.flatListContent}
 showsVerticalScrollIndicator={false}
 />
 
-
-
 <BottomNav/>
 
 </SafeAreaView>
@@ -385,8 +380,6 @@ showsVerticalScrollIndicator={false}
 );
 
 }
-
-
 
 const styles = StyleSheet.create({
 
@@ -500,16 +493,29 @@ fontSize:12,
 color:"gray"
 },
 
-seller:{
+sellerRow:{
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center",
+marginTop:6
+},
+
+sellerImage:{
+width:22,
+height:22,
+borderRadius:20,
+marginRight:6
+},
+
+sellerName:{
 fontSize:12,
-color:"#475569",
-marginTop:2
+color:"#475569"
 },
 
 time:{
 fontSize:11,
 color:"#94a3b8",
-marginTop:3
+marginLeft:4
 }
 
 });

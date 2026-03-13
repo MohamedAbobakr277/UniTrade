@@ -28,6 +28,8 @@ deleteDoc
 } from "firebase/firestore";
 
 import { signOut } from "firebase/auth";
+const CLOUD_NAME = "dstfo8pxq";
+const UPLOAD_PRESET = "unitrade_upload";
 
 export default function Profile(){
 
@@ -179,37 +181,66 @@ sold:true
 
 };
 
+const uploadImage = async (imageUri:string)=>{
 
+const data = new FormData();
+
+data.append("file",{
+uri:imageUri,
+type:"image/jpeg",
+name:"profile.jpg"
+} as any);
+
+data.append("upload_preset",UPLOAD_PRESET);
+
+const res = await fetch(
+`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+{
+method:"POST",
+body:data
+}
+);
+
+const file = await res.json();
+
+return file.secure_url;
+
+};
 /* ================= PICK IMAGE ================= */
 
 const pickImage = async ()=>{
 
 let result = await ImagePicker.launchImageLibraryAsync({
 mediaTypes: ImagePicker.MediaTypeOptions.Images,
-quality:1
+quality:0.7
 });
 
 if(!result.canceled){
 
 const uri = result.assets[0].uri;
 
+/* Upload image */
+
+const cloudUrl = await uploadImage(uri);
+
 setUser({
 ...user,
-profilePhoto:uri
+profilePhoto:cloudUrl
 });
 
 const uid = auth.currentUser?.uid;
 
 if(!uid) return;
 
+/* Update user profile with new photo */
+
 await updateDoc(doc(db,"users",uid),{
-profilePhoto:uri
+profilePhoto:cloudUrl
 });
 
 }
 
 };
-
 
 /* ================= SAVE PROFILE ================= */
 

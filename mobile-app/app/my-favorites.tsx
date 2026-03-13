@@ -4,10 +4,12 @@ View,
 Text,
 FlatList,
 Image,
-StyleSheet
+StyleSheet,
+TouchableOpacity
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
 import {
 collection,
@@ -19,6 +21,8 @@ where
 import { auth, db } from "./firebase";
 
 export default function MyFavorites(){
+
+const router = useRouter();
 
 const [favorites,setFavorites] = useState<any[]>([]);
 
@@ -51,12 +55,18 @@ const loadProducts = (ids:string[])=>{
 
 const unsubscribe = onSnapshot(collection(db,"products"),(snapshot)=>{
 
-const allProducts = snapshot.docs.map(doc=>({
-id:doc.id,
-...doc.data()
-}));
+const allProducts = snapshot.docs.map(doc=>{
+const data = doc.data();
+return {
+id: doc.id,
+...data,
+sold: data.sold ?? false // Ensure 'sold' property exists
+};
+});
 
-const favProducts = allProducts.filter(item=>ids.includes(item.id));
+const favProducts = allProducts.filter(
+item => ids.includes(item.id) && !item.sold
+);
 
 setFavorites(favProducts);
 
@@ -75,7 +85,13 @@ Array.isArray(item.images) && item.images.length>0
 
 return(
 
-<View style={styles.card}>
+<TouchableOpacity
+style={styles.card}
+onPress={()=>router.push({
+pathname:"/product/[id]",
+params:{id:item.id}
+})}
+>
 
 <Image
 source={{uri:imageUrl}}
@@ -98,7 +114,7 @@ style={styles.image}
 
 </View>
 
-</View>
+</TouchableOpacity>
 
 );
 
