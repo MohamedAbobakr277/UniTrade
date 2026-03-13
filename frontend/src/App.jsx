@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import SellTool from "./pages/SellTool";
 import Profile from "./pages/Profile";
+import ItemDetails from "./pages/ItemDetails";
 
 export default function App() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
 
       {/* Catch all: redirect unknown paths to login */}
       <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="/item/:id" element={<ItemDetails />} />
     </Routes>
   );
 }

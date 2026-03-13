@@ -1,23 +1,20 @@
-import { Box, Grid, Typography, Button, TextField } from "@mui/material";
+import { Box, Grid, Typography, Paper, Chip } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import CategoryBar from "../components/CategoryBar";
-import TopSection from "../components/TopSection"; // ✅ correct name
+import TopSection from "../components/TopSection";
 import ItemCard from "../components/ItemCard";
 import { useState, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase"; 
+import { db } from "../firebase";
 
 export default function Home() {
-    
-// State for items, search query, and selected category
-    const [items, setItems] = useState([]);
-    const [search, setSearch] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("All");
-       
-// Fetch items from Firestore on component mount
-    useEffect(() => {
-        const unsubscribe = onSnapshot(
+  const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
       collection(db, "products"),
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
@@ -31,74 +28,169 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
-    // Categories for filtering
-  const categories = [
-    { name: "All" },
-    { name: "Books" },
-    { name: "Calculators" },
-    { name: "Laptops" },
-    { name: "Engineering" },
-    { name: "Medical" },
-  ];
 
-  // Filter items based on search query and selected category
-    const filteredItems = items.filter((item) => {
-        const matchSearch = item.title?.toLowerCase().includes(search.toLowerCase());
-        const matchCategory = selectedCategory === "All" || item.category === selectedCategory;
+  const filteredItems = items.filter((item) => {
+    const itemTitle = item.title?.toLowerCase() || "";
+    const itemDescription = item.description?.toLowerCase() || "";
+    const itemCategory = item.category?.toLowerCase() || "";
+    const searchValue = search.toLowerCase();
+
+    const matchSearch =
+      itemTitle.includes(searchValue) ||
+      itemDescription.includes(searchValue) ||
+      itemCategory.includes(searchValue);
+
+    const matchCategory =
+      selectedCategory === "All" || item.category === selectedCategory;
+
     return matchSearch && matchCategory;
-});
+  });
 
-     return (
-    <Box sx={{ backgroundColor: "#f5f7fb", minHeight: "100vh" }}>
-      {/* Navbar */}
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 35%, #eef4ff 100%)",
+      }}
+    >
       <Navbar />
 
-      {/* Top Section */}
       <TopSection />
 
-      <Box sx={{ display: "flex" }}>
-        {/* Sidebar */}
+      <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
+        <CategoryBar
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          flexDirection: { xs: "column", md: "row" },
+        }}
+      >
         <Sidebar />
 
-        {/* Main Content */}
-        <Box sx={{ flex: 1, px: 5, py: 4 }}>
-          {/* Categories Buttons */}
-          <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
-            {categories.map((cat) => (
-              <Button
-                key={cat.name}
-                variant={selectedCategory === cat.name ? "contained" : "outlined"}
-                color="primary"
-                onClick={() => setSelectedCategory(cat.name)}
+        <Box
+          sx={{
+            flex: 1,
+            px: { xs: 2, md: 5 },
+            py: 4,
+            width: "100%",
+          }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              mb: 4,
+              p: { xs: 2.5, md: 3 },
+              borderRadius: "24px",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              boxShadow: "0 8px 30px rgba(15, 23, 42, 0.05)",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", md: "center" },
+                flexDirection: { xs: "column", md: "row" },
+                gap: 1.5,
+              }}
+            >
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: { xs: 24, md: 28 },
+                    fontWeight: 800,
+                    color: "#0f172a",
+                    mb: 0.5,
+                  }}
+                >
+                  All Listings
+                </Typography>
+
+                <Typography
+                  sx={{
+                    fontSize: "0.95rem",
+                    color: "#64748b",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Explore campus deals and discover useful student items in one place.
+                </Typography>
+              </Box>
+
+              <Chip
+                label={`${filteredItems.length} item${filteredItems.length !== 1 ? "s" : ""
+                  } found`}
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: "999px",
+                  backgroundColor: "#e0ecff",
+                  color: "#1d4ed8",
+                }}
+              />
+            </Box>
+          </Paper>
+
+          {filteredItems.length > 0 ? (
+            <Grid container spacing={3}>
+              {filteredItems.map((item) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
+                  <Box
+                    sx={{
+                      height: "100%",
+                      transition: "all 0.25s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                      },
+                    }}
+                  >
+                    <ItemCard item={item} />
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Paper
+              elevation={0}
+              sx={{
+                p: 5,
+                textAlign: "center",
+                borderRadius: "24px",
+                backgroundColor: "#ffffff",
+                border: "1px dashed #cbd5e1",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  mb: 1,
+                }}
               >
-                {cat.name}
-              </Button>
-            ))}
-          </Box>
+                No items found
+              </Typography>
 
-          {/* Search Input */}
-          <TextField
-            fullWidth
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ mb: 4 }}
-          />
-
-          {/* Title */}
-          <Typography sx={{ fontSize: 26, fontWeight: 700, mb: 4 }}>
-            All Listings
-          </Typography>
-
-          {/* Products Grid */}
-          <Grid container spacing={4}>
-            {filteredItems.map((item) => (
-              <Grid item xs={12} sm={6} md={4} key={item.id}>
-                <ItemCard item={item} />
-              </Grid>
-            ))}
-          </Grid>
+              <Typography
+                sx={{
+                  fontSize: "0.95rem",
+                  color: "#64748b",
+                  lineHeight: 1.7,
+                }}
+              >
+                Try another search or browse a different category.
+              </Typography>
+            </Paper>
+          )}
         </Box>
       </Box>
     </Box>
-  );}
+  );
+}
