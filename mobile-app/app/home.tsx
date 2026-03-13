@@ -12,6 +12,7 @@ StyleSheet
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 import {
 collection,
@@ -28,6 +29,8 @@ import { auth, db } from "./firebase";
 import BottomNav from "../components/BottomNav";
 
 export default function HomeScreen(){
+
+const router = useRouter();
 
 const [search,setSearch] = useState("");
 const [items,setItems] = useState<any[]>([]);
@@ -221,7 +224,13 @@ const isFav = favorites.includes(item.id);
 
 return(
 
-<View style={styles.card}>
+<TouchableOpacity
+style={styles.card}
+onPress={()=>router.push({
+pathname:"/product/[id]",
+params:{id:item.id}
+})}
+>
 
 <View>
 
@@ -273,7 +282,7 @@ Sold by: {sellerName}
 
 </View>
 
-</View>
+</TouchableOpacity>
 
 );
 
