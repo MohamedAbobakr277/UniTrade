@@ -244,7 +244,7 @@ Firebase Project
 | **Abdallah Mahmoud** | Backend Developer |
 | **Ahmed Emad** | Backend Developer |
 | **Ahmed Sayed** | Mobile Developer |
-| **Ahmed** | Mobile Developer |
+| **Ahmed Emad** | Mobile Developer |
 
 ---
 
