@@ -7,34 +7,33 @@ ScrollView,
 StyleSheet,
 TouchableOpacity,
 Linking,
-Dimensions
+Dimensions,
+Share,
+Modal
 } from "react-native";
 
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "./../firebase";
+
+import {
+doc,
+getDoc,
+setDoc,
+deleteDoc
+} from "firebase/firestore";
+
+import { db, auth } from "../firebase";
 
 const { width } = Dimensions.get("window");
-
-type Product = {
-id: string;
-images?: string[];
-price?: number;
-title?: string;
-university?: string;
-description?: string;
-condition?: string;
-category?: string;
-phone?: string;
-createdAt?: any;
-};
 
 export default function ProductDetails(){
 
 const { id } = useLocalSearchParams();
-const [product,setProduct] = useState<Product | null>(null);
+
+const [product,setProduct] = useState<any>(null);
 const [activeImage,setActiveImage] = useState(0);
+const [favorite,setFavorite] = useState(false);
+const [zoom,setZoom] = useState(false);
 
 useEffect(()=>{
 
@@ -43,7 +42,9 @@ const fetchProduct = async()=>{
 if(!id) return;
 
 const docId = Array.isArray(id) ? id[0] : id;
+
 const ref = doc(db,"products",docId);
+
 const snap = await getDoc(ref);
 
 if(snap.exists()){
@@ -59,16 +60,84 @@ fetchProduct();
 
 },[id]);
 
-const formatDate = (timestamp:any)=>{
-if(!timestamp) return "";
-return timestamp.toDate().toLocaleDateString("en-GB");
+/* FAVORITE */
+
+const toggleFavorite = async()=>{
+
+const user = auth.currentUser;
+
+if(!user || !product) return;
+
+const favRef = doc(db,"favorites",`${user.uid}_${product.id}`);
+
+if(favorite){
+
+await deleteDoc(favRef);
+setFavorite(false);
+
+}else{
+
+await setDoc(favRef,{
+userId:user.uid,
+productId:product.id,
+createdAt:new Date()
+});
+
+setFavorite(true);
+
+}
+
 };
+
+/* SHARE */
+
+const shareProduct = async()=>{
+
+if(!product) return;
+
+await Share.share({
+message:`${product.title} - EGP ${Number(product.price).toLocaleString()}`
+});
+
+};
+
+/* CONTACT */
 
 const phone = product?.phone || "";
 
 const openWhatsApp = ()=> Linking.openURL(`https://wa.me/${phone}`);
 const callSeller = ()=> Linking.openURL(`tel:${phone}`);
 const sendSMS = ()=> Linking.openURL(`sms:${phone}`);
+
+/* TIME AGO */
+
+const timeAgo = (timestamp:any)=>{
+
+if(!timestamp) return "";
+
+const now = new Date();
+const date = timestamp.toDate();
+
+const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+const hours = Math.floor(seconds / 3600);
+
+if(hours < 1){
+
+const minutes = Math.floor(seconds / 60);
+return minutes + " minutes ago";
+
+}
+
+if(hours < 24){
+return hours + " hours ago";
+}
+
+const days = Math.floor(hours / 24);
+
+return days + " days ago";
+
+};
 
 if(!product){
 return(
@@ -77,6 +146,10 @@ return(
 </View>
 );
 }
+
+const mainImage =
+product.images?.[0] ||
+"https://via.placeholder.com/400";
 
 return(
 
@@ -92,30 +165,59 @@ return(
 horizontal
 pagingEnabled
 showsHorizontalScrollIndicator={false}
+decelerationRate="fast"
 onScroll={(e)=>{
+
 const slide = Math.round(
 e.nativeEvent.contentOffset.x / width
 );
+
 setActiveImage(slide);
+
 }}
 scrollEventThrottle={16}
 >
 
-{product.images?.map((img,index)=>(
-<Image
+{product.images?.length ? (
+
+product.images.map((img:string,index:number)=>(
+
+<TouchableOpacity
 key={index}
+activeOpacity={0.9}
+onPress={()=>setZoom(true)}
+>
+
+<Image
 source={{uri:img}}
 style={styles.image}
 />
-))}
+
+</TouchableOpacity>
+
+))
+
+) : (
+
+<Image
+source={{uri:mainImage}}
+style={styles.image}
+/>
+
+)}
 
 </ScrollView>
 
-{/* IMAGE DOTS */}
+<View style={styles.imageCount}>
+<Text style={styles.imageCountText}>
+{activeImage+1}/{product.images?.length || 1}
+</Text>
+</View>
 
 <View style={styles.dots}>
 
-{product.images?.map((_,i)=>(
+{product.images?.map((_:any,i:number)=>(
+
 <View
 key={i}
 style={[
@@ -123,27 +225,46 @@ styles.dot,
 activeImage===i && styles.activeDot
 ]}
 />
+
 ))}
 
 </View>
 
 </View>
 
-{/* BACK BUTTON */}
+{/* TOP BUTTONS */}
 
 <TouchableOpacity
 style={styles.backBtn}
 onPress={()=>router.back()}
 >
-<Feather name="arrow-left" size={24} color="white"/>
+<Feather name="arrow-left" size={22} color="#333"/>
 </TouchableOpacity>
 
-{/* CARD */}
+<TouchableOpacity
+style={styles.favorite}
+onPress={toggleFavorite}
+>
+<Feather
+name="heart"
+size={22}
+color={favorite ? "red":"#333"}
+/>
+</TouchableOpacity>
 
-<View style={styles.card}>
+<TouchableOpacity
+style={styles.share}
+onPress={shareProduct}
+>
+<Feather name="share-2" size={22} color="#333"/>
+</TouchableOpacity>
+
+{/* CONTENT */}
+
+<View style={styles.content}>
 
 <Text style={styles.price}>
-EGP {product.price}
+EGP {Number(product.price).toLocaleString()}
 </Text>
 
 <Text style={styles.title}>
@@ -157,7 +278,7 @@ EGP {product.price}
 </Text>
 
 <Text style={styles.date}>
-{formatDate(product.createdAt)}
+{timeAgo(product.createdAt)}
 </Text>
 
 </View>
@@ -168,15 +289,37 @@ EGP {product.price}
 
 <View style={styles.infoRow}>
 
-<View style={styles.infoBox}>
-<Text style={styles.infoValue}>{product.condition}</Text>
-<Text style={styles.infoLabel}>Condition</Text>
+<View style={styles.infoCard}>
+<Text style={styles.infoValue}>
+{product.condition}
+</Text>
+<Text style={styles.infoLabel}>
+Condition
+</Text>
 </View>
 
-<View style={styles.infoBox}>
-<Text style={styles.infoValue}>{product.category}</Text>
-<Text style={styles.infoLabel}>Category</Text>
+<View style={styles.infoCard}>
+<Text style={styles.infoValue}>
+{product.category}
+</Text>
+<Text style={styles.infoLabel}>
+Category
+</Text>
 </View>
+
+</View>
+
+{/* SELLER */}
+
+<View style={styles.sellerCard}>
+
+<Text style={styles.sellerTitle}>
+Seller
+</Text>
+
+<Text style={styles.sellerName}>
+{product.sellerName || "Unknown"}
+</Text>
 
 </View>
 
@@ -184,12 +327,12 @@ EGP {product.price}
 
 </ScrollView>
 
-{/* CONTACT BAR */}
+{/* CONTACT */}
 
 <View style={styles.contactBar}>
 
 <TouchableOpacity
-style={[styles.contactBtn,{backgroundColor:"#25D366"}]}
+style={[styles.contactBtn,{backgroundColor:"#22C55E"}]}
 onPress={openWhatsApp}
 >
 <Feather name="message-circle" size={20} color="white"/>
@@ -214,6 +357,32 @@ onPress={callSeller}
 
 </View>
 
+{/* ZOOM */}
+
+<Modal visible={zoom} transparent={true}>
+
+<TouchableOpacity
+style={{
+flex:1,
+backgroundColor:"black",
+justifyContent:"center"
+}}
+onPress={()=>setZoom(false)}
+>
+
+<Image
+source={{uri:product.images?.[activeImage]}}
+style={{
+width:"100%",
+height:400,
+resizeMode:"contain"
+}}
+/>
+
+</TouchableOpacity>
+
+</Modal>
+
 </View>
 
 );
@@ -224,7 +393,7 @@ const styles = StyleSheet.create({
 
 screen:{
 flex:1,
-backgroundColor:"#F1F5F9"
+backgroundColor:"#F3F4F6"
 },
 
 loading:{
@@ -235,8 +404,9 @@ alignItems:"center"
 
 image:{
 width:width,
-height:320,
-resizeMode:"cover"
+height:260,
+resizeMode:"contain",
+backgroundColor:"white"
 },
 
 dots:{
@@ -258,21 +428,49 @@ activeDot:{
 backgroundColor:"#2563EB"
 },
 
+imageCount:{
+position:"absolute",
+bottom:15,
+right:15,
+backgroundColor:"rgba(0,0,0,0.6)",
+paddingHorizontal:8,
+paddingVertical:4,
+borderRadius:6
+},
+
+imageCountText:{
+color:"white"
+},
+
 backBtn:{
 position:"absolute",
 top:50,
 left:15,
-backgroundColor:"rgba(0,0,0,0.5)",
+backgroundColor:"rgba(255,255,255,0.8)",
 padding:10,
 borderRadius:30
 },
 
-card:{
-backgroundColor:"white",
-padding:20,
-borderTopLeftRadius:25,
-borderTopRightRadius:25,
-marginTop:-20
+favorite:{
+position:"absolute",
+top:50,
+right:60,
+backgroundColor:"rgba(255,255,255,0.8)",
+padding:10,
+borderRadius:30
+},
+
+share:{
+position:"absolute",
+top:50,
+right:15,
+backgroundColor:"rgba(255,255,255,0.8)",
+padding:10,
+borderRadius:30
+},
+
+content:{
+padding:20
 },
 
 price:{
@@ -282,31 +480,30 @@ color:"#2563EB"
 },
 
 title:{
-fontSize:18,
-marginTop:8,
-fontWeight:"600",
-color:"#111827"
+fontSize:20,
+marginTop:6,
+fontWeight:"600"
 },
 
 row:{
 flexDirection:"row",
 justifyContent:"space-between",
-marginTop:8
+marginTop:6
 },
 
 location:{
-color:"#64748B"
+color:"#6B7280"
 },
 
 date:{
-color:"#64748B"
+color:"#6B7280"
 },
 
 description:{
 marginTop:15,
 fontSize:15,
-color:"#374151",
-lineHeight:22
+lineHeight:22,
+color:"#374151"
 },
 
 infoRow:{
@@ -315,23 +512,39 @@ justifyContent:"space-between",
 marginTop:20
 },
 
-infoBox:{
+infoCard:{
 backgroundColor:"#EFF6FF",
+width:"48%",
 padding:15,
 borderRadius:12,
-width:"48%",
 alignItems:"center"
 },
 
 infoValue:{
-fontSize:16,
+fontSize:18,
 fontWeight:"bold",
 color:"#1E3A8A"
 },
 
 infoLabel:{
-color:"#64748B",
-marginTop:3
+marginTop:4,
+color:"#6B7280"
+},
+
+sellerCard:{
+marginTop:25,
+padding:15,
+backgroundColor:"white",
+borderRadius:12
+},
+
+sellerTitle:{
+fontWeight:"600",
+marginBottom:5
+},
+
+sellerName:{
+color:"#374151"
 },
 
 contactBar:{

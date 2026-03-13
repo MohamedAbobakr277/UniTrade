@@ -202,10 +202,16 @@ university,
 faculty,
 price,
 images:imageUrls,
-userId:auth.currentUser?.uid,
+
+userId: auth.currentUser?.uid,
+
+sellerName: auth.currentUser?.providerData[0]?.displayName,
+sellerEmail: auth.currentUser?.email,
+
 createdAt:new Date()
 
 });
+
 
 Alert.alert("Product posted successfully");
 
