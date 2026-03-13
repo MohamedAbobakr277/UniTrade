@@ -14,7 +14,6 @@ Alert
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
 import { auth, db } from "./firebase";
 
 import {
@@ -166,6 +165,17 @@ await deleteDoc(doc(db,"products",id));
 }
 ]
 );
+
+};
+/* ================= MARK SOLD ================= */
+
+/* ================= MARK SOLD ================= */
+
+const markSold = async (id:string)=>{
+
+await updateDoc(doc(db,"products",id),{
+sold:true
+});
 
 };
 
@@ -365,10 +375,22 @@ return(
 
 <View key={item.id} style={styles.productCard}>
 
+<View>
+
+{item.sold && (
+<View style={styles.soldBadge}>
+<Text style={styles.soldTextBadge}>
+SOLD
+</Text>
+</View>
+)}
+
 <Image
 source={{uri:image}}
 style={styles.productImage}
 />
+
+</View>
 
 <View style={styles.productInfo}>
 
@@ -399,6 +421,18 @@ onPress={()=>deleteProduct(item.id)}
 >
 <Feather name="trash-2" size={14} color="white"/>
 <Text style={styles.actionText}>Delete</Text>
+</TouchableOpacity>
+
+</View>
+<View style={styles.soldRow}>
+
+<TouchableOpacity
+style={styles.soldBtn}
+onPress={()=>markSold(item.id)}
+>
+
+<Feather name="check-circle" size={16} color={item.sold ? "#22c55e" : "white"}/>
+
 </TouchableOpacity>
 
 </View>
@@ -597,6 +631,22 @@ width:110,
 height:110,
 borderRadius:60
 },
+soldBadge:{
+position:"absolute",
+top:8,
+left:8,
+backgroundColor:"#ef4444",
+paddingHorizontal:8,
+paddingVertical:3,
+borderRadius:6,
+zIndex:10
+},
+
+soldTextBadge:{
+color:"white",
+fontSize:10,
+fontWeight:"700"
+},
 
 cameraIcon:{
 position:"absolute",
@@ -744,6 +794,17 @@ padding:6,
 borderRadius:6,
 width:"48%",
 justifyContent:"center"
+},
+
+soldRow:{
+alignItems:"center",
+marginTop:6
+},
+
+soldBtn:{
+backgroundColor:"#16a34a",
+padding:6,
+borderRadius:20
 },
 
 actionText:{

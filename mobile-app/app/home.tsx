@@ -46,10 +46,12 @@ useEffect(()=>{
 
 const unsubscribe = onSnapshot(collection(db,"products"),(snapshot)=>{
 
-const data = snapshot.docs.map(doc=>({
+const data = snapshot.docs
+.map(doc=>({
 id:doc.id,
 ...doc.data()
-}));
+}))
+.filter((item:any)=>!item.sold); // المنتجات المباعة تختفي
 
 setItems(data);
 

@@ -6,7 +6,8 @@ Image,
 ScrollView,
 StyleSheet,
 TouchableOpacity,
-Linking
+Linking,
+Dimensions
 } from "react-native";
 
 import { useLocalSearchParams, router } from "expo-router";
@@ -15,17 +16,19 @@ import { Feather } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./../firebase";
 
+const { width } = Dimensions.get("window");
+
 type Product = {
-  id: string;
-  images?: string[];
-  price?: number;
-  title?: string;
-  university?: string;
-  description?: string;
-  condition?: string;
-  category?: string;
-  phone?: string;
-  [key: string]: any;
+id: string;
+images?: string[];
+price?: number;
+title?: string;
+university?: string;
+description?: string;
+condition?: string;
+category?: string;
+phone?: string;
+[key: string]: any;
 };
 
 export default function ProductDetails(){
@@ -42,7 +45,8 @@ const fetchProduct = async()=>{
 if(!id) return;
 
 const docId = Array.isArray(id) ? id[0] : id;
-const ref = doc(db, "products", docId);
+
+const ref = doc(db,"products",docId);
 
 const snap = await getDoc(ref);
 
@@ -58,7 +62,6 @@ id:snap.id,
 fetchProduct();
 
 },[id]);
-
 
 /* CONTACT */
 
@@ -76,7 +79,6 @@ const sendSMS = ()=>{
 Linking.openURL(`sms:${phone}`);
 };
 
-
 /* LOADING */
 
 if(!product){
@@ -87,7 +89,6 @@ return(
 );
 }
 
-
 /* UI */
 
 return(
@@ -96,10 +97,25 @@ return(
 
 <ScrollView contentContainerStyle={{flexGrow:1}}>
 
+{/* IMAGE SLIDER */}
+
+<ScrollView
+horizontal
+pagingEnabled
+showsHorizontalScrollIndicator={false}
+>
+
+{product.images?.map((img,index)=>(
 <Image
-source={{uri:product.images?.[0]}}
+key={index}
+source={{uri:img}}
 style={styles.image}
 />
+))}
+
+</ScrollView>
+
+{/* BACK BUTTON */}
 
 <TouchableOpacity
 style={styles.backBtn}
@@ -108,6 +124,7 @@ onPress={()=>router.back()}
 <Feather name="arrow-left" size={22} color="white"/>
 </TouchableOpacity>
 
+{/* PRODUCT INFO */}
 
 <View style={styles.contentCard}>
 
@@ -131,7 +148,6 @@ EGP {product.price}
 
 </View>
 
-
 <View style={styles.infoRow}>
 
 <View style={styles.infoBox}>
@@ -149,8 +165,6 @@ EGP {product.price}
 </View>
 
 </ScrollView>
-
-
 
 {/* CONTACT BUTTONS */}
 
@@ -188,8 +202,6 @@ onPress={callSeller}
 
 }
 
-
-
 /* STYLES */
 
 const styles = StyleSheet.create({
@@ -206,9 +218,10 @@ alignItems:"center"
 },
 
 image:{
-width:"100%",
+width:width,
 height:320,
-resizeMode:"cover"
+resizeMode:"contain",
+backgroundColor:"#000"
 },
 
 backBtn:{

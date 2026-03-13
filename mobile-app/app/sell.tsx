@@ -97,7 +97,7 @@ return;
 }
 
 const result = await ImagePicker.launchImageLibraryAsync({
-mediaTypes: ['images'],
+mediaTypes: ImagePicker.MediaTypeOptions.Images,
 allowsMultipleSelection:true,
 selectionLimit:10,
 quality:0.7
@@ -123,10 +123,8 @@ setImages(allImages);
 /* ================= DELETE IMAGE ================= */
 
 const removeImage = (index:number)=>{
-
 const newImages = images.filter((_,i)=>i!==index);
 setImages(newImages);
-
 };
 
 /* ================= CLOUDINARY UPLOAD ================= */
@@ -164,7 +162,6 @@ const urls:string[] = [];
 for(const img of images){
 
 const url = await uploadImage(img);
-
 urls.push(url);
 
 }
@@ -233,14 +230,16 @@ return(
 
 <SafeAreaView style={{flex:1}}>
 
-<ScrollView style={{padding:20}}>
+<ScrollView
+style={{padding:20}}
+contentContainerStyle={{paddingBottom:120}}
+>
 
 <Text style={{fontSize:22,fontWeight:"bold",marginBottom:15}}>
 Sell Your Item
 </Text>
 
 {images.length>0 && (
-
 <Image
 source={{uri:images[0]}}
 style={{
@@ -250,7 +249,6 @@ borderRadius:15,
 marginBottom:10
 }}
 />
-
 )}
 
 <View style={{flexDirection:"row",flexWrap:"wrap"}}>
@@ -301,9 +299,7 @@ borderRadius:10,
 alignItems:"center"
 }}
 >
-
 <Text>Add Images</Text>
-
 </TouchableOpacity>
 
 <TextInput
