@@ -12,7 +12,6 @@ Dimensions
 
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./../firebase";
 
@@ -28,15 +27,14 @@ description?: string;
 condition?: string;
 category?: string;
 phone?: string;
-[key: string]: any;
+createdAt?: any;
 };
 
 export default function ProductDetails(){
 
 const { id } = useLocalSearchParams();
 const [product,setProduct] = useState<Product | null>(null);
-
-/* GET PRODUCT */
+const [activeImage,setActiveImage] = useState(0);
 
 useEffect(()=>{
 
@@ -45,9 +43,7 @@ const fetchProduct = async()=>{
 if(!id) return;
 
 const docId = Array.isArray(id) ? id[0] : id;
-
 const ref = doc(db,"products",docId);
-
 const snap = await getDoc(ref);
 
 if(snap.exists()){
@@ -63,23 +59,16 @@ fetchProduct();
 
 },[id]);
 
-/* CONTACT */
+const formatDate = (timestamp:any)=>{
+if(!timestamp) return "";
+return timestamp.toDate().toLocaleDateString("en-GB");
+};
 
 const phone = product?.phone || "";
 
-const openWhatsApp = ()=>{
-Linking.openURL(`https://wa.me/${phone}`);
-};
-
-const callSeller = ()=>{
-Linking.openURL(`tel:${phone}`);
-};
-
-const sendSMS = ()=>{
-Linking.openURL(`sms:${phone}`);
-};
-
-/* LOADING */
+const openWhatsApp = ()=> Linking.openURL(`https://wa.me/${phone}`);
+const callSeller = ()=> Linking.openURL(`tel:${phone}`);
+const sendSMS = ()=> Linking.openURL(`sms:${phone}`);
 
 if(!product){
 return(
@@ -89,20 +78,27 @@ return(
 );
 }
 
-/* UI */
-
 return(
 
 <View style={styles.screen}>
 
-<ScrollView contentContainerStyle={{flexGrow:1}}>
+<ScrollView>
 
 {/* IMAGE SLIDER */}
+
+<View>
 
 <ScrollView
 horizontal
 pagingEnabled
 showsHorizontalScrollIndicator={false}
+onScroll={(e)=>{
+const slide = Math.round(
+e.nativeEvent.contentOffset.x / width
+);
+setActiveImage(slide);
+}}
+scrollEventThrottle={16}
 >
 
 {product.images?.map((img,index)=>(
@@ -115,20 +111,36 @@ style={styles.image}
 
 </ScrollView>
 
+{/* IMAGE DOTS */}
+
+<View style={styles.dots}>
+
+{product.images?.map((_,i)=>(
+<View
+key={i}
+style={[
+styles.dot,
+activeImage===i && styles.activeDot
+]}
+/>
+))}
+
+</View>
+
+</View>
+
 {/* BACK BUTTON */}
 
 <TouchableOpacity
 style={styles.backBtn}
 onPress={()=>router.back()}
 >
-<Feather name="arrow-left" size={22} color="white"/>
+<Feather name="arrow-left" size={24} color="white"/>
 </TouchableOpacity>
 
-{/* PRODUCT INFO */}
+{/* CARD */}
 
-<View style={styles.contentCard}>
-
-<View>
+<View style={styles.card}>
 
 <Text style={styles.price}>
 EGP {product.price}
@@ -138,26 +150,32 @@ EGP {product.price}
 {product.title}
 </Text>
 
+<View style={styles.row}>
+
 <Text style={styles.location}>
 📍 {product.university}
 </Text>
+
+<Text style={styles.date}>
+{formatDate(product.createdAt)}
+</Text>
+
+</View>
 
 <Text style={styles.description}>
 {product.description}
 </Text>
 
-</View>
-
 <View style={styles.infoRow}>
 
 <View style={styles.infoBox}>
-<Text style={styles.infoLabel}>Condition</Text>
 <Text style={styles.infoValue}>{product.condition}</Text>
+<Text style={styles.infoLabel}>Condition</Text>
 </View>
 
 <View style={styles.infoBox}>
-<Text style={styles.infoLabel}>Category</Text>
 <Text style={styles.infoValue}>{product.category}</Text>
+<Text style={styles.infoLabel}>Category</Text>
 </View>
 
 </View>
@@ -166,9 +184,9 @@ EGP {product.price}
 
 </ScrollView>
 
-{/* CONTACT BUTTONS */}
+{/* CONTACT BAR */}
 
-<View style={styles.contactRow}>
+<View style={styles.contactBar}>
 
 <TouchableOpacity
 style={[styles.contactBtn,{backgroundColor:"#25D366"}]}
@@ -179,7 +197,7 @@ onPress={openWhatsApp}
 </TouchableOpacity>
 
 <TouchableOpacity
-style={[styles.contactBtn,{backgroundColor:"#ef4444"}]}
+style={[styles.contactBtn,{backgroundColor:"#3B82F6"}]}
 onPress={sendSMS}
 >
 <Feather name="mail" size={20} color="white"/>
@@ -202,13 +220,11 @@ onPress={callSeller}
 
 }
 
-/* STYLES */
-
 const styles = StyleSheet.create({
 
 screen:{
 flex:1,
-backgroundColor:"#020617"
+backgroundColor:"#F1F5F9"
 },
 
 loading:{
@@ -220,8 +236,26 @@ alignItems:"center"
 image:{
 width:width,
 height:320,
-resizeMode:"contain",
-backgroundColor:"#000"
+resizeMode:"cover"
+},
+
+dots:{
+flexDirection:"row",
+position:"absolute",
+bottom:15,
+alignSelf:"center"
+},
+
+dot:{
+width:8,
+height:8,
+borderRadius:4,
+backgroundColor:"#D1D5DB",
+margin:4
+},
+
+activeDot:{
+backgroundColor:"#2563EB"
 },
 
 backBtn:{
@@ -229,82 +263,90 @@ position:"absolute",
 top:50,
 left:15,
 backgroundColor:"rgba(0,0,0,0.5)",
-padding:8,
-borderRadius:20
+padding:10,
+borderRadius:30
 },
 
-contentCard:{
-backgroundColor:"#111827",
-marginTop:-30,
+card:{
+backgroundColor:"white",
+padding:20,
 borderTopLeftRadius:25,
 borderTopRightRadius:25,
-padding:22,
-flex:1,
-justifyContent:"space-between"
+marginTop:-20
 },
 
 price:{
-fontSize:26,
-fontWeight:"700",
-color:"#ffffff"
+fontSize:30,
+fontWeight:"bold",
+color:"#2563EB"
 },
 
 title:{
 fontSize:18,
 marginTop:8,
-color:"#cbd5e1"
+fontWeight:"600",
+color:"#111827"
+},
+
+row:{
+flexDirection:"row",
+justifyContent:"space-between",
+marginTop:8
 },
 
 location:{
-marginTop:6,
-color:"#94a3b8",
-fontSize:14
+color:"#64748B"
+},
+
+date:{
+color:"#64748B"
 },
 
 description:{
-marginTop:16,
-color:"#e2e8f0",
+marginTop:15,
+fontSize:15,
+color:"#374151",
 lineHeight:22
 },
 
 infoRow:{
 flexDirection:"row",
 justifyContent:"space-between",
-marginTop:25
+marginTop:20
 },
 
 infoBox:{
-backgroundColor:"#020617",
-padding:14,
+backgroundColor:"#EFF6FF",
+padding:15,
 borderRadius:12,
 width:"48%",
 alignItems:"center"
 },
 
-infoLabel:{
-color:"#94a3b8",
-fontSize:12
-},
-
 infoValue:{
-color:"#ffffff",
-fontWeight:"600",
-marginTop:5
+fontSize:16,
+fontWeight:"bold",
+color:"#1E3A8A"
 },
 
-contactRow:{
+infoLabel:{
+color:"#64748B",
+marginTop:3
+},
+
+contactBar:{
 flexDirection:"row",
 justifyContent:"space-around",
 padding:15,
-backgroundColor:"#020617",
+backgroundColor:"white",
 borderTopWidth:1,
-borderColor:"#1e293b"
+borderColor:"#E5E7EB"
 },
 
 contactBtn:{
 flexDirection:"row",
 alignItems:"center",
-padding:12,
+padding:14,
 borderRadius:10
 },
 
