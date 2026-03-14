@@ -18,7 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import { db, auth } from "./firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 
 /* ================= CLOUDINARY ================= */
 
@@ -192,6 +192,27 @@ setLoading(true);
 
 const imageUrls = await uploadImages();
 
+let sellerName = "";
+let userId = "";
+let sellerEmail = "";
+
+if (auth.currentUser) {
+
+userId = auth.currentUser.uid;
+sellerEmail = auth.currentUser.email ?? "";
+
+const userRef = doc(db, "users", userId);
+const userSnap = await getDoc(userRef);
+
+if (userSnap.exists()) {
+const data = userSnap.data();
+sellerName = (data.firstName || "") + " " + (data.lastName || "");
+}
+
+}
+
+/* ===== ADD PRODUCT ===== */
+
 await addDoc(collection(db,"products"),{
 
 title,
@@ -203,15 +224,14 @@ faculty,
 price,
 images:imageUrls,
 
-userId: auth.currentUser?.uid,
+userId: userId,
 
-sellerName: auth.currentUser?.providerData[0]?.displayName,
-sellerEmail: auth.currentUser?.email,
+sellerName: sellerName.trim(),
+sellerEmail: sellerEmail,
 
 createdAt:new Date()
 
 });
-
 
 Alert.alert("Product posted successfully");
 
