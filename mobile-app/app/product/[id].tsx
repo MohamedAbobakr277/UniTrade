@@ -31,7 +31,7 @@ export default function ProductDetails(){
 const { id } = useLocalSearchParams();
 
 const [product,setProduct] = useState<any>(null);
-const [sellerPhoto,setSellerPhoto] = useState(""); // ⭐ صورة البائع
+const [sellerPhoto,setSellerPhoto] = useState("");
 const [activeImage,setActiveImage] = useState(0);
 const [favorite,setFavorite] = useState(false);
 const [zoom,setZoom] = useState(false);
@@ -57,7 +57,7 @@ id:snap.id,
 ...data
 });
 
-/* ⭐ جلب صورة البائع من users */
+/* GET SELLER PHOTO */
 
 if(data.userId){
 
@@ -69,10 +69,11 @@ if(userSnap.exists()){
 const userData:any = userSnap.data();
 
 setSellerPhoto(
+userData.profilePhoto ||
 userData.photoURL ||
 userData.photo ||
 userData.avatar ||
-""
+"https://cdn-icons-png.flaticon.com/512/149/149071.png"
 );
 
 }
@@ -348,9 +349,7 @@ Seller
 
 <Image
 source={{
-uri:
-sellerPhoto ||
-"https://cdn-icons-png.flaticon.com/512/149/149071.png"
+uri: sellerPhoto
 }}
 style={styles.sellerImage}
 />
