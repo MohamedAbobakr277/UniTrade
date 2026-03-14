@@ -27,7 +27,19 @@ const UPLOAD_PRESET = "unitrade_upload";
 
 /* ================= DATA ================= */
 
-const categories = ["Books","Calculators","Laptops","Engineering","Medical"];
+const categories = [
+"Books & Notes",
+"Calculators",
+"Laptops & Tablets",
+"Electronics",
+"Engineering Tools",
+"Medical Tools",
+"Lab Equipment",
+"Stationery",
+"Bags & Accessories",
+"Furniture"
+];
+
 const conditions = ["Good","Fair","Poor"];
 
 const universities = [
@@ -193,6 +205,7 @@ setLoading(true);
 const imageUrls = await uploadImages();
 
 let sellerName = "";
+let sellerPhoto = "";
 let userId = "";
 let sellerEmail = "";
 
@@ -205,8 +218,12 @@ const userRef = doc(db, "users", userId);
 const userSnap = await getDoc(userRef);
 
 if (userSnap.exists()) {
-const data = userSnap.data();
+
+const data:any = userSnap.data();
+
 sellerName = (data.firstName || "") + " " + (data.lastName || "");
+sellerPhoto = data.photoURL || data.photo || data.avatar || "";
+
 }
 
 }
@@ -228,6 +245,7 @@ userId: userId,
 
 sellerName: sellerName.trim(),
 sellerEmail: sellerEmail,
+sellerPhoto: sellerPhoto,
 
 createdAt:new Date()
 
@@ -502,8 +520,6 @@ Post Item
 );
 
 }
-
-/* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
 

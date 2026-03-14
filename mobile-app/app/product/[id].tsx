@@ -31,6 +31,7 @@ export default function ProductDetails(){
 const { id } = useLocalSearchParams();
 
 const [product,setProduct] = useState<any>(null);
+const [sellerPhoto,setSellerPhoto] = useState(""); // ⭐ صورة البائع
 const [activeImage,setActiveImage] = useState(0);
 const [favorite,setFavorite] = useState(false);
 const [zoom,setZoom] = useState(false);
@@ -48,10 +49,36 @@ const ref = doc(db,"products",docId);
 const snap = await getDoc(ref);
 
 if(snap.exists()){
+
+const data:any = snap.data();
+
 setProduct({
 id:snap.id,
-...snap.data()
+...data
 });
+
+/* ⭐ جلب صورة البائع من users */
+
+if(data.userId){
+
+const userRef = doc(db,"users",data.userId);
+const userSnap = await getDoc(userRef);
+
+if(userSnap.exists()){
+
+const userData:any = userSnap.data();
+
+setSellerPhoto(
+userData.photoURL ||
+userData.photo ||
+userData.avatar ||
+""
+);
+
+}
+
+}
+
 }
 
 };
@@ -317,9 +344,22 @@ Category
 Seller
 </Text>
 
+<View style={styles.sellerRow}>
+
+<Image
+source={{
+uri:
+sellerPhoto ||
+"https://cdn-icons-png.flaticon.com/512/149/149071.png"
+}}
+style={styles.sellerImage}
+/>
+
 <Text style={styles.sellerName}>
 {product.sellerName || "Unknown"}
 </Text>
+
+</View>
 
 </View>
 
@@ -543,8 +583,21 @@ fontWeight:"600",
 marginBottom:5
 },
 
+sellerRow:{
+flexDirection:"row",
+alignItems:"center"
+},
+
+sellerImage:{
+width:45,
+height:45,
+borderRadius:50,
+marginRight:10
+},
+
 sellerName:{
-color:"#374151"
+color:"#374151",
+fontSize:16
 },
 
 contactBar:{

@@ -146,12 +146,27 @@ setFavorites(favorites.filter(id=>id!==productId));
 /* ================= CATEGORIES ================= */
 
 const categories = [
-{name:"All",icon:"home"},
-{name:"Books",icon:"book"},
-{name:"Calculators",icon:"hash"},
-{name:"Laptops",icon:"monitor"},
-{name:"Engineering",icon:"tool"},
-{name:"Medical",icon:"plus-square"},
+{ name:"All", icon:"home" },
+
+{ name:"Books & Notes", icon:"book" },
+
+{ name:"Calculators", icon:"hash" },
+
+{ name:"Laptops & Tablets", icon:"monitor" },
+
+{ name:"Electronics", icon:"headphones" },
+
+{ name:"Engineering Tools", icon:"tool" },
+
+{ name:"Medical Tools", icon:"plus-square" },
+
+{ name:"Lab Equipment", icon:"activity" },
+
+{ name:"Stationery", icon:"edit-3" },
+
+{ name:"Bags & Accessories", icon:"briefcase" },
+
+{ name:"Furniture", icon:"box" }
 ];
 
 /* ================= FILTER ================= */
@@ -438,7 +453,8 @@ justifyContent:"center"
 categoryText:{
 color:"white",
 fontSize:11,
-marginTop:4
+marginTop:4,
+textAlign:"center"
 },
 
 card:{

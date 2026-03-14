@@ -27,8 +27,26 @@ const { id } = useLocalSearchParams();
 const [title,setTitle] = useState("");
 const [price,setPrice] = useState("");
 const [condition,setCondition] = useState("");
+const [category,setCategory] = useState("");
 
 const [images,setImages] = useState<string[]>([]);
+
+/* ================= DATA ================= */
+
+const categories = [
+"Books & Notes",
+"Calculators",
+"Laptops & Tablets",
+"Electronics",
+"Engineering Tools",
+"Medical Tools",
+"Lab Equipment",
+"Stationery",
+"Bags & Accessories",
+"Furniture"
+];
+
+const conditions = ["Good","Fair","Poor"];
 
 /* ================= LOAD PRODUCT ================= */
 
@@ -47,6 +65,7 @@ const data:any = snap.data();
 setTitle(data.title);
 setPrice(String(data.price));
 setCondition(data.condition);
+setCategory(data.category);
 
 if(data.images){
 setImages(data.images);
@@ -108,6 +127,7 @@ await updateDoc(doc(db,"products",id as string),{
 title,
 price:Number(price),
 condition,
+category,
 images
 
 });
@@ -151,14 +171,71 @@ keyboardType="numeric"
 style={styles.input}
 />
 
+{/* CATEGORY */}
+
+<Text style={styles.section}>
+Category
+</Text>
+
+<View style={{flexDirection:"row",flexWrap:"wrap",marginBottom:10}}>
+
+{categories.map((cat)=>(
+
+<TouchableOpacity
+key={cat}
+onPress={()=>setCategory(cat)}
+style={{
+backgroundColor:category===cat?"#2563EB":"#E5E7EB",
+paddingHorizontal:12,
+paddingVertical:8,
+borderRadius:10,
+marginRight:8,
+marginBottom:8
+}}
+>
+
+<Text style={{color:category===cat?"white":"black"}}>
+{cat}
+</Text>
+
+</TouchableOpacity>
+
+))}
+
+</View>
+
 {/* CONDITION */}
 
-<TextInput
-placeholder="Condition"
-value={condition}
-onChangeText={setCondition}
-style={styles.input}
-/>
+<Text style={styles.section}>
+Condition
+</Text>
+
+<View style={{flexDirection:"row",marginBottom:10}}>
+
+{conditions.map((c)=>(
+
+<TouchableOpacity
+key={c}
+onPress={()=>setCondition(c)}
+style={{
+flex:1,
+backgroundColor:condition===c?"#2563EB":"#E5E7EB",
+padding:10,
+borderRadius:10,
+marginRight:8,
+alignItems:"center"
+}}
+>
+
+<Text style={{color:condition===c?"white":"black"}}>
+{c}
+</Text>
+
+</TouchableOpacity>
+
+))}
+
+</View>
 
 {/* IMAGES */}
 
