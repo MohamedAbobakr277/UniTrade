@@ -1,13 +1,22 @@
-import { AppBar, Toolbar, Box, IconButton, Avatar, Typography, Badge } from "@mui/material";
+import {
+    AppBar,
+    Toolbar,
+    Box,
+    IconButton,
+    Avatar,
+    Typography,
+    Badge,
+} from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 
 export default function Navbar() {
     const navigate = useNavigate();
+    const location = useLocation(); // 🔥 لمعرفة الصفحة الحالية
     const [editData, setEditData] = useState(null);
 
     useEffect(() => {
@@ -26,6 +35,15 @@ export default function Navbar() {
 
         fetchUserData();
     }, []);
+
+    // 🔥 التعامل مع ضغط اللوجو
+    const handleLogoClick = () => {
+        if (location.pathname === "/home") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+            navigate("/home");
+        }
+    };
 
     return (
         <AppBar
@@ -50,7 +68,7 @@ export default function Navbar() {
             >
                 {/* LOGO */}
                 <Box
-                    onClick={() => navigate("/")}
+                    onClick={handleLogoClick} // 🔥 التعديل هنا
                     sx={{
                         display: "flex",
                         alignItems: "center",
@@ -94,7 +112,13 @@ export default function Navbar() {
                 </Box>
 
                 {/* RIGHT ICONS */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 2 } }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: { xs: 1, md: 2 },
+                    }}
+                >
                     <IconButton
                         sx={{
                             width: 44,
@@ -114,25 +138,35 @@ export default function Navbar() {
                             color="error"
                             variant="dot"
                             overlap="circular"
-                            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                            anchorOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                            }}
                         >
-                            <NotificationsNoneIcon sx={{ color: "#334155" }} />
+                            <NotificationsNoneIcon
+                                sx={{ color: "#334155" }}
+                            />
                         </Badge>
                     </IconButton>
 
                     <Avatar
-                        src={editData?.profilePhoto || "/default-avatar.png"}
+                        src={
+                            editData?.profilePhoto ||
+                            "/default-avatar.png"
+                        }
                         alt={editData?.name || "Profile"}
                         sx={{
                             width: 44,
                             height: 44,
                             cursor: "pointer",
                             border: "2px solid #ffffff",
-                            boxShadow: "0 4px 14px rgba(15, 23, 42, 0.10)",
+                            boxShadow:
+                                "0 4px 14px rgba(15, 23, 42, 0.10)",
                             transition: "all 0.25s ease",
                             "&:hover": {
                                 transform: "scale(1.05)",
-                                boxShadow: "0 8px 20px rgba(37, 99, 235, 0.20)",
+                                boxShadow:
+                                    "0 8px 20px rgba(37, 99, 235, 0.20)",
                             },
                         }}
                         onClick={() => navigate("/profile")}

@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -14,7 +13,7 @@ import ItemDetails from "./pages/ItemDetails";
 export default function App() {
   return (
     <Routes>
-      {/* Default redirect to login */}
+      {/* Default redirect */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
       {/* Auth pages */}
@@ -31,6 +30,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/sell"
         element={
@@ -39,6 +39,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/profile"
         element={
@@ -48,14 +49,22 @@ export default function App() {
         }
       />
 
-      {/* Protected admin routes */}
+      <Route
+        path="/item/:id"
+        element={
+          <ProtectedRoute>
+            <ItemDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin routes */}
       <Route element={<ProtectedAdminRoute />}>
         <Route path="/admindashboard" element={<AdminDashboard />} />
       </Route>
 
-      {/* Catch all: redirect unknown paths to login */}
+      {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
-      <Route path="/item/:id" element={<ItemDetails />} />
     </Routes>
   );
 }
