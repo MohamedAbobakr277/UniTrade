@@ -2,16 +2,12 @@ import {
     Box,
     Typography,
     Paper,
-    Chip,
     Avatar,
     Divider,
     Button,
     Grid,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
@@ -25,6 +21,7 @@ export default function ItemDetails() {
     const [item, setItem] = useState(null);
     const [sellerData, setSellerData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
         const fetchItem = async () => {
@@ -45,7 +42,7 @@ export default function ItemDetails() {
                     setItem(null);
                 }
             } catch (error) {
-                console.error("Error fetching item details:", error);
+                console.error(error);
                 setItem(null);
             } finally {
                 setLoading(false);
@@ -57,7 +54,7 @@ export default function ItemDetails() {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+            <Box sx={{ minHeight: "100vh" }}>
                 <Navbar />
                 <Box sx={{ p: 5 }}>
                     <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
@@ -70,21 +67,17 @@ export default function ItemDetails() {
 
     if (!item) {
         return (
-            <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+            <Box sx={{ minHeight: "100vh" }}>
                 <Navbar />
                 <Box sx={{ p: 5 }}>
-                    <Typography sx={{ fontSize: 26, fontWeight: 800, mb: 2 }}>
+                    <Typography sx={{ fontSize: 26, fontWeight: 800 }}>
                         Item not found
                     </Typography>
                     <Button
                         variant="contained"
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate("/")}
-                        sx={{
-                            borderRadius: "12px",
-                            textTransform: "none",
-                            fontWeight: 700,
-                        }}
+                        onClick={() => navigate("/home")}
+                        sx={{ mt: 2, textTransform: "none", fontWeight: 700 }}
                     >
                         Back to Home
                     </Button>
@@ -93,14 +86,13 @@ export default function ItemDetails() {
         );
     }
 
-    const imageUrl =
-        Array.isArray(item.images) && item.images.length > 0
-            ? item.images[0]
-            : item.image || "https://via.placeholder.com/700x450?text=No+Image";
+    const hasImages =
+        Array.isArray(item.images) && item.images.length > 0;
 
-    const formattedDate = item.createdAt
-        ? new Date(item.createdAt.seconds * 1000).toLocaleString()
-        : "Just now";
+    const imageUrl = hasImages
+        ? item.images[currentImageIndex]
+        : item.image ||
+        "https://via.placeholder.com/700x450?text=No+Image";
 
     const sellerName =
         item.sellerName ||
@@ -108,224 +100,216 @@ export default function ItemDetails() {
         sellerData?.fullName ||
         "Unknown Seller";
 
-    const conditionColor =
-        item.condition === "New"
-            ? "#16a34a"
-            : item.condition === "Like New"
-                ? "#2563eb"
-                : "#f59e0b";
-
     return (
         <Box
             sx={{
                 minHeight: "100vh",
                 background:
-                    "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 35%, #eef4ff 100%)",
+                    "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 100%)",
             }}
         >
             <Navbar />
 
-            <Box sx={{ px: { xs: 2, md: 5 }, py: 4 }}>
-                <Button
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate("/")}
+            {/* 🔥 Center Layout */}
+            <Box
+                sx={{
+                    py: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                <Box
                     sx={{
-                        mb: 3,
-                        textTransform: "none",
-                        fontWeight: 700,
-                        borderRadius: "12px",
-                        color: "#1d4ed8",
+                        width: "100%",
+                        maxWidth: "1200px",
+                        px: { xs: 2, md: 3 },
                     }}
                 >
-                    Back to Listings
-                </Button>
+                    <Button
+                        startIcon={<ArrowBackIcon />}
+                        onClick={() => navigate(-1)}
+                        sx={{
+                            mb: 3,
+                            textTransform: "none",
+                            fontWeight: 700,
+                        }}
+                    >
+                        Back
+                    </Button>
 
-                <Grid container spacing={4}>
-                    <Grid item xs={12} md={7}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                borderRadius: "24px",
-                                overflow: "hidden",
-                                border: "1px solid #e2e8f0",
-                                backgroundColor: "#fff",
-                            }}
-                        >
-                            <Box
-                                component="img"
-                                src={imageUrl}
-                                alt={item.title}
+                    <Grid container spacing={4}>
+                        <Grid item xs={12} md={7}>
+                            <Paper
                                 sx={{
-                                    width: "100%",
-                                    height: { xs: 300, md: 500 },
-                                    objectFit: "cover",
-                                    display: "block",
-                                }}
-                            />
-                        </Paper>
-                    </Grid>
-
-                    <Grid item xs={12} md={5}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: 3,
-                                borderRadius: "24px",
-                                border: "1px solid #e2e8f0",
-                                backgroundColor: "#fff",
-                                boxShadow: "0 8px 30px rgba(15,23,42,0.05)",
-                            }}
-                        >
-                            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
-                                {item.category && (
-                                    <Chip
-                                        label={item.category}
-                                        sx={{
-                                            backgroundColor: "#eef4ff",
-                                            color: "#1d4ed8",
-                                            fontWeight: 700,
-                                        }}
-                                    />
-                                )}
-
-                                {item.condition && (
-                                    <Chip
-                                        icon={<VerifiedOutlinedIcon />}
-                                        label={item.condition}
-                                        sx={{
-                                            backgroundColor: `${conditionColor}12`,
-                                            color: conditionColor,
-                                            fontWeight: 700,
-                                            "& .MuiChip-icon": {
-                                                color: conditionColor,
-                                            },
-                                        }}
-                                    />
-                                )}
-                            </Box>
-
-                            <Typography
-                                sx={{
-                                    fontSize: { xs: 28, md: 34 },
-                                    fontWeight: 800,
-                                    color: "#0f172a",
-                                    lineHeight: 1.3,
-                                    mb: 1.5,
+                                    borderRadius: "20px",
+                                    overflow: "hidden",
+                                    position: "relative",
                                 }}
                             >
-                                {item.title}
-                            </Typography>
-
-                            <Typography
-                                sx={{
-                                    fontSize: 32,
-                                    fontWeight: 800,
-                                    color: "#2563eb",
-                                    mb: 2,
-                                }}
-                            >
-                                {item.price} EGP
-                            </Typography>
-
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 1,
-                                    mb: 1.5,
-                                    color: "#64748b",
-                                }}
-                            >
-                                <LocationOnIcon sx={{ fontSize: 18 }} />
-                                <Typography sx={{ fontSize: "0.95rem" }}>
-                                    {item.university || "University not specified"}
-                                </Typography>
-                            </Box>
-
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 1,
-                                    mb: 3,
-                                    color: "#64748b",
-                                }}
-                            >
-                                <AccessTimeIcon sx={{ fontSize: 18 }} />
-                                <Typography sx={{ fontSize: "0.95rem" }}>
-                                    {formattedDate}
-                                </Typography>
-                            </Box>
-
-                            <Divider sx={{ my: 2.5 }} />
-
-                            <Typography
-                                sx={{
-                                    fontSize: 18,
-                                    fontWeight: 800,
-                                    color: "#0f172a",
-                                    mb: 1.5,
-                                }}
-                            >
-                                Description
-                            </Typography>
-
-                            <Typography
-                                sx={{
-                                    color: "#475569",
-                                    lineHeight: 1.8,
-                                    fontSize: "0.96rem",
-                                    mb: 3,
-                                }}
-                            >
-                                {item.description || "No description available."}
-                            </Typography>
-
-                            <Divider sx={{ my: 2.5 }} />
-
-                            <Typography
-                                sx={{
-                                    fontSize: 18,
-                                    fontWeight: 800,
-                                    color: "#0f172a",
-                                    mb: 1.5,
-                                }}
-                            >
-                                Seller Information
-                            </Typography>
-
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                <Avatar
-                                    src={sellerData?.profilePhoto || "/default-avatar.png"}
-                                    sx={{ width: 52, height: 52 }}
+                                <Box
+                                    component="img"
+                                    src={imageUrl}
+                                    alt={item.title}
+                                    sx={{
+                                        width: "100%",
+                                        height: { xs: 300, md: 500 },
+                                        objectFit: "cover",
+                                    }}
                                 />
-                                <Box>
-                                    <Typography sx={{ fontWeight: 700, color: "#0f172a" }}>
-                                        {sellerName}
-                                    </Typography>
-                                    <Typography sx={{ color: "#64748b", fontSize: "0.9rem" }}>
-                                        Student Seller
-                                    </Typography>
-                                </Box>
-                            </Box>
 
-                            <Button
-                                fullWidth
-                                variant="contained"
+                                {hasImages && item.images.length > 1 && (
+                                    <>
+                                        <Button
+                                            onClick={() =>
+                                                setCurrentImageIndex(
+                                                    (prev) =>
+                                                        prev === 0
+                                                            ? item.images.length - 1
+                                                            : prev - 1
+                                                )
+                                            }
+                                            sx={{
+                                                position: "absolute",
+                                                top: "50%",
+                                                left: 10,
+                                                transform:
+                                                    "translateY(-50%)",
+                                                backgroundColor:
+                                                    "rgba(0,0,0,0.5)",
+                                                color: "#fff",
+                                                minWidth: 40,
+                                            }}
+                                        >
+                                            ◀
+                                        </Button>
+
+                                        <Button
+                                            onClick={() =>
+                                                setCurrentImageIndex(
+                                                    (prev) =>
+                                                        prev ===
+                                                            item.images.length - 1
+                                                            ? 0
+                                                            : prev + 1
+                                                )
+                                            }
+                                            sx={{
+                                                position: "absolute",
+                                                top: "50%",
+                                                right: 10,
+                                                transform:
+                                                    "translateY(-50%)",
+                                                backgroundColor:
+                                                    "rgba(0,0,0,0.5)",
+                                                color: "#fff",
+                                                minWidth: 40,
+                                            }}
+                                        >
+                                            ▶
+                                        </Button>
+                                    </>
+                                )}
+                            </Paper>
+                        </Grid>
+
+                        <Grid item xs={12} md={5}>
+                            <Paper
                                 sx={{
-                                    mt: 4,
-                                    py: 1.4,
-                                    borderRadius: "14px",
-                                    textTransform: "none",
-                                    fontWeight: 800,
-                                    background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
+                                    p: 3,
+                                    borderRadius: "20px",
+                                    backgroundColor: "#fff",
                                 }}
                             >
-                                Contact Seller
-                            </Button>
-                        </Paper>
+                                <Typography
+                                    sx={{
+                                        fontSize: 26,
+                                        fontWeight: 800,
+                                        mb: 2,
+                                    }}
+                                >
+                                    {item.title}
+                                </Typography>
+
+                                <Typography
+                                    sx={{
+                                        fontSize: 30,
+                                        fontWeight: 800,
+                                        color: "#2563eb",
+                                        mb: 2,
+                                    }}
+                                >
+                                    {item.price} EGP
+                                </Typography>
+
+                                <Divider sx={{ my: 2 }} />
+
+                                <Typography
+                                    sx={{ fontWeight: 800, mb: 1 }}
+                                >
+                                    Description
+                                </Typography>
+
+                                <Typography sx={{ mb: 3 }}>
+                                    {item.description ||
+                                        "No description available."}
+                                </Typography>
+
+                                <Divider sx={{ my: 2 }} />
+
+                                <Typography
+                                    sx={{ fontWeight: 800, mb: 1 }}
+                                >
+                                    Seller
+                                </Typography>
+
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5,
+                                    }}
+                                >
+                                    <Avatar
+                                        src={
+                                            sellerData?.profilePhoto ||
+                                            "/default-avatar.png"
+                                        }
+                                        sx={{ width: 50, height: 50 }}
+                                    />
+                                    <Box>
+                                        <Typography
+                                            sx={{ fontWeight: 700 }}
+                                        >
+                                            {sellerName}
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                fontSize: "0.9rem",
+                                                color: "#64748b",
+                                            }}
+                                        >
+                                            Student Seller
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{
+                                        mt: 4,
+                                        py: 1.3,
+                                        borderRadius: "12px",
+                                        textTransform: "none",
+                                        fontWeight: 800,
+                                    }}
+                                >
+                                    Contact Seller
+                                </Button>
+                            </Paper>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </Box>
             </Box>
         </Box>
     );
