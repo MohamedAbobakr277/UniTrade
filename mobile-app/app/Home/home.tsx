@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from "../../constants/ThemeContext";
 import {
 View,
 Text,
@@ -30,6 +31,8 @@ import styles from "./home.styles";
 export default function HomeScreen(){
 
 const router = useRouter();
+
+const { theme } = useTheme();
 
 const [search,setSearch] = useState("");
 const [items,setItems] = useState<any[]>([]);
@@ -225,7 +228,7 @@ const isFav = favorites.includes(item.id);
 return(
 
 <TouchableOpacity
-style={styles.card}
+style={[styles.card,{backgroundColor:theme.card}]}
 onPress={()=>router.push({
 pathname:"/product/[id]",
 params:{id:item.id}
@@ -256,7 +259,7 @@ color={isFav ? "red" : "white"}
 
 <View style={styles.cardContent}>
 
-<Text style={styles.title} numberOfLines={1}>
+<Text style={[styles.title,{color:theme.text}]} numberOfLines={1}>
 {item.title}
 </Text>
 
@@ -281,7 +284,7 @@ source={{uri:sellerPhoto}}
 style={styles.sellerImage}
 />
 
-<Text style={styles.sellerName}>
+<Text style={[styles.sellerName,{color:theme.text}]}>
 {sellerName}
 </Text>
 
@@ -311,13 +314,13 @@ style={styles.sellerImage}
 
 return(
 
-<SafeAreaView style={styles.container}>
+<SafeAreaView style={[styles.container,{backgroundColor:theme.background}]}>
 
 <View style={styles.paddingWrapper}>
 
 <View style={styles.headerRow}>
 
-<Text style={styles.header}>
+<Text style={[styles.header,{color:theme.text}]}>
 Marketplace
 </Text>
 
@@ -334,9 +337,8 @@ style={styles.logo}
 
 <TextInput
 placeholder="Search products..."
-value={search}
-onChangeText={setSearch}
-style={styles.searchInput}
+placeholderTextColor={theme.text}
+style={[styles.searchInput,{color:theme.text}]}
 />
 
 </View>

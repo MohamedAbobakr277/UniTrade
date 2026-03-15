@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from "../../constants/ThemeContext";
 import {
 View,
 Text,
@@ -21,6 +22,8 @@ import { auth, db } from "../services/firebase";
 import styles from "./my-favoriyes.styles";
 
 export default function MyFavorites(){
+
+const { theme } = useTheme();
 
 const router = useRouter();
 
@@ -60,7 +63,7 @@ const data = doc.data();
 return {
 id: doc.id,
 ...data,
-sold: data.sold ?? false // Ensure 'sold' property exists
+sold: data.sold ?? false
 };
 });
 
@@ -86,7 +89,7 @@ Array.isArray(item.images) && item.images.length>0
 return(
 
 <TouchableOpacity
-style={styles.card}
+style={[styles.card,{backgroundColor:theme.card}]}
 onPress={()=>router.push({
 pathname:"/product/[id]",
 params:{id:item.id}
@@ -100,7 +103,7 @@ style={styles.image}
 
 <View style={styles.cardContent}>
 
-<Text style={styles.title}>
+<Text style={[styles.title,{color:theme.text}]}>
 {item.title}
 </Text>
 
@@ -124,9 +127,9 @@ style={styles.image}
 
 return(
 
-<SafeAreaView style={styles.container}>
+<SafeAreaView style={[styles.container,{backgroundColor:theme.background}]}>
 
-<Text style={styles.header}>
+<Text style={[styles.header,{color:theme.text}]}>
 My Favorites
 </Text>
 
@@ -143,6 +146,3 @@ columnWrapperStyle={styles.row}
 );
 
 }
-
-
-

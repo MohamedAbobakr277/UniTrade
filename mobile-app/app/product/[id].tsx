@@ -13,6 +13,7 @@ Modal
 
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { useTheme } from "../../constants/ThemeContext";
 
 import {
 doc,
@@ -27,6 +28,8 @@ const { width } = Dimensions.get("window");
 import styles from "./[id].styles";
 
 export default function ProductDetails(){
+
+const { theme } = useTheme();
 
 const { id } = useLocalSearchParams();
 
@@ -169,8 +172,8 @@ return days + " days ago";
 
 if(!product){
 return(
-<View style={styles.loading}>
-<Text>Loading...</Text>
+<View style={[styles.loading,{backgroundColor:theme.background}]}>
+<Text style={{color:theme.text}}>Loading...</Text>
 </View>
 );
 }
@@ -181,7 +184,7 @@ product.images?.[0] ||
 
 return(
 
-<View style={styles.screen}>
+<View style={[styles.screen,{backgroundColor:theme.background}]}>
 
 <ScrollView>
 
@@ -266,7 +269,7 @@ activeImage===i && styles.activeDot
 style={styles.backBtn}
 onPress={()=>router.back()}
 >
-<Feather name="arrow-left" size={22} color="#333"/>
+<Feather name="arrow-left" size={22} color={theme.text}/>
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -276,7 +279,7 @@ onPress={toggleFavorite}
 <Feather
 name="heart"
 size={22}
-color={favorite ? "red":"#333"}
+color={favorite ? "red":theme.text}
 />
 </TouchableOpacity>
 
@@ -284,18 +287,18 @@ color={favorite ? "red":"#333"}
 style={styles.share}
 onPress={shareProduct}
 >
-<Feather name="share-2" size={22} color="#333"/>
+<Feather name="share-2" size={22} color={theme.text}/>
 </TouchableOpacity>
 
 {/* CONTENT */}
 
 <View style={styles.content}>
 
-<Text style={styles.price}>
+<Text style={[styles.price,{color:theme.text}]}>
 EGP {Number(product.price).toLocaleString()}
 </Text>
 
-<Text style={styles.title}>
+<Text style={[styles.title,{color:theme.text}]}>
 {product.title}
 </Text>
 
@@ -311,14 +314,14 @@ EGP {Number(product.price).toLocaleString()}
 
 </View>
 
-<Text style={styles.description}>
+<Text style={[styles.description,{color:theme.text}]}>
 {product.description}
 </Text>
 
 <View style={styles.infoRow}>
 
-<View style={styles.infoCard}>
-<Text style={styles.infoValue}>
+<View style={[styles.infoCard,{backgroundColor:theme.card}]}>
+<Text style={[styles.infoValue,{color:theme.text}]}>
 {product.condition}
 </Text>
 <Text style={styles.infoLabel}>
@@ -326,8 +329,8 @@ Condition
 </Text>
 </View>
 
-<View style={styles.infoCard}>
-<Text style={styles.infoValue}>
+<View style={[styles.infoCard,{backgroundColor:theme.card}]}>
+<Text style={[styles.infoValue,{color:theme.text}]}>
 {product.category}
 </Text>
 <Text style={styles.infoLabel}>
@@ -339,9 +342,9 @@ Category
 
 {/* SELLER */}
 
-<View style={styles.sellerCard}>
+<View style={[styles.sellerCard,{backgroundColor:theme.card}]}>
 
-<Text style={styles.sellerTitle}>
+<Text style={[styles.sellerTitle,{color:theme.text}]}>
 Seller
 </Text>
 
@@ -354,7 +357,7 @@ uri: sellerPhoto
 style={styles.sellerImage}
 />
 
-<Text style={styles.sellerName}>
+<Text style={[styles.sellerName,{color:theme.text}]}>
 {product.sellerName || "Unknown"}
 </Text>
 

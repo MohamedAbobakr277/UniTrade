@@ -11,12 +11,16 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useTheme } from "../../constants/ThemeContext";
 import styles from "./forgot-styles";
 
 // Import Firebase auth service
 import { forgotPassword } from "../services/auth"; 
 
 const ForgotPassword: React.FC = () => {
+
+  const { theme } = useTheme();
+
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -37,7 +41,7 @@ const ForgotPassword: React.FC = () => {
         "Success",
         "Password reset email sent. Check your inbox."
       );
-      router.push("/reset-password/reset-password"); // Redirect to reset-password
+      router.push("/reset-password/reset-password");
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
@@ -46,24 +50,32 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <View style={[styles.container,{backgroundColor:theme.background}]}>
+      
+      <StatusBar barStyle={theme.background === "#121212" ? "light-content" : "dark-content"} />
 
       <Image
         source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
-      <Text style={styles.title}>Reset Password</Text>
+      <Text style={[styles.title,{color:theme.text}]}>
+        Reset Password
+      </Text>
 
       <TextInput
         placeholder="Enter your email"
+        placeholderTextColor="#9ca3af"
         value={email}
         onChangeText={(text) => {
           setEmail(text);
           setError("");
         }}
-        style={[styles.input, error && { borderColor: "red" }]}
+        style={[
+          styles.input,
+          {color:theme.text},
+          error && { borderColor: "red" }
+        ]}
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -84,6 +96,7 @@ const ForgotPassword: React.FC = () => {
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+
     </View>
   );
 };

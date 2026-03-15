@@ -4,7 +4,6 @@ View,
 Text,
 TextInput,
 TouchableOpacity,
-
 Image,
 ScrollView,
 Alert
@@ -17,9 +16,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 import { db } from "../services/firebase";
+import { useTheme } from "../../constants/ThemeContext";
 import styles from "./edit-product.style";
 
 export default function EditProduct(){
+
+const { theme } = useTheme();
 
 const router = useRouter();
 
@@ -147,9 +149,9 @@ Alert.alert("Error","Failed to update");
 
 return(
 
-<ScrollView style={styles.container}>
+<ScrollView style={[styles.container,{backgroundColor:theme.background}]}>
 
-<Text style={styles.title}>
+<Text style={[styles.title,{color:theme.text}]}>
 Edit Product
 </Text>
 
@@ -157,24 +159,26 @@ Edit Product
 
 <TextInput
 placeholder="Product Title"
+placeholderTextColor="#9ca3af"
 value={title}
 onChangeText={setTitle}
-style={styles.input}
+style={[styles.input,{color:theme.text,backgroundColor:theme.card}]}
 />
 
 {/* PRICE */}
 
 <TextInput
 placeholder="Price"
+placeholderTextColor="#9ca3af"
 value={price}
 onChangeText={setPrice}
 keyboardType="numeric"
-style={styles.input}
+style={[styles.input,{color:theme.text,backgroundColor:theme.card}]}
 />
 
 {/* CATEGORY */}
 
-<Text style={styles.section}>
+<Text style={[styles.section,{color:theme.text}]}>
 Category
 </Text>
 
@@ -186,7 +190,7 @@ Category
 key={cat}
 onPress={()=>setCategory(cat)}
 style={{
-backgroundColor:category===cat?"#2563EB":"#E5E7EB",
+backgroundColor:category===cat?"#2563EB":theme.card,
 paddingHorizontal:12,
 paddingVertical:8,
 borderRadius:10,
@@ -195,7 +199,7 @@ marginBottom:8
 }}
 >
 
-<Text style={{color:category===cat?"white":"black"}}>
+<Text style={{color:category===cat?"white":theme.text}}>
 {cat}
 </Text>
 
@@ -207,7 +211,7 @@ marginBottom:8
 
 {/* CONDITION */}
 
-<Text style={styles.section}>
+<Text style={[styles.section,{color:theme.text}]}>
 Condition
 </Text>
 
@@ -220,7 +224,7 @@ key={c}
 onPress={()=>setCondition(c)}
 style={{
 flex:1,
-backgroundColor:condition===c?"#2563EB":"#E5E7EB",
+backgroundColor:condition===c?"#2563EB":theme.card,
 padding:10,
 borderRadius:10,
 marginRight:8,
@@ -228,7 +232,7 @@ alignItems:"center"
 }}
 >
 
-<Text style={{color:condition===c?"white":"black"}}>
+<Text style={{color:condition===c?"white":theme.text}}>
 {c}
 </Text>
 
@@ -240,7 +244,7 @@ alignItems:"center"
 
 {/* IMAGES */}
 
-<Text style={styles.section}>
+<Text style={[styles.section,{color:theme.text}]}>
 Images
 </Text>
 
@@ -301,4 +305,3 @@ Save Changes
 );
 
 }
-
