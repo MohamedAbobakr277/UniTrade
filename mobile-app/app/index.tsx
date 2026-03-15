@@ -20,7 +20,7 @@ import styles from "./styles";
 import { login } from "./services/auth";
 
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth } from "./services/firebase";
 
 const LoginScreen: React.FC = () => {
 
@@ -45,7 +45,7 @@ const LoginScreen: React.FC = () => {
         await user.reload(); // تحديث حالة المستخدم
 
         if(user.emailVerified){
-          router.replace("/home");
+          router.replace("/Home/home");
         }
 
       }
@@ -158,7 +158,7 @@ const LoginScreen: React.FC = () => {
 
       {/* FORGOT PASSWORD */}
 
-      <TouchableOpacity onPress={()=>router.push("/forgot-password")}>
+      <TouchableOpacity onPress={()=>router.push("/forgot-password/forgot-password")}>
 
         <Text style={styles.forgot}>Forgot Password?</Text>
 
@@ -195,7 +195,7 @@ const LoginScreen: React.FC = () => {
 
         <Text
           style={{color:"#2563EB",fontWeight:"600"}}
-          onPress={()=>router.push("/signup")}
+          onPress={()=>router.push("/SignUp/signup")}
         >
 
           Sign Up

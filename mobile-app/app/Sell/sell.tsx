@@ -17,8 +17,9 @@ import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
-import { db, auth } from "./firebase";
+import { db, auth } from "../services/firebase";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import styles from "./sell.styles";
 
 /* ================= CLOUDINARY ================= */
 
@@ -253,7 +254,7 @@ createdAt:new Date()
 
 Alert.alert("Product posted successfully");
 
-router.replace("/home");
+router.replace("/Home/home");
 
 }catch(e){
 
@@ -521,33 +522,3 @@ Post Item
 
 }
 
-const styles = StyleSheet.create({
-
-input:{
-borderWidth:1,
-borderColor:"#ddd",
-padding:12,
-borderRadius:10,
-marginBottom:12
-},
-
-label:{
-fontWeight:"bold",
-marginBottom:8
-},
-
-dropdown:{
-backgroundColor:"#fff",
-borderWidth:1,
-borderColor:"#ddd",
-borderRadius:8,
-marginBottom:10
-},
-
-item:{
-padding:12,
-borderBottomWidth:1,
-borderBottomColor:"#eee"
-}
-
-});

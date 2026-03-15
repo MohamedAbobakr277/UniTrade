@@ -16,9 +16,9 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import styles from "./styles2";
+import styles from "./signup.styles";
 
-import { signUp } from "./services/auth";
+import { signUp } from "../services/auth";
 
 const SignUpScreen: React.FC = () => {
   const router = useRouter();
@@ -185,7 +185,7 @@ const SignUpScreen: React.FC = () => {
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
         <Image
-          source={require("../assets/images/logo.png")}
+          source={require("../../assets/images/logo.png")}
           style={styles.logo}
         />
 

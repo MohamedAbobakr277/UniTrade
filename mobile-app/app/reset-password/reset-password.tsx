@@ -16,8 +16,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 
 import { confirmPasswordReset } from "firebase/auth";
-import { auth } from "./firebase";
-
+import { auth } from "../services/firebase";
 import styles from "./reset-styles";
 
 export default function ResetPassword() {
@@ -111,7 +110,7 @@ export default function ResetPassword() {
       <StatusBar barStyle="dark-content"/>
 
       <Image
-        source={require("../assets/images/logo.png")}
+        source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 

@@ -23,7 +23,7 @@ export default function BottomNav(){
 
       <TouchableOpacity
         style={styles.item}
-        onPress={()=>router.push("/home")}
+        onPress={()=>router.push("/Home/home")}
       >
 
         <Feather name="home" size={22} color="#2563EB"/>
@@ -39,7 +39,7 @@ export default function BottomNav(){
 
       <TouchableOpacity
         style={styles.item}
-        onPress={()=>router.push("/sell")}
+        onPress={()=>router.push("/Sell/sell")}
       >
 
         <Feather name="plus-circle" size={22} color="#2563EB"/>
@@ -55,7 +55,7 @@ export default function BottomNav(){
 
       <TouchableOpacity
         style={styles.item}
-        onPress={()=>router.push("/my-favorites")}
+        onPress={()=>router.push("/favorites/my-favorites")}
       >
 
         <Feather name="heart" size={22} color="#2563EB"/>
@@ -71,7 +71,7 @@ export default function BottomNav(){
 
       <TouchableOpacity
         style={styles.item}
-        onPress={()=>router.push("/profile")}
+        onPress={()=>router.push("/Profile/profile")}
       >
 
         <Feather name="user" size={22} color="#2563EB"/>
