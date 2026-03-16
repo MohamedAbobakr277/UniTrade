@@ -8,47 +8,61 @@ TouchableOpacity,
 Linking,
 Dimensions,
 Share,
-Modal
+Modal,
+StatusBar,
+StyleSheet,
+ActivityIndicator
 } from "react-native";
 
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 
-import {
-doc,
-getDoc,
-setDoc,
-deleteDoc
-} from "firebase/firestore";
-
+import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
 const { width } = Dimensions.get("window");
-import styles from "./[id].styles";
+
+type Product = {
+id: string;
+title: string;
+price: number;
+description?: string;
+university?: string;
+condition?: string;
+category?: string;
+images?: string[];
+createdAt?: any;
+userId?: string;
+sellerName?: string;
+phone?: string;
+};
 
 export default function ProductDetails(){
 
 const { theme } = useTheme();
-
 const { id } = useLocalSearchParams();
 
-const [product,setProduct] = useState<any>(null);
-const [sellerPhoto,setSellerPhoto] = useState("");
-const [activeImage,setActiveImage] = useState(0);
-const [favorite,setFavorite] = useState(false);
-const [zoom,setZoom] = useState(false);
+const [product,setProduct] = useState<Product | null>(null);
+const [sellerPhoto,setSellerPhoto] = useState<string>("");
+const [activeImage,setActiveImage] = useState<number>(0);
+const [favorite,setFavorite] = useState<boolean>(false);
+const [zoom,setZoom] = useState<boolean>(false);
+const [loading,setLoading] = useState<boolean>(true);
+
+/* FETCH PRODUCT */
 
 useEffect(()=>{
 
 const fetchProduct = async()=>{
+
+try{
 
 if(!id) return;
 
 const docId = Array.isArray(id) ? id[0] : id;
 
 const ref = doc(db,"products",docId);
-
 const snap = await getDoc(ref);
 
 if(snap.exists()){
@@ -60,7 +74,7 @@ id:snap.id,
 ...data
 });
 
-/* GET SELLER PHOTO */
+/* SELLER PHOTO */
 
 if(data.userId){
 
@@ -75,13 +89,22 @@ setSellerPhoto(
 userData.profilePhoto ||
 userData.photoURL ||
 userData.photo ||
-userData.avatar ||
 "https://cdn-icons-png.flaticon.com/512/149/149071.png"
 );
 
 }
 
 }
+
+}
+
+}catch(e){
+
+console.log("Error:",e);
+
+}finally{
+
+setLoading(false);
 
 }
 
@@ -96,7 +119,6 @@ fetchProduct();
 const toggleFavorite = async()=>{
 
 const user = auth.currentUser;
-
 if(!user || !product) return;
 
 const favRef = doc(db,"favorites",`${user.uid}_${product.id}`);
@@ -149,54 +171,57 @@ if(!timestamp) return "";
 const now = new Date();
 const date = timestamp.toDate();
 
-const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+const seconds = Math.floor((now.getTime()-date.getTime())/1000);
+const hours = Math.floor(seconds/3600);
 
-const hours = Math.floor(seconds / 3600);
+if(hours < 1) return Math.floor(seconds/60)+" min ago";
+if(hours < 24) return hours+" hours ago";
 
-if(hours < 1){
-
-const minutes = Math.floor(seconds / 60);
-return minutes + " minutes ago";
-
-}
-
-if(hours < 24){
-return hours + " hours ago";
-}
-
-const days = Math.floor(hours / 24);
-
-return days + " days ago";
+return Math.floor(hours/24)+" days ago";
 
 };
 
-if(!product){
+if(loading){
+
 return(
 <View style={[styles.loading,{backgroundColor:theme.background}]}>
-<Text style={{color:theme.text}}>Loading...</Text>
+<ActivityIndicator size="large" color="#2563EB"/>
+<Text style={{color:theme.text,marginTop:10}}>
+Loading Product...
+</Text>
 </View>
 );
+
 }
 
-const mainImage =
-product.images?.[0] ||
-"https://via.placeholder.com/400";
+if(!product){
+
+return(
+<View style={[styles.loading,{backgroundColor:theme.background}]}>
+<Text style={{color:theme.text}}>
+Product not found
+</Text>
+</View>
+);
+
+}
 
 return(
 
 <View style={[styles.screen,{backgroundColor:theme.background}]}>
 
-<ScrollView>
+<StatusBar barStyle="light-content" translucent backgroundColor="transparent"/>
+
+<ScrollView showsVerticalScrollIndicator={false}>
 
 {/* IMAGE SLIDER */}
 
-<View>
+<View style={styles.imageContainer}>
 
 <ScrollView
 horizontal
 pagingEnabled
 showsHorizontalScrollIndicator={false}
-decelerationRate="fast"
 onScroll={(e)=>{
 
 const slide = Math.round(
@@ -209,86 +234,53 @@ setActiveImage(slide);
 scrollEventThrottle={16}
 >
 
-{product.images?.length ? (
-
-product.images.map((img:string,index:number)=>(
-
-<TouchableOpacity
-key={index}
-activeOpacity={0.9}
-onPress={()=>setZoom(true)}
->
-
-<Image
-source={{uri:img}}
-style={styles.image}
-/>
-
+{(product.images?.length
+? product.images
+:["https://via.placeholder.com/400"]
+).map((img,index)=>(
+<TouchableOpacity key={index} onPress={()=>setZoom(true)}>
+<Image source={{uri:img}} style={styles.mainImage}/>
 </TouchableOpacity>
-
-))
-
-) : (
-
-<Image
-source={{uri:mainImage}}
-style={styles.image}
-/>
-
-)}
+))}
 
 </ScrollView>
 
-<View style={styles.imageCount}>
-<Text style={styles.imageCountText}>
-{activeImage+1}/{product.images?.length || 1}
-</Text>
 </View>
 
-<View style={styles.dots}>
+{/* HEADER BUTTONS */}
 
-{product.images?.map((_:any,i:number)=>(
-
-<View
-key={i}
-style={[
-styles.dot,
-activeImage===i && styles.activeDot
-]}
-/>
-
-))}
-
-</View>
-
-</View>
-
-{/* TOP BUTTONS */}
+<View style={styles.headerButtons}>
 
 <TouchableOpacity
-style={styles.backBtn}
+style={styles.iconCircle}
 onPress={()=>router.back()}
 >
-<Feather name="arrow-left" size={22} color={theme.text}/>
+<Feather name="arrow-left" size={22} color="white"/>
 </TouchableOpacity>
 
+<View style={{flexDirection:"row"}}>
+
 <TouchableOpacity
-style={styles.favorite}
+style={[styles.iconCircle,{marginRight:10}]}
 onPress={toggleFavorite}
 >
 <Feather
 name="heart"
 size={22}
-color={favorite ? "red":theme.text}
+color={favorite ? "red":"white"}
 />
 </TouchableOpacity>
 
 <TouchableOpacity
-style={styles.share}
+style={styles.iconCircle}
 onPress={shareProduct}
 >
-<Feather name="share-2" size={22} color={theme.text}/>
+<Feather name="share-2" size={22} color="white"/>
 </TouchableOpacity>
+
+</View>
+
+</View>
 
 {/* CONTENT */}
 
@@ -304,11 +296,11 @@ EGP {Number(product.price).toLocaleString()}
 
 <View style={styles.row}>
 
-<Text style={styles.location}>
+<Text style={[styles.location,{color:theme.text}]}>
 📍 {product.university}
 </Text>
 
-<Text style={styles.date}>
+<Text style={styles.dateText}>
 {timeAgo(product.createdAt)}
 </Text>
 
@@ -317,28 +309,6 @@ EGP {Number(product.price).toLocaleString()}
 <Text style={[styles.description,{color:theme.text}]}>
 {product.description}
 </Text>
-
-<View style={styles.infoRow}>
-
-<View style={[styles.infoCard,{backgroundColor:theme.card}]}>
-<Text style={[styles.infoValue,{color:theme.text}]}>
-{product.condition}
-</Text>
-<Text style={styles.infoLabel}>
-Condition
-</Text>
-</View>
-
-<View style={[styles.infoCard,{backgroundColor:theme.card}]}>
-<Text style={[styles.infoValue,{color:theme.text}]}>
-{product.category}
-</Text>
-<Text style={styles.infoLabel}>
-Category
-</Text>
-</View>
-
-</View>
 
 {/* SELLER */}
 
@@ -351,9 +321,7 @@ Seller
 <View style={styles.sellerRow}>
 
 <Image
-source={{
-uri: sellerPhoto
-}}
+source={{uri:sellerPhoto}}
 style={styles.sellerImage}
 />
 
@@ -367,18 +335,20 @@ style={styles.sellerImage}
 
 </View>
 
+<View style={{height:120}}/>
+
 </ScrollView>
 
-{/* CONTACT */}
+{/* CONTACT BAR */}
 
-<View style={styles.contactBar}>
+<View style={[styles.contactBar,{backgroundColor:theme.background}]}>
 
 <TouchableOpacity
 style={[styles.contactBtn,{backgroundColor:"#22C55E"}]}
 onPress={openWhatsApp}
 >
 <Feather name="message-circle" size={20} color="white"/>
-<Text style={styles.contactText}>WhatsApp</Text>
+<Text style={styles.contactBtnText}>WhatsApp</Text>
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -386,7 +356,7 @@ style={[styles.contactBtn,{backgroundColor:"#3B82F6"}]}
 onPress={sendSMS}
 >
 <Feather name="mail" size={20} color="white"/>
-<Text style={styles.contactText}>SMS</Text>
+<Text style={styles.contactBtnText}>SMS</Text>
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -394,31 +364,24 @@ style={[styles.contactBtn,{backgroundColor:"#2563EB"}]}
 onPress={callSeller}
 >
 <Feather name="phone" size={20} color="white"/>
-<Text style={styles.contactText}>Call</Text>
+<Text style={styles.contactBtnText}>Call</Text>
 </TouchableOpacity>
 
 </View>
 
 {/* ZOOM */}
 
-<Modal visible={zoom} transparent={true}>
+<Modal visible={zoom} transparent>
 
 <TouchableOpacity
-style={{
-flex:1,
-backgroundColor:"black",
-justifyContent:"center"
-}}
+style={styles.modalContainer}
 onPress={()=>setZoom(false)}
 >
 
 <Image
 source={{uri:product.images?.[activeImage]}}
-style={{
-width:"100%",
-height:400,
-resizeMode:"contain"
-}}
+style={styles.fullImage}
+resizeMode="contain"
 />
 
 </TouchableOpacity>
@@ -430,3 +393,152 @@ resizeMode:"contain"
 );
 
 }
+
+/* STYLES */
+
+const styles = StyleSheet.create({
+
+screen:{flex:1},
+
+loading:{
+flex:1,
+justifyContent:"center",
+alignItems:"center"
+},
+
+imageContainer:{
+width:width,
+height:380,
+backgroundColor:"#000"
+},
+
+mainImage:{
+width:width,
+height:380,
+resizeMode:"cover"
+},
+
+headerButtons:{
+position:"absolute",
+top:50,
+left:20,
+right:20,
+flexDirection:"row",
+justifyContent:"space-between",
+zIndex:10
+},
+
+iconCircle:{
+backgroundColor:"rgba(0,0,0,0.45)",
+width:44,
+height:44,
+borderRadius:22,
+justifyContent:"center",
+alignItems:"center"
+},
+
+content:{
+padding:20
+},
+
+price:{
+fontSize:28,
+fontWeight:"bold",
+marginBottom:5
+},
+
+title:{
+fontSize:20,
+fontWeight:"600",
+marginBottom:10
+},
+
+row:{
+flexDirection:"row",
+justifyContent:"space-between",
+marginBottom:20
+},
+
+location:{
+fontSize:14
+},
+
+dateText:{
+color:"#888",
+fontSize:13
+},
+
+description:{
+fontSize:16,
+lineHeight:24,
+marginBottom:25
+},
+
+sellerCard:{
+padding:15,
+borderRadius:15
+},
+
+sellerTitle:{
+fontWeight:"bold",
+marginBottom:10
+},
+
+sellerRow:{
+flexDirection:"row",
+alignItems:"center"
+},
+
+sellerImage:{
+width:50,
+height:50,
+borderRadius:25,
+marginRight:12
+},
+
+sellerName:{
+fontSize:16,
+fontWeight:"600"
+},
+
+contactBar:{
+position:"absolute",
+bottom:0,
+width:width,
+flexDirection:"row",
+paddingHorizontal:15,
+paddingTop:15,
+paddingBottom:35,
+justifyContent:"space-between",
+borderTopWidth:1
+},
+
+contactBtn:{
+flexDirection:"row",
+alignItems:"center",
+paddingVertical:12,
+paddingHorizontal:10,
+borderRadius:12,
+flex:0.31,
+justifyContent:"center"
+},
+
+contactBtnText:{
+color:"white",
+marginLeft:4,
+fontWeight:"bold",
+fontSize:11
+},
+
+modalContainer:{
+flex:1,
+backgroundColor:"black",
+justifyContent:"center"
+},
+
+fullImage:{
+width:"100%",
+height:"80%"
+}
+
+});

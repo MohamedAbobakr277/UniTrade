@@ -331,14 +331,31 @@ style={styles.logo}
 
 </View>
 
-<View style={styles.searchBox}>
+<View
+style={[
+styles.searchBox,
+{
+backgroundColor: theme.card,
+borderColor: theme.text === "#ffffff" ? "#334155" : "#e5e7eb"
+}
+]}
+>
 
-<Feather name="search" size={18} color="gray"/>
+<Feather
+name="search"
+size={18}
+color={theme.text}
+/>
 
 <TextInput
 placeholder="Search products..."
-placeholderTextColor={theme.text}
-style={[styles.searchInput,{color:theme.text}]}
+placeholderTextColor={theme.text === "#ffffff" ? "#94a3b8" : "#6b7280"}
+style={[
+styles.searchInput,
+{ color: theme.text }
+]}
+value={search}
+onChangeText={(text: string) => setSearch(text)}
 />
 
 </View>
