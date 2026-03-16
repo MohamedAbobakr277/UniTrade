@@ -9,7 +9,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 
-export default function TopSection() {
+export default function TopSection({ search, setSearch }) {
     return (
         <Paper
             elevation={0}
@@ -64,6 +64,8 @@ export default function TopSection() {
                 >
                     <TextField
                         fullWidth
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search for items..."
                         sx={{
                             "& .MuiOutlinedInput-root": {

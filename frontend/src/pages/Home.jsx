@@ -2,7 +2,7 @@ import { Box, Grid, Typography, Paper, Chip } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import CategoryBar from "../components/CategoryBar";
-import TopSection from "../components/TopSection";
+import TopSection from "../components/Topsection";
 import ItemCard from "../components/ItemCard";
 import { useState, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -32,13 +32,11 @@ export default function Home() {
   const filteredItems = items.filter((item) => {
     const itemTitle = item.title?.toLowerCase() || "";
     const itemDescription = item.description?.toLowerCase() || "";
-    const itemCategory = item.category?.toLowerCase() || "";
     const searchValue = search.toLowerCase();
 
     const matchSearch =
       itemTitle.includes(searchValue) ||
-      itemDescription.includes(searchValue) ||
-      itemCategory.includes(searchValue);
+      itemDescription.includes(searchValue);
 
     const matchCategory =
       selectedCategory === "All" || item.category === selectedCategory;
@@ -56,7 +54,8 @@ export default function Home() {
     >
       <Navbar />
 
-      <TopSection />
+      {/* SEARCH SECTION */}
+      <TopSection search={search} setSearch={setSearch} />
 
       <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
         <CategoryBar
