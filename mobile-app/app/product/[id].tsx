@@ -18,7 +18,17 @@ import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 
-import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import {
+doc,
+getDoc,
+collection,
+query,
+where,
+getDocs,
+addDoc,
+deleteDoc
+} from "firebase/firestore";
+
 import { db, auth } from "../services/firebase";
 
 const { width } = Dimensions.get("window");
@@ -50,8 +60,6 @@ const [favorite,setFavorite] = useState<boolean>(false);
 const [zoom,setZoom] = useState<boolean>(false);
 const [loading,setLoading] = useState<boolean>(true);
 
-/* FETCH PRODUCT */
-
 useEffect(()=>{
 
 const fetchProduct = async()=>{
@@ -73,8 +81,6 @@ setProduct({
 id:snap.id,
 ...data
 });
-
-/* SELLER PHOTO */
 
 if(data.userId){
 
@@ -99,13 +105,9 @@ userData.photo ||
 }
 
 }catch(e){
-
 console.log("Error:",e);
-
 }finally{
-
 setLoading(false);
-
 }
 
 };
@@ -114,35 +116,64 @@ fetchProduct();
 
 },[id]);
 
-/* FAVORITE */
+useEffect(()=>{
+
+const checkFavorite = async()=>{
+
+const user = auth.currentUser;
+if(!user || !product) return;
+
+const q = query(
+collection(db,"favorites"),
+where("userId","==",user.uid),
+where("productId","==",product.id)
+);
+
+const snapshot = await getDocs(q);
+
+if(!snapshot.empty){
+setFavorite(true);
+}
+
+};
+
+checkFavorite();
+
+},[product]);
 
 const toggleFavorite = async()=>{
 
 const user = auth.currentUser;
 if(!user || !product) return;
 
-const favRef = doc(db,"favorites",`${user.uid}_${product.id}`);
+const q = query(
+collection(db,"favorites"),
+where("userId","==",user.uid),
+where("productId","==",product.id)
+);
 
-if(favorite){
+const snapshot = await getDocs(q);
 
-await deleteDoc(favRef);
-setFavorite(false);
+if(snapshot.empty){
 
-}else{
-
-await setDoc(favRef,{
+await addDoc(collection(db,"favorites"),{
 userId:user.uid,
-productId:product.id,
-createdAt:new Date()
+productId:product.id
 });
 
 setFavorite(true);
 
+}else{
+
+snapshot.forEach(async(docItem)=>{
+await deleteDoc(docItem.ref);
+});
+
+setFavorite(false);
+
 }
 
 };
-
-/* SHARE */
 
 const shareProduct = async()=>{
 
@@ -154,15 +185,11 @@ message:`${product.title} - EGP ${Number(product.price).toLocaleString()}`
 
 };
 
-/* CONTACT */
-
 const phone = product?.phone || "";
 
 const openWhatsApp = ()=> Linking.openURL(`https://wa.me/${phone}`);
 const callSeller = ()=> Linking.openURL(`tel:${phone}`);
 const sendSMS = ()=> Linking.openURL(`sms:${phone}`);
-
-/* TIME AGO */
 
 const timeAgo = (timestamp:any)=>{
 
@@ -214,8 +241,6 @@ return(
 
 <ScrollView showsVerticalScrollIndicator={false}>
 
-{/* IMAGE SLIDER */}
-
 <View style={styles.imageContainer}>
 
 <ScrollView
@@ -238,16 +263,16 @@ scrollEventThrottle={16}
 ? product.images
 :["https://via.placeholder.com/400"]
 ).map((img,index)=>(
+
 <TouchableOpacity key={index} onPress={()=>setZoom(true)}>
 <Image source={{uri:img}} style={styles.mainImage}/>
 </TouchableOpacity>
+
 ))}
 
 </ScrollView>
 
 </View>
-
-{/* HEADER BUTTONS */}
 
 <View style={styles.headerButtons}>
 
@@ -264,11 +289,13 @@ onPress={()=>router.back()}
 style={[styles.iconCircle,{marginRight:10}]}
 onPress={toggleFavorite}
 >
+
 <Feather
 name="heart"
 size={22}
 color={favorite ? "red":"white"}
 />
+
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -281,8 +308,6 @@ onPress={shareProduct}
 </View>
 
 </View>
-
-{/* CONTENT */}
 
 <View style={styles.content}>
 
@@ -310,8 +335,6 @@ EGP {Number(product.price).toLocaleString()}
 {product.description}
 </Text>
 
-{/* SELLER */}
-
 <View style={[styles.sellerCard,{backgroundColor:theme.card}]}>
 
 <Text style={[styles.sellerTitle,{color:theme.text}]}>
@@ -338,8 +361,6 @@ style={styles.sellerImage}
 <View style={{height:120}}/>
 
 </ScrollView>
-
-{/* CONTACT BAR */}
 
 <View style={[styles.contactBar,{backgroundColor:theme.background}]}>
 
@@ -369,8 +390,6 @@ onPress={callSeller}
 
 </View>
 
-{/* ZOOM */}
-
 <Modal visible={zoom} transparent>
 
 <TouchableOpacity
@@ -381,7 +400,6 @@ onPress={()=>setZoom(false)}
 <Image
 source={{uri:product.images?.[activeImage]}}
 style={styles.fullImage}
-resizeMode="contain"
 />
 
 </TouchableOpacity>
@@ -393,8 +411,6 @@ resizeMode="contain"
 );
 
 }
-
-/* STYLES */
 
 const styles = StyleSheet.create({
 
@@ -408,14 +424,14 @@ alignItems:"center"
 
 imageContainer:{
 width:width,
-height:380,
+height:420,
 backgroundColor:"#000"
 },
 
 mainImage:{
 width:width,
-height:380,
-resizeMode:"cover"
+height:420,
+resizeMode:"contain"
 },
 
 headerButtons:{
@@ -538,7 +554,8 @@ justifyContent:"center"
 
 fullImage:{
 width:"100%",
-height:"80%"
+height:"100%",
+resizeMode:"contain"
 }
 
 });
