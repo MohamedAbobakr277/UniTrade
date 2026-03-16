@@ -82,7 +82,7 @@ export default function Sidebar() {
                 <Button
                     fullWidth
                     variant="contained"
-                    onClick={() => navigate("/selltool")}
+                    onClick={() => navigate("/sell")}
                     startIcon={<AddShoppingCartOutlinedIcon />}
                     sx={{
                         mb: 3,
