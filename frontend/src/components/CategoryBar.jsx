@@ -6,6 +6,9 @@ import LaptopMacIcon from "@mui/icons-material/LaptopMac";
 import BuildIcon from "@mui/icons-material/Build";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import ScienceIcon from "@mui/icons-material/Science";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import BackpackIcon from "@mui/icons-material/Backpack";
 
 export default function CategoryBar({
     selectedCategory,
@@ -28,7 +31,7 @@ export default function CategoryBar({
             iconColor: "#10b981",
         },
         {
-            label: "Laptops & Tablets",
+            label: "Electronics",
             icon: <LaptopMacIcon />,
             iconColor: "#8b5cf6",
         },
@@ -41,6 +44,20 @@ export default function CategoryBar({
             label: "Medical Tools",
             icon: <MedicalServicesIcon />,
             iconColor: "#2563eb",
+        },
+        {
+            label: "Lab Equipment",
+            icon: <ScienceIcon />,
+            iconColor: "#10b981",
+        },
+        {
+            label: "Stationery",
+            icon: <EditNoteIcon />,
+            iconColor: "#f59e0b",
+        }, {
+            label: "Bags & Accessories",
+            icon: <BackpackIcon />,
+            iconColor: "#8b5cf6",
         },
     ];
 
