@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Paper, Chip } from "@mui/material";
+import { Box, Typography, Paper, Chip } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import CategoryBar from "../components/CategoryBar";
@@ -54,7 +54,6 @@ export default function Home() {
     >
       <Navbar />
 
-      {/* SEARCH SECTION */}
       <TopSection search={search} setSearch={setSearch} />
 
       <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
@@ -138,23 +137,27 @@ export default function Home() {
           </Paper>
 
           {filteredItems.length > 0 ? (
-            <Grid container spacing={3}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, minmax(0, 1fr))",
+                  md: "repeat(2, minmax(0, 1fr))",
+                  lg: "repeat(3, minmax(0, 1fr))",
+                  xl: "repeat(3, minmax(0, 1fr))",
+                },
+                gap: 3,
+                width: "100%",
+                alignItems: "stretch",
+              }}
+            >
               {filteredItems.map((item) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-                  <Box
-                    sx={{
-                      height: "100%",
-                      transition: "all 0.25s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                      },
-                    }}
-                  >
-                    <ItemCard item={item} />
-                  </Box>
-                </Grid>
+                <Box key={item.id} sx={{ display: "flex" }}>
+                  <ItemCard item={item} />
+                </Box>
               ))}
-            </Grid>
+            </Box>
           ) : (
             <Paper
               elevation={0}

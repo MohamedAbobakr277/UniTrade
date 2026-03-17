@@ -66,6 +66,7 @@ export default function ItemCard({ item }) {
         backgroundColor: "#ffffff",
         boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
         transition: "all 0.3s ease",
+        width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -79,11 +80,13 @@ export default function ItemCard({ item }) {
       <Box sx={{ position: "relative", overflow: "hidden" }}>
         <CardMedia
           component="img"
-          height="220"
           image={imageUrl}
           alt={item.title || "Product image"}
           sx={{
+            width: "100%",
+            height: 220,
             objectFit: "cover",
+            display: "block",
             transition: "transform 0.35s ease",
             "&:hover": {
               transform: "scale(1.04)",
@@ -137,6 +140,7 @@ export default function ItemCard({ item }) {
           flexGrow: 1,
         }}
       >
+        {/* Title */}
         <Typography
           variant="h6"
           sx={{
@@ -144,12 +148,17 @@ export default function ItemCard({ item }) {
             fontSize: "1.05rem",
             color: "#0f172a",
             lineHeight: 1.4,
-            minHeight: "48px",
+            minHeight: "52px",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
           {item.title || "Untitled Item"}
         </Typography>
 
+        {/* Price */}
         <Typography
           variant="h6"
           sx={{
@@ -157,20 +166,20 @@ export default function ItemCard({ item }) {
             fontWeight: 800,
             mt: 1.2,
             fontSize: "1.25rem",
+            minHeight: "38px",
           }}
         >
           {item.price ? `${item.price} EGP` : "Price not available"}
         </Typography>
 
+        {/* University */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 1,
-            mt: 1.4,
-            color: "#64748b",
-            fontSize: 14,
-            flexWrap: "wrap",
+            mt: 1.2,
+            minHeight: "28px",
           }}
         >
           <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
@@ -180,13 +189,18 @@ export default function ItemCard({ item }) {
               fontSize: "0.92rem",
               color: "#64748b",
               fontWeight: 500,
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
             }}
           >
             {item.university || "University not specified"}
           </Typography>
         </Box>
 
-        <Box sx={{ mt: 1.4 }}>
+        {/* Condition */}
+        <Box sx={{ mt: 1.2, minHeight: "32px" }}>
           <Chip
             icon={<VerifiedOutlinedIcon />}
             label={item.condition || "Condition not specified"}
@@ -203,51 +217,66 @@ export default function ItemCard({ item }) {
           />
         </Box>
 
-        {item.description && (
-          <Typography
-            sx={{
-              mt: 1.5,
-              fontSize: "0.9rem",
-              color: "#64748b",
-              lineHeight: 1.6,
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              minHeight: "44px",
-            }}
-          >
-            {item.description}
-          </Typography>
-        )}
+        {/* Description - always reserve height */}
+        <Typography
+          sx={{
+            mt: 1.4,
+            fontSize: "0.9rem",
+            color: "#64748b",
+            lineHeight: 1.6,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            minHeight: "48px",
+          }}
+        >
+          {item.description || "No description available"}
+        </Typography>
+
+        <Box sx={{ flexGrow: 1 }} />
 
         <Divider sx={{ my: 2 }} />
 
+        {/* Footer / Seller */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: 1,
-            mt: "auto",
+            minHeight: "58px",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.2,
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
             <Avatar
               src={editData?.profilePhoto || "/default-avatar.png"}
               sx={{
                 width: 42,
                 height: 42,
                 border: "2px solid #e2e8f0",
+                flexShrink: 0,
               }}
             />
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography
                 sx={{
                   fontSize: 14,
                   fontWeight: 700,
                   color: "#0f172a",
                   lineHeight: 1.2,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 1,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
                 }}
               >
                 {sellerName}
@@ -271,18 +300,23 @@ export default function ItemCard({ item }) {
               gap: 0.6,
               backgroundColor: "#f8fafc",
               border: "1px solid #e2e8f0",
-              px: 1.2,
+              px: 1.1,
               py: 0.7,
               borderRadius: "12px",
               fontSize: 12.5,
               color: "#64748b",
               whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
             <AccessTimeIcon sx={{ fontSize: 15, color: "#94a3b8" }} />
             <Typography
               component="span"
-              sx={{ fontSize: 12.5, color: "#64748b", fontWeight: 500 }}
+              sx={{
+                fontSize: 12.5,
+                color: "#64748b",
+                fontWeight: 500,
+              }}
             >
               {formattedDate}
             </Typography>

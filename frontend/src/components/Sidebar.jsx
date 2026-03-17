@@ -150,7 +150,10 @@ export default function Sidebar() {
                         >
                             <MenuItem value="All Universities">All Universities</MenuItem>
                             <MenuItem value="Cairo University">Cairo University</MenuItem>
-                            <MenuItem value="Ain Shams">Ain Shams</MenuItem>
+                            <MenuItem value="Ain Shams">Ain Shams University</MenuItem>
+                            <MenuItem value="Ain Shams">Helwan University</MenuItem>
+                            <MenuItem value="Ain Shams">Menofia University</MenuItem>
+                            <MenuItem value="Ain Shams">Fayoum University</MenuItem>
                         </Select>
                     </FormControl>
                 </Box>

@@ -15,7 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState, useRef } from "react";
 import { db, auth } from "../firebase";
-import { addDoc, collection , doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 const CLOUD_NAME = "dstfo8pxq";
@@ -148,9 +148,9 @@ export default function SellTool() {
         let userPhoto = "";
 
         if (userSnap.exists()) {
-        const data = userSnap.data();
-        userName = data.name || "User";
-        userPhoto = data.photo || "";
+            const data = userSnap.data();
+            userName = data.name || "User";
+            userPhoto = data.photo || "";
         }
         if (images.length === 0) {
             setError("Please upload at least one image.");
@@ -353,9 +353,14 @@ export default function SellTool() {
                         value={form.university}
                         onChange={handleChange}
                     >
+                        <MenuItem value="All Universities">All Universities</MenuItem>
                         <MenuItem value="Cairo University">Cairo University</MenuItem>
-                        <MenuItem value="Alexandria University">Alexandria University</MenuItem>
-                        <MenuItem value="Ain Shams">Ain Shams</MenuItem>
+                        <MenuItem value="Ain Shams">Ain Shams University</MenuItem>
+                        <MenuItem value="Ain Shams">Helwan University</MenuItem>
+                        <MenuItem value="Ain Shams">Menofia University</MenuItem>
+                        <MenuItem value="Ain Shams">Fayoum University</MenuItem>
+                        <MenuItem value="Ain Shams">Others</MenuItem>
+
                     </Select>
                 </FormControl>
 
