@@ -12,6 +12,9 @@ export default function Home() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedUniversity, setSelectedUniversity] = useState("All Universities");
+  const [priceRange, setPriceRange] = useState([0, 7000]);
+  const [selectedConditions, setSelectedConditions] = useState([]); // array of strings: ["New", "Like New", ...]
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -33,6 +36,18 @@ export default function Home() {
     const itemTitle = item.title?.toLowerCase() || "";
     const itemDescription = item.description?.toLowerCase() || "";
     const searchValue = search.toLowerCase();
+    // condition filtering
+    const matchCondition =
+      selectedConditions.length === 0 ||
+    selectedConditions.includes(item.condition);
+    // price filtering
+    const matchPrice =
+    item.price >= priceRange[0] && item.price <= priceRange[1];
+
+    // university filtering
+    const matchUniversity =
+    selectedUniversity === "All Universities" ||
+    item.university === selectedUniversity;
 
     const matchSearch =
       itemTitle.includes(searchValue) ||
@@ -41,11 +56,11 @@ export default function Home() {
     const matchCategory =
       selectedCategory === "All" || item.category === selectedCategory;
 
-    // ✅ الجديد: فلترة الـ status
+    // status filtering (only show available items)
     const matchStatus =
       item.status === "available" || item.status === undefined;
 
-    return matchSearch && matchCategory && matchStatus;
+    return matchSearch && matchCategory && matchStatus && matchCondition && matchPrice && matchUniversity;
   });
 
   return (
@@ -74,7 +89,14 @@ export default function Home() {
           flexDirection: { xs: "column", md: "row" },
         }}
       >
-        <Sidebar />
+        <Sidebar
+        selectedUniversity={selectedUniversity}
+        setSelectedUniversity={setSelectedUniversity}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
+        selectedConditions={selectedConditions}
+        setSelectedConditions={setSelectedConditions}
+        />
 
         <Box
           sx={{
