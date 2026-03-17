@@ -29,30 +29,21 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  const filteredItems = items
-    .map((item) => {
-      const title = item.title?.toLowerCase() || "";
-      const description = item.description?.toLowerCase() || "";
-      const category = item.category?.toLowerCase() || "";
+  const filteredItems = items.filter((item) => {
+    const itemTitle = item.title?.toLowerCase() || "";
+    const itemDescription = item.description?.toLowerCase() || "";
+    const searchValue = search.toLowerCase();
 
-      const searchWords = search.toLowerCase().trim().split(/\s+/);
+    const matchSearch =
+      itemTitle.includes(searchValue) ||
+      itemDescription.includes(searchValue);
 
-      let score = 0;
+    const matchCategory =
+      selectedCategory === "All" || item.category === selectedCategory;
 
-      searchWords.forEach((word) => {
-        // يبدأ بالكلمة فقط
-        if (title.startsWith(word)) score += 3;
-        if (description.startsWith(word)) score += 2;
+    return matchSearch && matchCategory;
+  });
 
-        // تطابق كامل داخل النص
-        if (title.includes(word)) score += 1;
-        if (description.includes(word)) score += 1;
-      });
-
-      return { ...item, score };
-    })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score);
   return (
     <Box
       sx={{
