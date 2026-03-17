@@ -15,7 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState, useRef } from "react";
 import { db, auth } from "../firebase";
-import { addDoc, collection , doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 const CLOUD_NAME = "dstfo8pxq";
@@ -23,8 +23,6 @@ const UPLOAD_PRESET = "unitrade_upload";
 
 export default function SellTool() {
     const fileInputRef = useRef(null);
-
-    /* ================= STATES ================= */
 
     const [form, setForm] = useState({
         title: "",
@@ -42,9 +40,8 @@ export default function SellTool() {
 
     const MAX_FILES = 5;
     const MAX_SIZE_MB = 5;
-    // Upload image to Cloudinary and return the URL
-    const uploadImage = async (file) => {
 
+    const uploadImage = async (file) => {
         const data = new FormData();
         data.append("file", file);
         data.append("upload_preset", UPLOAD_PRESET);
@@ -53,31 +50,22 @@ export default function SellTool() {
             `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
             {
                 method: "POST",
-                body: data
+                body: data,
             }
         );
 
         const result = await res.json();
-
         return result.secure_url;
     };
-    // Upload all images and return their URLs
+
     const uploadImages = async () => {
-
         const urls = [];
-
         for (let img of images) {
-
             const url = await uploadImage(img.file);
-
             urls.push(url);
-
         }
-
         return urls;
     };
-
-    /* ================= FORM HANDLER ================= */
 
     const handleChange = (e) => {
         setForm({
@@ -85,8 +73,6 @@ export default function SellTool() {
             [e.target.name]: e.target.value,
         });
     };
-
-    /* ================= IMAGE HANDLING ================= */
 
     const handleFiles = (files) => {
         setError("");
@@ -124,49 +110,39 @@ export default function SellTool() {
         setImages(updated);
     };
 
-    /* ================= FAKE UPLOAD ================= */
-
-    const simulateUpload = () => {
-        setUploadProgress(0);
-
-        const interval = setInterval(() => {
-            setUploadProgress((prev) => {
-                if (prev >= 100) {
-                    clearInterval(interval);
-                    return 100;
-                }
-                return prev + 10;
-            });
-        }, 200);
-    };
-
     const handleSubmit = async () => {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        let userName = "User";
-        let userPhoto = "";
-
-        if (userSnap.exists()) {
-        const data = userSnap.data();
-        userName = data.name || "User";
-        userPhoto = data.photo || "";
+        if (!auth.currentUser) {
+            setError("You must be logged in.");
+            return;
         }
+
         if (images.length === 0) {
             setError("Please upload at least one image.");
             return;
         }
 
         try {
-
             setUploadProgress(10);
 
+            // 🔥 رفع الصور
             const imageUrls = await uploadImages();
 
             setUploadProgress(70);
+
+            // 🔥 بيانات اليوزر
             const userRef = doc(db, "users", auth.currentUser.uid);
             const userSnap = await getDoc(userRef);
-            const userName = userSnap.exists() ? userSnap.data().firstName + " " + userSnap.data().lastName : "User";
+
+            let userName = "User";
+            let userPhoto = "";
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                userName = data.firstName + " " + data.lastName;
+                userPhoto = data.photo || "";
+            }
+
+            // 🔥 إضافة المنتج + الحالة الجديدة
             await addDoc(collection(db, "products"), {
                 title: form.title,
                 description: form.description,
@@ -178,23 +154,19 @@ export default function SellTool() {
                 userId: auth.currentUser.uid,
                 sellerName: userName,
                 sellerPhoto: userPhoto,
-                createdAt: new Date()
+                status: "available", // ✅ أهم تعديل
+                createdAt: new Date(),
             });
 
             setUploadProgress(100);
 
             alert("Product posted successfully");
             navigate("/home");
-
         } catch (err) {
-
             console.error(err);
             setError("Error posting item");
-
         }
     };
-
-    /* ================= UI ================= */
 
     return (
         <Box sx={{ backgroundColor: "#f5f7fb", minHeight: "100vh", p: 5 }}>
@@ -217,8 +189,6 @@ export default function SellTool() {
                         {error}
                     </Alert>
                 )}
-
-                {/* ================= IMAGE UPLOAD ================= */}
 
                 <Box
                     onDrop={handleDrop}
@@ -252,8 +222,6 @@ export default function SellTool() {
                         }
                     />
                 </Box>
-
-                {/* ================= IMAGE PREVIEW ================= */}
 
                 {images.length > 0 && (
                     <Box
@@ -295,8 +263,6 @@ export default function SellTool() {
                     </Box>
                 )}
 
-                {/* ================= UPLOAD PROGRESS ================= */}
-
                 {uploadProgress > 0 && (
                     <Box sx={{ mb: 3 }}>
                         <LinearProgress
@@ -308,8 +274,6 @@ export default function SellTool() {
                         </Typography>
                     </Box>
                 )}
-
-                {/* ================= FORM FIELDS ================= */}
 
                 <TextField
                     fullWidth

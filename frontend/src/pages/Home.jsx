@@ -41,7 +41,11 @@ export default function Home() {
     const matchCategory =
       selectedCategory === "All" || item.category === selectedCategory;
 
-    return matchSearch && matchCategory;
+    // ✅ الجديد: فلترة الـ status
+    const matchStatus =
+      item.status === "available" || item.status === undefined;
+
+    return matchSearch && matchCategory && matchStatus;
   });
 
   return (
