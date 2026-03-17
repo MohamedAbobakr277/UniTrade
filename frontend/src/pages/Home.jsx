@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Paper, Chip } from "@mui/material";
+import { Box, Typography, Paper, Chip } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import CategoryBar from "../components/CategoryBar";
@@ -12,6 +12,9 @@ export default function Home() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedUniversity, setSelectedUniversity] = useState("All Universities");
+  const [priceRange, setPriceRange] = useState([0, 7000]);
+  const [selectedConditions, setSelectedConditions] = useState([]); // array of strings: ["New", "Like New", ...]
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -29,30 +32,37 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  const filteredItems = items
-    .map((item) => {
-      const title = item.title?.toLowerCase() || "";
-      const description = item.description?.toLowerCase() || "";
-      const category = item.category?.toLowerCase() || "";
+  const filteredItems = items.filter((item) => {
+    const itemTitle = item.title?.toLowerCase() || "";
+    const itemDescription = item.description?.toLowerCase() || "";
+    const searchValue = search.toLowerCase();
+    // condition filtering
+    const matchCondition =
+      selectedConditions.length === 0 ||
+    selectedConditions.includes(item.condition);
+    // price filtering
+    const matchPrice =
+    item.price >= priceRange[0] && item.price <= priceRange[1];
 
-      const searchWords = search.toLowerCase().trim().split(/\s+/);
+    // university filtering
+    const matchUniversity =
+    selectedUniversity === "All Universities" ||
+    item.university === selectedUniversity;
 
-      let score = 0;
+    const matchSearch =
+      itemTitle.includes(searchValue) ||
+      itemDescription.includes(searchValue);
 
-      searchWords.forEach((word) => {
-        // يبدأ بالكلمة فقط
-        if (title.startsWith(word)) score += 3;
-        if (description.startsWith(word)) score += 2;
+    const matchCategory =
+      selectedCategory === "All" || item.category === selectedCategory;
 
-        // تطابق كامل داخل النص
-        if (title.includes(word)) score += 1;
-        if (description.includes(word)) score += 1;
-      });
+    // status filtering (only show available items)
+    const matchStatus =
+      item.status === "available" || item.status === undefined;
 
-      return { ...item, score };
-    })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score);
+    return matchSearch && matchCategory && matchStatus && matchCondition && matchPrice && matchUniversity;
+  });
+
   return (
     <Box
       sx={{
@@ -63,7 +73,6 @@ export default function Home() {
     >
       <Navbar />
 
-      {/* SEARCH SECTION */}
       <TopSection search={search} setSearch={setSearch} />
 
       <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
@@ -80,7 +89,14 @@ export default function Home() {
           flexDirection: { xs: "column", md: "row" },
         }}
       >
-        <Sidebar />
+        <Sidebar
+        selectedUniversity={selectedUniversity}
+        setSelectedUniversity={setSelectedUniversity}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
+        selectedConditions={selectedConditions}
+        setSelectedConditions={setSelectedConditions}
+        />
 
         <Box
           sx={{
@@ -147,23 +163,27 @@ export default function Home() {
           </Paper>
 
           {filteredItems.length > 0 ? (
-            <Grid container spacing={3}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, minmax(0, 1fr))",
+                  md: "repeat(2, minmax(0, 1fr))",
+                  lg: "repeat(3, minmax(0, 1fr))",
+                  xl: "repeat(3, minmax(0, 1fr))",
+                },
+                gap: 3,
+                width: "100%",
+                alignItems: "stretch",
+              }}
+            >
               {filteredItems.map((item) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-                  <Box
-                    sx={{
-                      height: "100%",
-                      transition: "all 0.25s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                      },
-                    }}
-                  >
-                    <ItemCard item={item} />
-                  </Box>
-                </Grid>
+                <Box key={item.id} sx={{ display: "flex" }}>
+                  <ItemCard item={item} />
+                </Box>
               ))}
-            </Grid>
+            </Box>
           ) : (
             <Paper
               elevation={0}

@@ -23,7 +23,7 @@ import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar() {
+export default function Sidebar({selectedUniversity, setSelectedUniversity, priceRange,setPriceRange,selectedConditions, setSelectedConditions,}) {
     const [price, setPrice] = useState([0, 7000]);
     const navigate = useNavigate();
 
@@ -132,8 +132,8 @@ export default function Sidebar() {
                     <FormControl fullWidth size="small">
                         <InputLabel sx={{ color: "#64748b" }}>University</InputLabel>
                         <Select
-                            defaultValue="All Universities"
-                            label="University"
+                            value={selectedUniversity}
+                            onChange={(e) => setSelectedUniversity(e.target.value)}
                             sx={{
                                 borderRadius: "14px",
                                 backgroundColor: "#f8fafc",
@@ -150,7 +150,10 @@ export default function Sidebar() {
                         >
                             <MenuItem value="All Universities">All Universities</MenuItem>
                             <MenuItem value="Cairo University">Cairo University</MenuItem>
-                            <MenuItem value="Ain Shams">Ain Shams</MenuItem>
+                            <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
+                            <MenuItem value="Helwan University">Helwan University</MenuItem>
+                            <MenuItem value="Menofia University">Menofia University</MenuItem>
+                            <MenuItem value="Fayoum University">Fayoum University</MenuItem>
                         </Select>
                     </FormControl>
                 </Box>
@@ -190,8 +193,8 @@ export default function Sidebar() {
                         }}
                     >
                         <Slider
-                            value={price}
-                            onChange={(e, newValue) => setPrice(newValue)}
+                            value={priceRange}
+                            onChange={(e, newValue) => setPriceRange(newValue)}
                             valueLabelDisplay="auto"
                             min={0}
                             max={7000}
@@ -311,6 +314,13 @@ export default function Sidebar() {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                      checked={selectedConditions.includes("New")}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setSelectedConditions([...selectedConditions, "New"]);
+                                        } else {
+                                            setSelectedConditions(selectedConditions.filter((c) => c !== "New"));
+                                        }}}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
@@ -328,6 +338,13 @@ export default function Sidebar() {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                     checked={selectedConditions.includes("Like New")}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setSelectedConditions([...selectedConditions, "Like New"]);
+                                        } else {
+                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Like New"));
+                                        }}}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
@@ -345,6 +362,13 @@ export default function Sidebar() {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                     checked={selectedConditions.includes("Good")}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setSelectedConditions([...selectedConditions, "Good"]);
+                                        } else {
+                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Good"));
+                                        }}}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
