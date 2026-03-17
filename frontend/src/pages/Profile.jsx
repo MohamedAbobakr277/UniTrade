@@ -212,6 +212,42 @@ export default function Profile() {
         }
 
     };
+    // 🔥 أضف الفنكشن دي فوق return (بعد handleDeleteListing)
+
+    const handleMarkAsSold = async (itemId) => {
+
+        try {
+
+            const itemRef = doc(db, "products", itemId);
+
+            await updateDoc(itemRef, {
+                status: "sold"
+            });
+
+            setUserItems(prev =>
+                prev.map(item =>
+                    item.id === itemId ? { ...item, status: "sold" } : item
+                )
+            );
+
+            setSnackbar({
+                open: true,
+                message: "Marked as sold",
+                severity: "success",
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            setSnackbar({
+                open: true,
+                message: "Failed to update status",
+                severity: "error",
+            });
+
+        }
+    };
     if (!user) {
         return <Typography sx={{ p: 5 }}>Loading profile...</Typography>;
     }
@@ -315,16 +351,75 @@ export default function Profile() {
                                 {userItems.map((item) => (
                                     <Grid item xs={12} sm={6} key={item.id}>
                                         <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', position: 'relative' }}>
+
+                                            {/* 🔥 STATUS BADGE */}
+                                            <Box sx={{
+                                                position: 'absolute',
+                                                top: 10,
+                                                left: 10,
+                                                px: 1.5,
+                                                py: 0.5,
+                                                borderRadius: 2,
+                                                fontSize: 12,
+                                                fontWeight: 700,
+                                                color: 'white',
+                                                bgcolor: item.status === "sold" ? '#ef4444' : '#22c55e'
+                                            }}>
+                                                {item.status === "sold" ? "SOLD" : "AVAILABLE"}
+                                            </Box>
+
                                             <CardMedia component="img" height="180" image={item.images?.[0] || ""} />
+
                                             <CardContent sx={{ p: 2 }}>
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{item.title}</Typography>
+
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                                                    <Typography variant="h6" color="primary" sx={{ fontWeight: 800 }}>${Number(item.price || 0).toFixed(2)}</Typography>
-                                                    <Typography variant="caption" color="text.secondary">Posted {item.postedDate}</Typography>
+                                                    <Typography variant="h6" color="primary" sx={{ fontWeight: 800 }}>
+                                                        ${Number(item.price || 0).toFixed(2)}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        Posted {item.postedDate}
+                                                    </Typography>
                                                 </Box>
+
+                                                {/* 🔥 BUTTONS */}
                                                 <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                                    <Button fullWidth variant="outlined" size="small" startIcon={<EditIcon />} sx={{ borderRadius: 2, textTransform: 'none' }} onClick={() => handleOpenEditListing(item)}>Edit</Button>
-                                                    <IconButton size="small" sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }} onClick={() => handleDeleteListing(item.id)}><DeleteIcon fontSize="small" /></IconButton>
+
+                                                    {item.status !== "sold" && (
+                                                        <Button
+                                                            fullWidth
+                                                            variant="contained"
+                                                            size="small"
+                                                            sx={{
+                                                                borderRadius: 2,
+                                                                textTransform: 'none',
+                                                                bgcolor: '#22c55e'
+                                                            }}
+                                                            onClick={() => handleMarkAsSold(item.id)}
+                                                        >
+                                                            Mark as Sold
+                                                        </Button>
+                                                    )}
+
+                                                    <Button
+                                                        fullWidth
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<EditIcon />}
+                                                        sx={{ borderRadius: 2, textTransform: 'none' }}
+                                                        onClick={() => handleOpenEditListing(item)}
+                                                    >
+                                                        Edit
+                                                    </Button>
+
+                                                    <IconButton
+                                                        size="small"
+                                                        sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }}
+                                                        onClick={() => handleDeleteListing(item.id)}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+
                                                 </Box>
                                             </CardContent>
                                         </Card>
