@@ -9,6 +9,8 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import SellTool from "./pages/SellTool";
 import Profile from "./pages/Profile";
 import ItemDetails from "./pages/ItemDetails";
+import MyListings from "./pages/MyListings";
+import Favourites from "./pages/Favourites";
 
 export default function App() {
   return (
@@ -50,10 +52,28 @@ export default function App() {
       />
 
       <Route
+        path="/my-listings"
+        element={
+          <ProtectedRoute>
+            <MyListings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/item/:id"
         element={
           <ProtectedRoute>
             <ItemDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/favourites"
+        element={
+          <ProtectedRoute>
+            <Favourites />
           </ProtectedRoute>
         }
       />

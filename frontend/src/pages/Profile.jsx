@@ -24,6 +24,7 @@ import {
     Snackbar,
     Alert,
     InputAdornment,
+    Chip,
 } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
@@ -41,6 +42,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import logo from '../assets/logo.png';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
@@ -62,6 +65,8 @@ export default function Profile() {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
     const [currentEditItem, setCurrentEditItem] = useState(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
     const navigate = useNavigate();
     const handleOpenEditListing = (item) => {
         setCurrentEditItem(item);
@@ -179,38 +184,34 @@ export default function Profile() {
 
         }
     };
-    const handleDeleteListing = async (itemId) => {
+    const handleOpenDeleteConfirm = (itemId) => {
+        setItemToDelete(itemId);
+        setIsDeleteDialogOpen(true);
+    };
 
-        if (!auth.currentUser) return;
-
-        const docRef = doc(db, "products", itemId);
+    const confirmDeleteListing = async () => {
+        if (!auth.currentUser || !itemToDelete) return;
+        const docRef = doc(db, "products", itemToDelete);
 
         try {
-
             await deleteDoc(docRef);
-
-            setUserItems(prev =>
-                prev.filter(item => item.id !== itemId)
-            );
-
+            setUserItems(prev => prev.filter(item => item.id !== itemToDelete));
+            
             setSnackbar({
                 open: true,
-                message: "Listing deleted successfully",
+                message: "Item deleted successfully!",
                 severity: "success",
             });
-
         } catch (error) {
-
             console.error("Error deleting listing:", error);
-
             setSnackbar({
                 open: true,
-                message: "Failed to delete listing",
+                message: "Failed to delete item",
                 severity: "error",
             });
-
         }
-
+        setIsDeleteDialogOpen(false);
+        setItemToDelete(null);
     };
     // 🔥 أضف الفنكشن دي فوق return (بعد handleDeleteListing)
 
@@ -252,11 +253,8 @@ export default function Profile() {
         return <Typography sx={{ p: 5 }}>Loading profile...</Typography>;
     }
     return (
-        <Box sx={{ backgroundColor: '#f5f7fb', minHeight: '100vh' }}>
-            <Box sx={{ bgcolor: '#f5f6f8', borderBottom: '1px solid #e0e0e0', px: 5, py: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <img src={logo} alt="UniTrade Logo" style={{ height: '100px' }} />
-                <Typography variant="h4" sx={{ fontWeight: 800, color: '#1a202c', letterSpacing: '-0.02em' }}>UniTrade</Typography>
-            </Box>
+        <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
+            <Navbar />
 
             <Box sx={{ display: 'flex' }}>
                 <Box sx={{ width: 280, borderRight: '1px solid #e2e8f0', bgcolor: 'white', minHeight: 'calc(100vh - 93px)' }}>
@@ -270,7 +268,7 @@ export default function Profile() {
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemButton sx={{ borderRadius: 2 }}>
+                                <ListItemButton sx={{ borderRadius: 2 }} onClick={() => navigate('/favourites')}>
                                     <ListItemIcon><FavoriteIcon /></ListItemIcon>
                                     <ListItemText primary="Favourites" />
                                 </ListItemButton>
@@ -344,88 +342,147 @@ export default function Profile() {
 
                         <Grid item xs={12} md={8}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 700 }}>My Listings</Typography>
-                                <Button variant="text" color="primary" sx={{ textTransform: 'none', fontWeight: 600 }}>View All</Button>
+                                <Typography variant="h6" sx={{ fontWeight: 700 }}>The Recent Items</Typography>
+                                {userItems.length > 0 && <Button variant="text" color="primary" sx={{ textTransform: 'none', fontWeight: 600 }} onClick={() => navigate('/my-listings')}>View All</Button>}
                             </Box>
-                            <Grid container spacing={3}>
-                                {userItems.map((item) => (
-                                    <Grid item xs={12} sm={6} key={item.id}>
-                                        <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', position: 'relative' }}>
-
-                                            {/* 🔥 STATUS BADGE */}
-                                            <Box sx={{
-                                                position: 'absolute',
-                                                top: 10,
-                                                left: 10,
-                                                px: 1.5,
-                                                py: 0.5,
-                                                borderRadius: 2,
-                                                fontSize: 12,
-                                                fontWeight: 700,
-                                                color: 'white',
-                                                bgcolor: item.status === "sold" ? '#ef4444' : '#22c55e'
-                                            }}>
-                                                {item.status === "sold" ? "SOLD" : "AVAILABLE"}
+                            
+                            {userItems.length > 0 ? (
+                                <Grid container spacing={3}>
+                                    {userItems.slice(0, 3).map((item) => (
+                                    <Grid item xs={12} sm={6} key={item.id} sx={{ display: 'flex' }}>
+                                        <Card
+                                            sx={{
+                                                borderRadius: "24px",
+                                                overflow: "hidden",
+                                                border: "1px solid #e2e8f0",
+                                                backgroundColor: "#ffffff",
+                                                boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
+                                                transition: "all 0.3s ease",
+                                                width: "100%",
+                                                height: "100%",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                "&:hover": {
+                                                    transform: "translateY(-8px)",
+                                                    boxShadow: "0 18px 40px rgba(15,23,42,0.12)",
+                                                },
+                                                position: 'relative'
+                                            }}
+                                        >
+                                            <Box sx={{ position: "relative", overflow: "hidden" }}>
+                                                <Box sx={{
+                                                    position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
+                                                    fontSize: 12, fontWeight: 700, color: 'white', zIndex: 2,
+                                                    bgcolor: item.status === "sold" ? '#ef4444' : '#10b981',
+                                                    boxShadow: "0 6px 18px rgba(0,0,0,0.15)"
+                                                }}>
+                                                    {item.status === "sold" ? "SOLD" : "AVAILABLE"}
+                                                </Box>
+                                                <CardMedia
+                                                    component="img"
+                                                    height="220"
+                                                    image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
+                                                    sx={{
+                                                        width: "100%",
+                                                        objectFit: "cover",
+                                                        display: "block",
+                                                        transition: "transform 0.35s ease",
+                                                        "&:hover": {
+                                                            transform: "scale(1.04)",
+                                                        },
+                                                    }}
+                                                />
                                             </Box>
 
-                                            <CardMedia component="img" height="180" image={item.images?.[0] || ""} />
+                                            <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                                                <Typography 
+                                                    variant="h6" 
+                                                    sx={{ 
+                                                        fontWeight: 800, 
+                                                        fontSize: "1.05rem", 
+                                                        color: "#0f172a", 
+                                                        lineHeight: 1.4, 
+                                                        minHeight: "52px",
+                                                        display: "-webkit-box", 
+                                                        WebkitLineClamp: 2, 
+                                                        WebkitBoxOrient: "vertical", 
+                                                        overflow: "hidden" 
+                                                    }}
+                                                >
+                                                    {item.title || "Untitled Item"}
+                                                </Typography>
 
-                                            <CardContent sx={{ p: 2 }}>
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{item.title}</Typography>
+                                                <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", minHeight: "38px" }}>
+                                                    {item.price ? `${item.price} EGP` : "Price not available"}
+                                                </Typography>
 
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                                                    <Typography variant="h6" color="primary" sx={{ fontWeight: 800 }}>
-                                                        ${Number(item.price || 0).toFixed(2)}
-                                                    </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        Posted {item.postedDate}
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, minHeight: "28px" }}>
+                                                    <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
+                                                    <Typography component="span" sx={{ fontSize: "0.92rem", color: "#64748b", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                                        {item.university || "University not specified"}
                                                     </Typography>
                                                 </Box>
 
-                                                {/* 🔥 BUTTONS */}
-                                                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                                <Box sx={{ mt: 1.2, minHeight: "32px" }}>
+                                                    <Chip
+                                                        icon={<VerifiedOutlinedIcon />}
+                                                        label={item.condition || "Condition not specified"}
+                                                        size="small"
+                                                        sx={{
+                                                            backgroundColor: `${item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b"}12`,
+                                                            color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b",
+                                                            fontWeight: 700,
+                                                            borderRadius: "10px",
+                                                            "& .MuiChip-icon": { color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b" },
+                                                        }}
+                                                    />
+                                                </Box>
 
+                                                <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "48px" }}>
+                                                    {item.description || "No description available"}
+                                                </Typography>
+                                                
+                                                <Box sx={{ flexGrow: 1 }} />
+                                                <Divider sx={{ my: 2 }} />
+
+                                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minHeight: "58px", width: "100%" }}>
                                                     {item.status !== "sold" && (
-                                                        <Button
-                                                            fullWidth
-                                                            variant="contained"
-                                                            size="small"
-                                                            sx={{
-                                                                borderRadius: 2,
-                                                                textTransform: 'none',
-                                                                bgcolor: '#22c55e'
-                                                            }}
+                                                        <Button 
+                                                            fullWidth 
+                                                            variant="contained" 
+                                                            size="small" 
+                                                            sx={{ borderRadius: "10px", textTransform: 'none', bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' }, height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, boxShadow: 'none' }} 
                                                             onClick={() => handleMarkAsSold(item.id)}
                                                         >
-                                                            Mark as Sold
+                                                            Sold
                                                         </Button>
                                                     )}
-
-                                                    <Button
-                                                        fullWidth
-                                                        variant="outlined"
-                                                        size="small"
-                                                        startIcon={<EditIcon />}
-                                                        sx={{ borderRadius: 2, textTransform: 'none' }}
+                                                    <Button 
+                                                        fullWidth 
+                                                        variant="outlined" 
+                                                        size="small" 
+                                                        startIcon={<EditIcon sx={{ fontSize: '1.1rem !important', mr: -0.5 }}/>} 
+                                                        sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: '#e2e8f0', color: '#334155', '&:hover': { borderColor: '#cbd5e1', bgcolor: '#f8fafc' } }} 
                                                         onClick={() => handleOpenEditListing(item)}
                                                     >
                                                         Edit
                                                     </Button>
-
-                                                    <IconButton
-                                                        size="small"
-                                                        sx={{ bgcolor: '#f1f5f9', borderRadius: 2, color: '#64748b' }}
-                                                        onClick={() => handleDeleteListing(item.id)}
+                                                    <IconButton 
+                                                        size="small" 
+                                                        sx={{ bgcolor: '#f1f5f9', borderRadius: "10px", color: '#64748b', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }} 
+                                                        onClick={() => handleOpenDeleteConfirm(item.id)}
                                                     >
                                                         <DeleteIcon fontSize="small" />
                                                     </IconButton>
-
                                                 </Box>
                                             </CardContent>
                                         </Card>
                                     </Grid>
                                 ))}
                             </Grid>
+                            ) : (
+                                <Typography sx={{ color: '#64748b', fontSize: '1.1rem' }}>You have not posted any listings yet.</Typography>
+                            )}
                         </Grid>
                     </Grid>
                 </Box>
@@ -433,7 +490,9 @@ export default function Profile() {
 
             {/* Edit Profile Modal */}
             <Dialog open={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
-                <DialogTitle sx={{ fontWeight: 700 }}>Edit Profile Information</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <PersonIcon color="primary" /> Edit Profile Information
+                </DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3, position: 'relative' }}>
                         <Avatar src={editData.profilePhoto} sx={{ width: 100, height: 100, mb: 1 }} />
@@ -458,32 +517,35 @@ export default function Profile() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600 }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveProfile} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700 }}>Save Changes</Button>
+                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ color: '#64748b', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveProfile} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
-            {/*edit listing modal*/}
-            <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>Edit Listing</DialogTitle>
+            {/* Edit Listing Modal */}
+            <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
+                <DialogTitle sx={{ fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <EditIcon color="primary" /> Edit Listing
+                </DialogTitle>
                 <DialogContent>
-                    <TextField
-                        fullWidth
-                        label="Title"
-                        value={currentEditItem?.title || ''}
-                        onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Price"
-                        type="number"
-                        value={currentEditItem?.price || ''}
-                        onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
+                        <TextField
+                            fullWidth
+                            label="Title"
+                            value={currentEditItem?.title || ''}
+                            onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Price"
+                            type="number"
+                            value={currentEditItem?.price || ''}
+                            onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                        />
+                    </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setIsEditListingModalOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveListing}>Save</Button>
+                <DialogActions sx={{ px: 3, pb: 3 }}>
+                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: '#64748b', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveListing} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
 
@@ -528,13 +590,27 @@ export default function Profile() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsResetModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600 }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleResetPassword} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700 }}>Update Password</Button>
+                    <Button onClick={() => setIsResetModalOpen(false)} sx={{ color: '#64748b', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleResetPassword} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Update Password</Button>
                 </DialogActions>
             </Dialog>
 
-            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-                <Alert severity={snackbar.severity} sx={{ width: '100%', borderRadius: 2 }}>{snackbar.message}</Alert>
+            {/* Delete Confirmation Modal */}
+            <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
+                <DialogTitle sx={{ fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <DeleteIcon color="error" /> Confirm Deletion
+                </DialogTitle>
+                <DialogContent>
+                    <Typography color="text.secondary" sx={{ mt: 1 }}>Are you sure you want to delete this item? This action cannot be undone.</Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 3 }}>
+                    <Button onClick={() => setIsDeleteDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" color="error" onClick={confirmDeleteListing} sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none', px: 4, boxShadow: 'none' }}>Delete</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+                <Alert severity={snackbar.severity} sx={{ width: '100%', borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontWeight: 600 }}>{snackbar.message}</Alert>
             </Snackbar>
         </Box>
     );

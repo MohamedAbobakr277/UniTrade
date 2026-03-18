@@ -12,9 +12,13 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import { useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import { IconButton } from "@mui/material";
 
 export default function ItemCard({ item }) {
   const [editData, setEditData] = useState(null);
@@ -36,6 +40,44 @@ export default function ItemCard({ item }) {
 
     fetchUserData();
   }, [item.userId]);
+
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    let unsubUser;
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (user) {
+        const userRef = doc(db, "users", user.uid);
+        unsubUser = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const favs = docSnap.data().favourites || [];
+            setIsFavorite(favs.includes(item.id));
+          }
+        });
+      }
+    });
+    return () => {
+      unsubAuth();
+      if (unsubUser) unsubUser();
+    };
+  }, [item.id]);
+
+  const toggleFavorite = async (e) => {
+    e.stopPropagation();
+    if (!currentUser) return;
+    const userRef = doc(db, "users", currentUser.uid);
+    try {
+      if (isFavorite) {
+        await updateDoc(userRef, { favourites: arrayRemove(item.id) });
+      } else {
+        await updateDoc(userRef, { favourites: arrayUnion(item.id) });
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+    }
+  };
 
   const imageUrl =
     Array.isArray(item.images) && item.images.length > 0
@@ -125,11 +167,25 @@ export default function ItemCard({ item }) {
               color: conditionColor,
               fontWeight: 700,
               borderRadius: "10px",
-              border: `1px solid ${conditionColor}22`,
               boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
             }}
           />
         )}
+
+        <IconButton
+          onClick={toggleFavorite}
+          sx={{
+            position: "absolute",
+            bottom: 14,
+            right: 14,
+            backgroundColor: "#ffffff",
+            color: isFavorite ? "#ef4444" : "#94a3b8",
+            "&:hover": { backgroundColor: "#f8fafc" },
+            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+          }}
+        >
+          {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+        </IconButton>
       </Box>
 
       <CardContent
