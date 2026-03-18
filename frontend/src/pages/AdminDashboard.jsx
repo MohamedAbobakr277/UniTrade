@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import {
@@ -53,36 +53,36 @@ const initialUsers = [
     { id: "USR-002", name: "Maya Williams", email: "m.williams@uni.edu", university: "McGill University", faculty: "Business", status: "Pending" },
 ];
 
-const categories = ["Electronics", "Books", "Furniture", "Sports", "Fashion", "Other"];
+const categories = ["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"];
 const conditions = ["New", "Like New", "Good", "Fair", "Poor"];
 
 export default function AdminDashboard() {
     const [listings, setListings] = useState([]);
     const [users, setUsers] = useState([]);
     const [activeTab, setActiveTab] = useState('dashboard');
-    
+
     const stats = [
         {
-        label:"Total Listings",
-        value:listings.length
+            label: "Total Listings",
+            value: listings.length
         }
     ]
     // Real-time Firestore Listeners
     useEffect(() => {
-        const unsubProducts = onSnapshot(collection(db,"products"),snapshot=>{
-        setListings(snapshot.docs.map(doc=>({id:doc.id,...doc.data()})))
+        const unsubProducts = onSnapshot(collection(db, "products"), snapshot => {
+            setListings(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
         })
 
-    const unsubUsers = onSnapshot(collection(db,"users"),snapshot=>{
-        setUsers(snapshot.docs.map(doc=>({id:doc.id,...doc.data()})))
-    })
+        const unsubUsers = onSnapshot(collection(db, "users"), snapshot => {
+            setUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+        })
 
-    return ()=>{
-        unsubProducts()
-        unsubUsers()
-    }
+        return () => {
+            unsubProducts()
+            unsubUsers()
+        }
 
-    },[]);
+    }, []);
 
     // Modal States
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -102,21 +102,21 @@ export default function AdminDashboard() {
     };
 
     const handleSaveEdit = async () => {
-  try {
-    const ref = doc(db, "products", selectedItem.id);
+        try {
+            const ref = doc(db, "products", selectedItem.id);
 
-    await updateDoc(ref, {
-      title: editForm.title,
-      description: editForm.description,
-      category: editForm.category,
-      price: Number(editForm.price)
-    });
+            await updateDoc(ref, {
+                title: editForm.title,
+                description: editForm.description,
+                category: editForm.category,
+                price: Number(editForm.price)
+            });
 
-    setIsEditModalOpen(false);
-  } catch (err) {
-    console.error(err);
-  }
-};
+            setIsEditModalOpen(false);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const handleOpenAdd = () => {
         setAddForm({ title: '', description: '', category: 'Electronics', price: '', condition: 'New' });
@@ -124,31 +124,31 @@ export default function AdminDashboard() {
     };
 
     const handleSaveAdd = async () => {
-  try {
-    await addDoc(collection(db, "products"), {
-      title: addForm.title,
-      description: addForm.description,
-      category: addForm.category,
-      price: Number(addForm.price),
-      condition: addForm.condition,
-      user: "Admin",
-      image: "https://images.unsplash.com/photo-1581093588401-22f7c1b3e9b5",
-      createdAt: new Date()
-    });
+        try {
+            await addDoc(collection(db, "products"), {
+                title: addForm.title,
+                description: addForm.description,
+                category: addForm.category,
+                price: Number(addForm.price),
+                condition: addForm.condition,
+                user: "Admin",
+                image: "https://images.unsplash.com/photo-1581093588401-22f7c1b3e9b5",
+                createdAt: new Date()
+            });
 
-    setIsAddModalOpen(false);
-  } catch (err) {
-    console.error(err);
-  }
-};
+            setIsAddModalOpen(false);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const handleConfirmDelete = async () => {
         try {
             await deleteDoc(doc(db, "products", itemToDelete.id));
             setIsDeleteModalOpen(false);
-            } catch (err) {
+        } catch (err) {
             console.error(err);
-            }
+        }
     };
 
     const navigate = useNavigate();
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
                                     <TableCell>
                                         <Chip label="ACTIVE" size="small" sx={{ bgcolor: '#eff6ff', color: '#2563eb', fontWeight: 700, fontSize: '0.65rem' }} />
                                     </TableCell>
-                                    <TableCell color="text.secondary">{item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString(): "Just now"}</TableCell>
+                                    <TableCell color="text.secondary">{item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : "Just now"}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

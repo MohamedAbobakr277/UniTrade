@@ -311,9 +311,12 @@ export default function SellTool() {
                     >
                         <MenuItem value="Books & Notes">Books & Notes</MenuItem>
                         <MenuItem value="Calculators">Calculators</MenuItem>
-                        <MenuItem value="Laptops & Tablets">Laptops & Tablets</MenuItem>
+                        <MenuItem value="Electronics">Electronics</MenuItem>
                         <MenuItem value="Engineering Tools">Engineering Tools</MenuItem>
                         <MenuItem value="Medical Tools">Medical Tools</MenuItem>
+                        <MenuItem value="Lab Equipment">Lab Equipment</MenuItem>
+                        <MenuItem value="Stationery">Stationery</MenuItem>
+                        <MenuItem value="Bags & Accessories">Bags & Accessories</MenuItem>
                     </Select>
                 </FormControl>
 
@@ -324,13 +327,23 @@ export default function SellTool() {
                         value={form.university}
                         onChange={handleChange}
                     >
-                        <MenuItem value="All Universities">All Universities</MenuItem>
                         <MenuItem value="Cairo University">Cairo University</MenuItem>
-                        <MenuItem value="Ain Shams">Ain Shams University</MenuItem>
-                        <MenuItem value="Ain Shams">Helwan University</MenuItem>
-                        <MenuItem value="Ain Shams">Menofia University</MenuItem>
-                        <MenuItem value="Ain Shams">Fayoum University</MenuItem>
-                        <MenuItem value="Ain Shams">Others</MenuItem>
+                        <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
+                        <MenuItem value="Alexandria University">Alexandria University</MenuItem>
+                        <MenuItem value="Mansoura University">Mansoura University</MenuItem>
+                        <MenuItem value="Assiut University">Assiut University</MenuItem>
+                        <MenuItem value="Helwan University">Helwan University</MenuItem>
+                        <MenuItem value="Tanta University">Tanta University</MenuItem>
+                        <MenuItem value="Zagazig University">Zagazig University</MenuItem>
+                        <MenuItem value="Suez Canal University">Suez Canal University</MenuItem>
+                        <MenuItem value="Al-Azhar University">Al-Azhar University</MenuItem>
+                        <MenuItem value="German University in Cairo">German University in Cairo</MenuItem>
+                        <MenuItem value="British University in Egypt">British University in Egypt</MenuItem>
+                        <MenuItem value="October 6 University">October 6 University</MenuItem>
+                        <MenuItem value="Future University in Egypt">Future University in Egypt</MenuItem>
+                        <MenuItem value="AASTMT">AASTMT</MenuItem>
+                        <MenuItem value="Nile University">Nile University</MenuItem>
+                        <MenuItem value="Others">Others</MenuItem>
 
                     </Select>
                 </FormControl>
@@ -345,6 +358,8 @@ export default function SellTool() {
                         <MenuItem value="New">New</MenuItem>
                         <MenuItem value="Like New">Like New</MenuItem>
                         <MenuItem value="Good">Good</MenuItem>
+                        <MenuItem value="Fair">Fair</MenuItem>
+                        <MenuItem value="Poor">Poor</MenuItem>
                     </Select>
                 </FormControl>
 

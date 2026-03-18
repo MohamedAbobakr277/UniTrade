@@ -151,9 +151,21 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                             <MenuItem value="All Universities">All Universities</MenuItem>
                             <MenuItem value="Cairo University">Cairo University</MenuItem>
                             <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
+                            <MenuItem value="Alexandria University">Alexandria University</MenuItem>
+                            <MenuItem value="Mansoura University">Mansoura University</MenuItem>
+                            <MenuItem value="Assiut University">Assiut University</MenuItem>
                             <MenuItem value="Helwan University">Helwan University</MenuItem>
-                            <MenuItem value="Menofia University">Menofia University</MenuItem>
-                            <MenuItem value="Fayoum University">Fayoum University</MenuItem>
+                            <MenuItem value="Tanta University">Tanta University</MenuItem>
+                            <MenuItem value="Zagazig University">Zagazig University</MenuItem>
+                            <MenuItem value="Suez Canal University">Suez Canal University</MenuItem>
+                            <MenuItem value="Al-Azhar University">Al-Azhar University</MenuItem>
+                            <MenuItem value="German University in Cairo">German University in Cairo</MenuItem>
+                            <MenuItem value="British University in Egypt">British University in Egypt</MenuItem>
+                            <MenuItem value="October 6 University">October 6 University</MenuItem>
+                            <MenuItem value="Future University in Egypt">Future University in Egypt</MenuItem>
+                            <MenuItem value="AASTMT">AASTMT</MenuItem>
+                            <MenuItem value="Nile University">Nile University</MenuItem>
+                            <MenuItem value="Others">Others</MenuItem>
                         </Select>
                     </FormControl>
                 </Box>
@@ -380,6 +392,54 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                                 label={
                                     <Typography sx={{ fontWeight: 600, color: "#334155" }}>
                                         Good
+                                    </Typography>
+                                }
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                     checked={selectedConditions.includes("Fair")}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setSelectedConditions([...selectedConditions, "Fair"]);
+                                        } else {
+                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Fair"));
+                                        }}}
+                                        sx={{
+                                            color: "#94a3b8",
+                                            "&.Mui-checked": {
+                                                color: "#2563eb",
+                                            },
+                                        }}
+                                    />
+                                }
+                                label={
+                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                        Fair
+                                    </Typography>
+                                }
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                     checked={selectedConditions.includes("Poor")}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setSelectedConditions([...selectedConditions, "Poor"]);
+                                        } else {
+                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Poor"));
+                                        }}}
+                                        sx={{
+                                            color: "#94a3b8",
+                                            "&.Mui-checked": {
+                                                color: "#2563eb",
+                                            },
+                                        }}
+                                    />
+                                }
+                                label={
+                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                        Poor
                                     </Typography>
                                 }
                             />
