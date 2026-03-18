@@ -198,16 +198,23 @@ export default function Signup() {
                                             setSelectedFaculty("");
                                         }}
                                     >
-                                        <MenuItem value="Cairo University">
-                                            Cairo University
-                                        </MenuItem>
-                                        <MenuItem value="Ain Shams University">
-                                            Ain Shams University
-                                        </MenuItem>
-                                        <MenuItem value="Alexandria University">
-                                            Alexandria University
-                                        </MenuItem>
-                                        <MenuItem value="Other">Other</MenuItem>
+                                        <MenuItem value="Cairo University">Cairo University</MenuItem>
+                                        <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
+                                        <MenuItem value="Alexandria University">Alexandria University</MenuItem>
+                                        <MenuItem value="Mansoura University">Mansoura University</MenuItem>
+                                        <MenuItem value="Assiut University">Assiut University</MenuItem>
+                                        <MenuItem value="Helwan University">Helwan University</MenuItem>
+                                        <MenuItem value="Tanta University">Tanta University</MenuItem>
+                                        <MenuItem value="Zagazig University">Zagazig University</MenuItem>
+                                        <MenuItem value="Suez Canal University">Suez Canal University</MenuItem>
+                                        <MenuItem value="Al-Azhar University">Al-Azhar University</MenuItem>
+                                        <MenuItem value="German University in Cairo">German University in Cairo</MenuItem>
+                                        <MenuItem value="British University in Egypt">British University in Egypt</MenuItem>
+                                        <MenuItem value="October 6 University">October 6 University</MenuItem>
+                                        <MenuItem value="Future University in Egypt">Future University in Egypt</MenuItem>
+                                        <MenuItem value="AASTMT">AASTMT</MenuItem>
+                                        <MenuItem value="Nile University">Nile University</MenuItem>
+                                        <MenuItem value="Others">Others</MenuItem>
                                     </Select>
                                 </FormControl>
 
@@ -230,7 +237,17 @@ export default function Signup() {
                                     >
                                         <MenuItem value="Engineering">Engineering</MenuItem>
                                         <MenuItem value="Medicine">Medicine</MenuItem>
+                                        <MenuItem value="Pharmacy">Pharmacy</MenuItem>
+                                        <MenuItem value="Dentistry">Dentistry</MenuItem>
+                                        <MenuItem value="Nursing">Nursing</MenuItem>
+                                        <MenuItem value="Science">Science</MenuItem>
+                                        <MenuItem value="Arts">Arts</MenuItem>
                                         <MenuItem value="Commerce">Commerce</MenuItem>
+                                        <MenuItem value="Law">Law</MenuItem>
+                                        <MenuItem value="Education">Education</MenuItem>
+                                        <MenuItem value="Agriculture">Agriculture</MenuItem>
+                                        <MenuItem value="Veterinary Medicine">Veterinary Medicine</MenuItem>
+                                        <MenuItem value="Physical Therapy">Physical Therapy</MenuItem>
                                         <MenuItem value="Other">Other</MenuItem>
                                     </Select>
                                 </FormControl>
