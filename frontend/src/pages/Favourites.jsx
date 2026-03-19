@@ -80,13 +80,21 @@ export default function Favourites() {
         {loading ? (
           <Typography sx={{ color: '#64748b', fontSize: '1.1rem' }}>Loading favourites...</Typography>
         ) : items.length > 0 ? (
-          <Grid container spacing={3}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: 3,
+              width: "100%",
+              alignItems: "stretch",
+            }}
+          >
             {items.map((item) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={item.id} sx={{ display: 'flex' }}>
+              <Box key={item.id} sx={{ display: 'flex' }}>
                 <ItemCard item={item} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         ) : (
           <Typography sx={{ color: '#64748b', fontSize: '1.1rem' }}>You have not added any favourites yet.</Typography>
         )}
