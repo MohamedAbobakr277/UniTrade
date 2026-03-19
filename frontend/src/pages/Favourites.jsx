@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, IconButton, Grid } from '@mui/material';
+import { Box, Typography, IconButton, Grid, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -49,10 +49,31 @@ export default function Favourites() {
     <Box sx={{ minHeight: "100vh", background: "#f8fbff" }}>
       <Navbar />
       <Box sx={{ p: { xs: 2, md: 5 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <IconButton onClick={() => navigate('/profile')} sx={{ mr: 2 }}>
-            <ArrowBackIcon />
-          </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+          <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/profile')}
+              sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  color: "#64748b",
+                  bgcolor: "#ffffff",
+                  px: 2.5,
+                  py: 0.8,
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
+                  border: "1px solid #e2e8f0",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                      bgcolor: "#f8fafc",
+                      color: "#0f172a",
+                      transform: "translateX(-4px)",
+                      boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
+                  },
+              }}
+          >
+              Back to Profile
+          </Button>
           <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', m: 0 }}>My Favourites</Typography>
         </Box>
 

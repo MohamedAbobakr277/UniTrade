@@ -65,7 +65,7 @@ export default function CategoryBar({
         <Paper
             elevation={0}
             sx={{
-                mb: 3,
+                mb: 1.5,
                 p: { xs: 2, md: 2.5 },
                 borderRadius: "22px",
                 backgroundColor: "#ffffff",

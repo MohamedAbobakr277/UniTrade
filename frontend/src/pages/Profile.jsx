@@ -71,7 +71,29 @@ export default function Profile() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isResetModalOpen, setIsResetModalOpen] = useState(false);
     const [editData, setEditData] = useState({});
+    const [customUniversity, setCustomUniversity] = useState("");
+    const [customFaculty, setCustomFaculty] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    const handleOpenEditModal = () => {
+        const data = { ...user };
+        let cUni = "";
+        let cFac = "";
+
+        if (data.university && !universities.includes(data.university) && data.university !== "Others") {
+            cUni = data.university;
+            data.university = "Others";
+        }
+        if (data.faculty && !faculties.includes(data.faculty) && data.faculty !== "Others") {
+            cFac = data.faculty;
+            data.faculty = "Others";
+        }
+
+        setCustomUniversity(cUni);
+        setCustomFaculty(cFac);
+        setEditData(data);
+        setIsEditModalOpen(true);
+    };
     const [passwords, setPasswords] = useState({ new: '', confirm: '' });
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
@@ -109,6 +131,12 @@ export default function Profile() {
                 id: doc.id,
                 ...doc.data()
             }));
+            
+            items.sort((a, b) => {
+                const timeA = a.createdAt?.seconds || 0;
+                const timeB = b.createdAt?.seconds || 0;
+                return timeB - timeA;
+            });
 
             setUserItems(items);
         };
@@ -136,9 +164,17 @@ export default function Profile() {
 
     const handleSaveProfile = async () => {
         try {
+            const finalData = { ...editData };
+            if (finalData.university === "Others") {
+                finalData.university = customUniversity;
+            }
+            if (finalData.faculty === "Others") {
+                finalData.faculty = customFaculty;
+            }
+
             const userRef = doc(db, 'users', auth.currentUser.uid);
-            await setDoc(userRef, editData, { merge: true }); // merge: true للحفاظ على البيانات الأخرى
-            setUser(editData);
+            await setDoc(userRef, finalData, { merge: true }); // merge: true للحفاظ على البيانات الأخرى
+            setUser(finalData);
             setIsEditModalOpen(false);
             setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
         } catch (error) {
@@ -308,10 +344,31 @@ export default function Profile() {
                 </Box>
 
                 <Box sx={{ flex: 1, p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 0 }}>
-                        <IconButton onClick={() => navigate('/home')} sx={{ mr: 2 }}>
-                            <ArrowBackIcon />
-                        </IconButton>
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+                        <Button
+                            startIcon={<ArrowBackIcon />}
+                            onClick={() => navigate('/home')}
+                            sx={{
+                                textTransform: "none",
+                                fontWeight: 700,
+                                color: "#64748b",
+                                bgcolor: "#ffffff",
+                                px: 2.5,
+                                py: 0.8,
+                                borderRadius: "12px",
+                                boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
+                                border: "1px solid #e2e8f0",
+                                transition: "all 0.2s ease",
+                                "&:hover": {
+                                    bgcolor: "#f8fafc",
+                                    color: "#0f172a",
+                                    transform: "translateX(-4px)",
+                                    boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
+                                },
+                            }}
+                        >
+                            Back to Home
+                        </Button>
                         <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', m: 0 }}>My Profile</Typography>
                     </Box>
                     <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', overflow: 'visible' }}>
@@ -328,14 +385,14 @@ export default function Profile() {
                                 </Box>
                             </Box>
                             <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Button variant="outlined" startIcon={<EditIcon />} sx={{ borderRadius: 3, textTransform: 'none', px: 3 }} onClick={() => { setEditData({ ...user }); setIsEditModalOpen(true); }}>Edit Profile</Button>
+                                <Button variant="outlined" startIcon={<EditIcon />} sx={{ borderRadius: 3, textTransform: 'none', px: 3 }} onClick={handleOpenEditModal}>Edit Profile</Button>
                                 <Button variant="contained" startIcon={<LockResetIcon />} sx={{ borderRadius: 3, textTransform: 'none', px: 3, bgcolor: '#2563eb' }} onClick={() => setIsResetModalOpen(true)}>Reset Password</Button>
                             </Box>
                         </CardContent>
                     </Card>
 
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} md={4}>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'stretch' }}>
+                        <Box sx={{ width: { xs: '100%', md: '350px' }, flexShrink: 0 }}>
                             <Card sx={{ borderRadius: 4, height: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
                                 <CardContent sx={{ p: 4 }}>
                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Personal Information</Typography>
@@ -355,18 +412,26 @@ export default function Profile() {
                                     </Box>
                                 </CardContent>
                             </Card>
-                        </Grid>
+                        </Box>
 
-                        <Grid item xs={12} md={8}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>The Recent Items</Typography>
                                 {userItems.length > 0 && <Button variant="text" color="primary" sx={{ textTransform: 'none', fontWeight: 600 }} onClick={() => navigate('/my-listings')}>View All</Button>}
                             </Box>
 
                             {userItems.length > 0 ? (
-                                <Grid container spacing={3}>
+                                <Box
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
+                                        gap: 3,
+                                        width: "100%",
+                                        alignItems: "stretch",
+                                    }}
+                                >
                                     {userItems.slice(0, 2).map((item) => (
-                                        <Grid item xs={12} sm={6} key={item.id} sx={{ display: 'flex' }}>
+                                        <Box key={item.id} sx={{ display: 'flex' }}>
                                             <Card
                                                 sx={{
                                                     borderRadius: "24px",
@@ -419,7 +484,7 @@ export default function Profile() {
                                                             fontSize: "1.05rem",
                                                             color: "#0f172a",
                                                             lineHeight: 1.4,
-                                                            minHeight: "52px",
+                                                            height: "54px",
                                                             display: "-webkit-box",
                                                             WebkitLineClamp: 2,
                                                             WebkitBoxOrient: "vertical",
@@ -429,18 +494,18 @@ export default function Profile() {
                                                         {item.title || "Untitled Item"}
                                                     </Typography>
 
-                                                    <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", minHeight: "38px" }}>
+                                                    <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
                                                         {item.price ? `${item.price} EGP` : "Price not available"}
                                                     </Typography>
 
-                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, minHeight: "28px" }}>
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
                                                         <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
                                                         <Typography component="span" sx={{ fontSize: "0.92rem", color: "#64748b", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                                                             {item.university || "University not specified"}
                                                         </Typography>
                                                     </Box>
 
-                                                    <Box sx={{ mt: 1.2, minHeight: "32px" }}>
+                                                    <Box sx={{ mt: 1.2, height: "32px" }}>
                                                         <Chip
                                                             icon={<VerifiedOutlinedIcon />}
                                                             label={item.condition || "Condition not specified"}
@@ -455,14 +520,14 @@ export default function Profile() {
                                                         />
                                                     </Box>
 
-                                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "48px" }}>
+                                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
                                                         {item.description || "No description available"}
                                                     </Typography>
 
                                                     <Box sx={{ flexGrow: 1 }} />
                                                     <Divider sx={{ my: 2 }} />
 
-                                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minHeight: "58px", width: "100%" }}>
+                                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: "58px", width: "100%" }}>
                                                         {item.status !== "sold" && (
                                                             <Button
                                                                 fullWidth
@@ -494,14 +559,14 @@ export default function Profile() {
                                                     </Box>
                                                 </CardContent>
                                             </Card>
-                                        </Grid>
+                                        </Box>
                                     ))}
-                                </Grid>
+                                </Box>
                             ) : (
                                 <Typography sx={{ color: '#64748b', fontSize: '1.1rem' }}>You have not posted any listings yet.</Typography>
                             )}
-                        </Grid>
-                    </Grid>
+                        </Box>
+                    </Box>
                 </Box>
             </Box>
 
@@ -525,12 +590,18 @@ export default function Profile() {
                             <Grid item xs={6}><TextField fullWidth label="Last Name" name="lastName" value={editData.lastName} onChange={handleInputChange} /></Grid>
                         </Grid>
                         <TextField fullWidth label="Phone Number" name="phoneNumber" value={editData.phoneNumber} onChange={handleInputChange} />
-                        <TextField select fullWidth label="University" name="university" value={editData.university} onChange={handleInputChange}>
+                        <TextField select fullWidth label="University" name="university" value={editData.university || ""} onChange={handleInputChange}>
                             {universities.map((uni) => <MenuItem key={uni} value={uni}>{uni}</MenuItem>)}
                         </TextField>
-                        <TextField select fullWidth label="Faculty" name="faculty" value={editData.faculty} onChange={handleInputChange}>
+                        {editData.university === "Others" && (
+                            <TextField fullWidth label="Enter Your University" value={customUniversity} onChange={(e) => setCustomUniversity(e.target.value)} />
+                        )}
+                        <TextField select fullWidth label="Faculty" name="faculty" value={editData.faculty || ""} onChange={handleInputChange}>
                             {faculties.map((f) => <MenuItem key={f} value={f}>{f}</MenuItem>)}
                         </TextField>
+                        {editData.faculty === "Others" && (
+                            <TextField fullWidth label="Enter Your Faculty" value={customFaculty} onChange={(e) => setCustomFaculty(e.target.value)} />
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>

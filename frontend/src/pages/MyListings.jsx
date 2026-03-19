@@ -36,6 +36,12 @@ export default function MyListings() {
                 id: doc.id,
                 ...doc.data()
             }));
+            
+            items.sort((a, b) => {
+                const timeA = a.createdAt?.seconds || 0;
+                const timeB = b.createdAt?.seconds || 0;
+                return timeB - timeA;
+            });
             setUserItems(items);
         };
         fetchUserData();
@@ -96,17 +102,46 @@ export default function MyListings() {
             <Navbar />
 
             <Box sx={{ p: { xs: 2, md: 5 } }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-                    <IconButton onClick={() => navigate('/profile')} sx={{ mr: 2 }}>
-                        <ArrowBackIcon />
-                    </IconButton>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+                    <Button
+                        startIcon={<ArrowBackIcon />}
+                        onClick={() => navigate('/profile')}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            color: "#64748b",
+                            bgcolor: "#ffffff",
+                            px: 2.5,
+                            py: 0.8,
+                            borderRadius: "12px",
+                            boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
+                            border: "1px solid #e2e8f0",
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                                bgcolor: "#f8fafc",
+                                color: "#0f172a",
+                                transform: "translateX(-4px)",
+                                boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
+                            },
+                        }}
+                    >
+                        Back to Profile
+                    </Button>
                     <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', m: 0 }}>My Listings</Typography>
                 </Box>
 
                 {userItems.length > 0 ? (
-                    <Grid container spacing={3}>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                            gap: 3,
+                            width: "100%",
+                            alignItems: "stretch",
+                        }}
+                    >
                     {userItems.map((item) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={item.id} sx={{ display: 'flex' }}>
+                        <Box key={item.id} sx={{ display: 'flex' }}>
                             <Card
                                 sx={{
                                     borderRadius: "24px",
@@ -159,7 +194,7 @@ export default function MyListings() {
                                             fontSize: "1.05rem", 
                                             color: "#0f172a", 
                                             lineHeight: 1.4, 
-                                            minHeight: "52px",
+                                            height: "54px",
                                             display: "-webkit-box", 
                                             WebkitLineClamp: 2, 
                                             WebkitBoxOrient: "vertical", 
@@ -169,18 +204,18 @@ export default function MyListings() {
                                         {item.title || "Untitled Item"}
                                     </Typography>
 
-                                    <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", minHeight: "38px" }}>
+                                    <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
                                         {item.price ? `${item.price} EGP` : "Price not available"}
                                     </Typography>
 
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, minHeight: "28px" }}>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
                                         <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
                                         <Typography component="span" sx={{ fontSize: "0.92rem", color: "#64748b", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                                             {item.university || "University not specified"}
                                         </Typography>
                                     </Box>
 
-                                    <Box sx={{ mt: 1.2, minHeight: "32px" }}>
+                                    <Box sx={{ mt: 1.2, height: "32px" }}>
                                         <Chip
                                             icon={<VerifiedOutlinedIcon />}
                                             label={item.condition || "Condition not specified"}
@@ -195,14 +230,14 @@ export default function MyListings() {
                                         />
                                     </Box>
 
-                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "48px" }}>
+                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
                                         {item.description || "No description available"}
                                     </Typography>
                                     
                                     <Box sx={{ flexGrow: 1 }} />
                                     <Divider sx={{ my: 2 }} />
 
-                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minHeight: "58px", width: "100%" }}>
+                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: "58px", width: "100%" }}>
                                         {item.status !== "sold" && (
                                             <Button 
                                                 fullWidth 
@@ -234,9 +269,9 @@ export default function MyListings() {
                                     </Box>
                                 </CardContent>
                             </Card>
-                        </Grid>
+                        </Box>
                     ))}
-                </Grid>
+                </Box>
                 ) : (
                     <Typography sx={{ color: '#64748b', fontSize: '1.1rem', mt: 2 }}>You have not posted any listings yet.</Typography>
                 )}

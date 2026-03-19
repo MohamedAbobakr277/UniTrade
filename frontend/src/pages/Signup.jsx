@@ -99,8 +99,8 @@ export default function Signup() {
             !formData.confirmPassword ||
             !selectedUniversity ||
             !selectedFaculty ||
-            (selectedUniversity === "Other" && !customUniversity) ||
-            (selectedFaculty === "Other" && !customFaculty)            
+            (selectedUniversity === "Others" && !customUniversity) ||
+            (selectedFaculty === "Others" && !customFaculty)            
         ) {
             setError("Please fill all required fields.");
             return;
@@ -124,8 +124,8 @@ export default function Signup() {
                 formData.lastName,
                 formData.email,
                 formData.password,
-                selectedFaculty === "Other" ? customFaculty : selectedFaculty,
-                selectedUniversity === "Other"
+                selectedFaculty === "Others" ? customFaculty : selectedFaculty,
+                selectedUniversity === "Others"
                     ? customUniversity
                     : selectedUniversity,
                 formData.phone
@@ -218,7 +218,7 @@ export default function Signup() {
                                     </Select>
                                 </FormControl>
 
-                                {selectedUniversity === "Other" && (
+                                {selectedUniversity === "Others" && (
                                     <TextField
                                         label="Enter Your University"
                                         value={customUniversity}
@@ -248,11 +248,11 @@ export default function Signup() {
                                         <MenuItem value="Agriculture">Agriculture</MenuItem>
                                         <MenuItem value="Veterinary Medicine">Veterinary Medicine</MenuItem>
                                         <MenuItem value="Physical Therapy">Physical Therapy</MenuItem>
-                                        <MenuItem value="Other">Other</MenuItem>
+                                        <MenuItem value="Others">Others</MenuItem>
                                     </Select>
                                 </FormControl>
 
-                                {selectedFaculty === "Other" && (
+                                {selectedFaculty === "Others" && (
                                     <TextField
                                         label="Enter Your Faculty"
                                         value={customFaculty}

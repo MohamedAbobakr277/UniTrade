@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import ItemDetails from "./pages/ItemDetails";
 import MyListings from "./pages/MyListings";
 import Favourites from "./pages/Favourites";
+import SellerProfile from "./pages/SellerProfile";
 
 export default function App() {
   return (
@@ -74,6 +75,15 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Favourites />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/seller/:id"
+        element={
+          <ProtectedRoute>
+            <SellerProfile />
           </ProtectedRoute>
         }
       />

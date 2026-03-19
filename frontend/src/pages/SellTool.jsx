@@ -34,6 +34,7 @@ export default function SellTool() {
     });
 
     const [images, setImages] = useState([]);
+    const [customUniversity, setCustomUniversity] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -154,7 +155,7 @@ export default function SellTool() {
                 title: form.title,
                 description: form.description,
                 category: form.category,
-                university: form.university,
+                university: form.university === "Others" ? customUniversity : form.university,
                 condition: form.condition,
                 price: Number(form.price),
                 images: imageUrls,
@@ -344,9 +345,18 @@ export default function SellTool() {
                         <MenuItem value="AASTMT">AASTMT</MenuItem>
                         <MenuItem value="Nile University">Nile University</MenuItem>
                         <MenuItem value="Others">Others</MenuItem>
-
                     </Select>
                 </FormControl>
+
+                {form.university === "Others" && (
+                    <TextField
+                        fullWidth
+                        label="Enter Your University"
+                        value={customUniversity}
+                        onChange={(e) => setCustomUniversity(e.target.value)}
+                        sx={{ mb: 3 }}
+                    />
+                )}
 
                 <FormControl fullWidth sx={{ mb: 3 }}>
                     <InputLabel>Condition</InputLabel>

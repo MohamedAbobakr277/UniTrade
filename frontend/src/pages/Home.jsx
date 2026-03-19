@@ -24,6 +24,11 @@ export default function Home() {
           id: doc.id,
           ...doc.data(),
         }));
+        data.sort((a, b) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+        });
         setItems(data);
       },
       (error) => console.error("Error fetching products:", error)
@@ -32,6 +37,14 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  const standardUniversities = [
+    "Cairo University", "Ain Shams University", "Alexandria University",
+    "Mansoura University", "Assiut University", "Helwan University",
+    "Tanta University", "Zagazig University", "Suez Canal University",
+    "Al-Azhar University", "German University in Cairo", "British University in Egypt",
+    "October 6 University", "Future University in Egypt", "AASTMT", "Nile University"
+  ];
+
   const filteredItems = items.filter((item) => {
     const itemTitle = item.title?.toLowerCase() || "";
     const itemDescription = item.description?.toLowerCase() || "";
@@ -39,15 +52,16 @@ export default function Home() {
     // condition filtering
     const matchCondition =
       selectedConditions.length === 0 ||
-    selectedConditions.includes(item.condition);
+      selectedConditions.includes(item.condition);
     // price filtering
     const matchPrice =
-    item.price >= priceRange[0] && item.price <= priceRange[1];
+      item.price >= priceRange[0] && item.price <= priceRange[1];
 
     // university filtering
     const matchUniversity =
-    selectedUniversity === "All Universities" ||
-    item.university === selectedUniversity;
+      selectedUniversity === "All Universities" ||
+      item.university === selectedUniversity ||
+      (selectedUniversity === "Others" && !standardUniversities.includes(item.university));
 
     const matchSearch =
       itemTitle.includes(searchValue) ||
@@ -75,37 +89,31 @@ export default function Home() {
 
       <TopSection search={search} setSearch={setSearch} />
 
-      <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
+      <Box sx={{ px: { xs: 2, md: 5 }, py: { xs: 3, md: 4 } }}>
         <CategoryBar
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
         />
-      </Box>
-
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          flexDirection: { xs: "column", md: "row" },
-        }}
-      >
-        <Sidebar
-        selectedUniversity={selectedUniversity}
-        setSelectedUniversity={setSelectedUniversity}
-        priceRange={priceRange}
-        setPriceRange={setPriceRange}
-        selectedConditions={selectedConditions}
-        setSelectedConditions={setSelectedConditions}
-        />
 
         <Box
           sx={{
-            flex: 1,
-            px: { xs: 2, md: 5 },
-            py: 4,
-            width: "100%",
+            display: "flex",
+            alignItems: "flex-start",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 3, md: 4 },
+            mt: { xs: 2, md: 1 },
           }}
         >
+          <Sidebar
+            selectedUniversity={selectedUniversity}
+            setSelectedUniversity={setSelectedUniversity}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            selectedConditions={selectedConditions}
+            setSelectedConditions={setSelectedConditions}
+          />
+
+          <Box sx={{ flex: 1, width: "100%" }}>
           <Paper
             elevation={0}
             sx={{
@@ -166,13 +174,7 @@ export default function Home() {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "repeat(2, minmax(0, 1fr))",
-                  md: "repeat(2, minmax(0, 1fr))",
-                  lg: "repeat(3, minmax(0, 1fr))",
-                  xl: "repeat(3, minmax(0, 1fr))",
-                },
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                 gap: 3,
                 width: "100%",
                 alignItems: "stretch",
@@ -219,6 +221,7 @@ export default function Home() {
           )}
         </Box>
       </Box>
+    </Box>
     </Box>
   );
 }

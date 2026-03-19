@@ -23,7 +23,7 @@ import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({selectedUniversity, setSelectedUniversity, priceRange,setPriceRange,selectedConditions, setSelectedConditions,}) {
+export default function Sidebar({ selectedUniversity, setSelectedUniversity, priceRange, setPriceRange, selectedConditions, setSelectedConditions, }) {
     const [price, setPrice] = useState([0, 7000]);
     const navigate = useNavigate();
 
@@ -31,12 +31,7 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
         <Box
             sx={{
                 width: { xs: "100%", md: 280 },
-                p: { xs: 2, md: 2 },
-                minHeight: "100vh",
-                background:
-                    "linear-gradient(180deg, #f8fbff 0%, #f8fafc 45%, #f1f5f9 100%)",
-                borderRight: { xs: "none", md: "1px solid #e2e8f0" },
-                boxShadow: { xs: "none", md: "6px 0 24px rgba(15,23,42,0.04)" },
+                minHeight: { md: "100vh" },
             }}
         >
             <Paper
@@ -326,13 +321,14 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                      checked={selectedConditions.includes("New")}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedConditions([...selectedConditions, "New"]);
-                                        } else {
-                                            setSelectedConditions(selectedConditions.filter((c) => c !== "New"));
-                                        }}}
+                                        checked={selectedConditions.includes("New")}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedConditions([...selectedConditions, "New"]);
+                                            } else {
+                                                setSelectedConditions(selectedConditions.filter((c) => c !== "New"));
+                                            }
+                                        }}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
@@ -350,13 +346,14 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                     checked={selectedConditions.includes("Like New")}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedConditions([...selectedConditions, "Like New"]);
-                                        } else {
-                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Like New"));
-                                        }}}
+                                        checked={selectedConditions.includes("Like New")}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedConditions([...selectedConditions, "Like New"]);
+                                            } else {
+                                                setSelectedConditions(selectedConditions.filter((c) => c !== "Like New"));
+                                            }
+                                        }}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
@@ -374,13 +371,14 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                     checked={selectedConditions.includes("Good")}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedConditions([...selectedConditions, "Good"]);
-                                        } else {
-                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Good"));
-                                        }}}
+                                        checked={selectedConditions.includes("Good")}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedConditions([...selectedConditions, "Good"]);
+                                            } else {
+                                                setSelectedConditions(selectedConditions.filter((c) => c !== "Good"));
+                                            }
+                                        }}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
@@ -398,13 +396,14 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                     checked={selectedConditions.includes("Fair")}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedConditions([...selectedConditions, "Fair"]);
-                                        } else {
-                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Fair"));
-                                        }}}
+                                        checked={selectedConditions.includes("Fair")}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedConditions([...selectedConditions, "Fair"]);
+                                            } else {
+                                                setSelectedConditions(selectedConditions.filter((c) => c !== "Fair"));
+                                            }
+                                        }}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {
@@ -422,13 +421,14 @@ export default function Sidebar({selectedUniversity, setSelectedUniversity, pric
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                     checked={selectedConditions.includes("Poor")}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedConditions([...selectedConditions, "Poor"]);
-                                        } else {
-                                            setSelectedConditions(selectedConditions.filter((c) => c !== "Poor"));
-                                        }}}
+                                        checked={selectedConditions.includes("Poor")}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedConditions([...selectedConditions, "Poor"]);
+                                            } else {
+                                                setSelectedConditions(selectedConditions.filter((c) => c !== "Poor"));
+                                            }
+                                        }}
                                         sx={{
                                             color: "#94a3b8",
                                             "&.Mui-checked": {

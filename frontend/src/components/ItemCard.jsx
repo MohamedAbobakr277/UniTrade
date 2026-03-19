@@ -105,17 +105,18 @@ export default function ItemCard({ item }) {
         borderRadius: "24px",
         overflow: "hidden",
         border: "1px solid #e2e8f0",
-        backgroundColor: "#ffffff",
+        backgroundColor: item.status === "sold" ? "#f8fafc" : "#ffffff",
         boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
         transition: "all 0.3s ease",
         width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        cursor: "pointer",
+        cursor: item.status === "sold" ? "default" : "pointer",
+        opacity: item.status === "sold" ? 0.8 : 1,
         "&:hover": {
-          transform: "translateY(-8px)",
-          boxShadow: "0 18px 40px rgba(15,23,42,0.12)",
+          transform: item.status === "sold" ? "none" : "translateY(-8px)",
+          boxShadow: item.status === "sold" ? "none" : "0 18px 40px rgba(15,23,42,0.12)",
         },
       }}
     >
@@ -130,11 +131,46 @@ export default function ItemCard({ item }) {
             objectFit: "cover",
             display: "block",
             transition: "transform 0.35s ease",
+            ...(item.status === "sold" && {
+                filter: "grayscale(100%) brightness(0.9)",
+            }),
             "&:hover": {
-              transform: "scale(1.04)",
+              transform: item.status === "sold" ? "scale(1)" : "scale(1.04)",
             },
           }}
         />
+
+        {item.status === "sold" && (
+            <Box
+                sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "rgba(255,255,255,0.4)",
+                    zIndex: 10,
+                }}
+            >
+                <Chip
+                    label="SOLD OUT"
+                    sx={{
+                        fontWeight: 900,
+                        fontSize: "0.95rem",
+                        letterSpacing: "1px",
+                        px: 1.5,
+                        py: 2.5,
+                        borderRadius: "16px",
+                        backgroundColor: "#1e293b",
+                        color: "#ffffff",
+                        boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+                    }}
+                />
+            </Box>
+        )}
 
         {item.badge && (
           <Chip
@@ -182,6 +218,7 @@ export default function ItemCard({ item }) {
             color: isFavorite ? "#ef4444" : "#94a3b8",
             "&:hover": { backgroundColor: "#f8fafc" },
             boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+            zIndex: 20,
           }}
         >
           {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
@@ -204,7 +241,7 @@ export default function ItemCard({ item }) {
             fontSize: "1.05rem",
             color: "#0f172a",
             lineHeight: 1.4,
-            minHeight: "52px",
+            height: "54px",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -222,7 +259,7 @@ export default function ItemCard({ item }) {
             fontWeight: 800,
             mt: 1.2,
             fontSize: "1.25rem",
-            minHeight: "38px",
+            height: "38px",
           }}
         >
           {item.price ? `${item.price} EGP` : "Price not available"}
@@ -235,7 +272,7 @@ export default function ItemCard({ item }) {
             alignItems: "center",
             gap: 1,
             mt: 1.2,
-            minHeight: "28px",
+            height: "28px",
           }}
         >
           <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
@@ -256,7 +293,7 @@ export default function ItemCard({ item }) {
         </Box>
 
         {/* Condition */}
-        <Box sx={{ mt: 1.2, minHeight: "32px" }}>
+        <Box sx={{ mt: 1.2, height: "32px" }}>
           <Chip
             icon={<VerifiedOutlinedIcon />}
             label={item.condition || "Condition not specified"}
@@ -284,7 +321,7 @@ export default function ItemCard({ item }) {
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            minHeight: "48px",
+            height: "48px",
           }}
         >
           {item.description || "No description available"}
@@ -299,9 +336,11 @@ export default function ItemCard({ item }) {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: 1,
+            justifyContent: "flex-start",
+            gap: 1.5,
             minHeight: "58px",
+            flexWrap: "wrap",
+            pb: 1,
           }}
         >
           <Box
@@ -310,7 +349,6 @@ export default function ItemCard({ item }) {
               alignItems: "center",
               gap: 1.2,
               minWidth: 0,
-              flex: 1,
             }}
           >
             <Avatar
@@ -329,10 +367,7 @@ export default function ItemCard({ item }) {
                   fontWeight: 700,
                   color: "#0f172a",
                   lineHeight: 1.2,
-                  display: "-webkit-box",
-                  WebkitLineClamp: 1,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
+                  wordBreak: "break-word",
                 }}
               >
                 {sellerName}
