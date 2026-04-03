@@ -24,6 +24,15 @@ export function useAdminUsers() {
 
   const toggleAdminRole = async (user) => {
     try {
+      // Prevent demoting the last admin
+      if (user.role === "admin") {
+        const adminCount = users.filter((u) => u.role === "admin").length;
+        if (adminCount <= 1) {
+          alert("Cannot demote the last admin. Promote another user to admin first.");
+          return;
+        }
+      }
+
       const newRole = user.role === "admin" ? "student" : "admin";
       await updateUser(user.id, { role: newRole });
       setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, role: newRole } : u));

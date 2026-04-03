@@ -1,6 +1,7 @@
 import { Box, Typography, Avatar } from "@mui/material";
 import { useEffect, useState } from "react";
-import { auth } from "../../../firebase";
+import { auth, db } from "../../../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const TAB_LABELS = {
   dashboard: "Dashboard Overview",
@@ -12,10 +13,23 @@ export default function AdminHeader({ activeTab }) {
   const [adminName, setAdminName] = useState("Admin");
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      setAdminName(user.displayName || user.email?.split("@")[0] || "Admin");
-    }
+    const fetchAdminName = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const fullName = [data.firstName, data.lastName].filter(Boolean).join(" ");
+          setAdminName(fullName || data.name || user.email?.split("@")[0] || "Admin");
+        }
+      } catch (err) {
+        console.error("Error fetching admin name:", err);
+      }
+    };
+
+    fetchAdminName();
   }, []);
 
   const initial = adminName.charAt(0).toUpperCase();

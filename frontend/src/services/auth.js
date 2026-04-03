@@ -95,6 +95,15 @@ export async function login(email, password) {
             userData = userSnap.data();
         }
 
+        /* ====== BANNED CHECK ====== */
+
+        if (userData && userData.isBanned) {
+            await signOut(auth);
+            throw new Error(
+                "Your account has been suspended. Please contact the administration for more information."
+            );
+        }
+
         /* ====== ADMIN LOGIN ====== */
 
         if (userData && userData.role === "admin") {
@@ -117,8 +126,9 @@ export async function login(email, password) {
             const pendingSnap = await getDoc(pendingRef);
 
             if (!pendingSnap.exists()) {
+                await signOut(auth);
                 throw new Error(
-                    "No account exists with this email. Please sign up first."
+                    "This account has been deleted. Please contact the administration for more information."
                 );
             }
 

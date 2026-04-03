@@ -17,7 +17,7 @@ import { styled } from "@mui/material/styles";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "../services/auth";
 
 /* ================= BACKGROUND ================= */
@@ -102,10 +102,16 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const [error, setError] = useState(
+        location.state?.banned
+            ? "Your account has been suspended. Please contact the administration for more information."
+            : ""
+    );
 
     const handleTogglePassword = () => {
         setShowPassword((prev) => !prev);
