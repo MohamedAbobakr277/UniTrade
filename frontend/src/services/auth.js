@@ -127,6 +127,7 @@ export async function login(email, password) {
             await setDoc(userRef, {
                 ...pendingData,
                 role: "student",
+                emailVerified: user.emailVerified,
                 createdAt: new Date(),
             });
 
@@ -135,6 +136,7 @@ export async function login(email, password) {
             userData = {
                 ...pendingData,
                 role: "student",
+                emailVerified: user.emailVerified,
             };
         }
 
