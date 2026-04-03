@@ -1,4 +1,5 @@
-import { Box, Typography, Paper, Chip } from "@mui/material";
+import { Box, Typography, Paper, Chip, Fab } from "@mui/material";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import CategoryBar from "../components/CategoryBar";
@@ -15,6 +16,19 @@ export default function Home() {
   const [selectedUniversity, setSelectedUniversity] = useState("All Universities");
   const [priceRange, setPriceRange] = useState([0, 7000]);
   const [selectedConditions, setSelectedConditions] = useState([]); // array of strings: ["New", "Like New", ...]
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -78,6 +92,7 @@ export default function Home() {
   });
 
   return (
+    <>
     <Box
       sx={{
         minHeight: "100vh",
@@ -223,5 +238,32 @@ export default function Home() {
       </Box>
     </Box>
     </Box>
+
+      {/* Scroll to top button */}
+      <Fab
+        onClick={scrollToTop}
+        size="medium"
+        aria-label="scroll to top"
+        sx={{
+          position: "fixed",
+          bottom: 32,
+          right: 32,
+          background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+          color: "#fff",
+          boxShadow: "0 8px 24px rgba(37, 99, 235, 0.35)",
+          opacity: showScrollTop ? 1 : 0,
+          transform: showScrollTop ? "translateY(0)" : "translateY(20px)",
+          transition: "opacity 0.3s ease, transform 0.3s ease",
+          pointerEvents: showScrollTop ? "auto" : "none",
+          "&:hover": {
+            background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
+            boxShadow: "0 10px 30px rgba(37, 99, 235, 0.45)",
+          },
+          zIndex: 1000,
+        }}
+      >
+        <KeyboardArrowUpIcon />
+      </Fab>
+    </>
   );
 }
