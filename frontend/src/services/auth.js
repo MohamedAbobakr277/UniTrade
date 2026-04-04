@@ -167,6 +167,8 @@ export async function login(email, password) {
                     throw new Error("Incorrect password. Please try again.");
                 case "auth/too-many-requests":
                     throw new Error("Too many attempts. Please try again later.");
+                case "auth/invalid-credential":
+                    throw new Error("Invalid email or password.");
             }
         }
 
