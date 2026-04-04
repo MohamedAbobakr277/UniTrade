@@ -17,7 +17,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useRef } from "react";
 import { db, auth } from "../firebase";
-import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -160,7 +160,7 @@ export default function SellTool() {
                 sellerName: userName,
                 sellerPhoto: userPhoto,
                 status: "available", // ✅ أهم تعديل
-                createdAt: new Date(),
+                createdAt: serverTimestamp(),
             });
 
             setUploadProgress(100);

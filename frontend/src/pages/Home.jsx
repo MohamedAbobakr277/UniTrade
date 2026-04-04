@@ -44,9 +44,14 @@ export default function Home() {
           ...doc.data(),
         }));
         data.sort((a, b) => {
-          const timeA = a.createdAt?.seconds || 0;
-          const timeB = b.createdAt?.seconds || 0;
-          return timeB - timeA;
+          const getTime = (val) => {
+            if (!val) return Date.now(); 
+            if (val.seconds) return val.seconds * 1000;
+            if (val instanceof Date) return val.getTime();
+            if (typeof val.getTime === "function") return val.getTime();
+            return 0;
+          };
+          return getTime(b.createdAt) - getTime(a.createdAt);
         });
         setItems(data);
       },
@@ -99,9 +104,14 @@ export default function Home() {
     if (sortBy === "price_high_low") return b.price - a.price;
     
     // sort by newest by default
-    const timeA = a.createdAt?.seconds || 0;
-    const timeB = b.createdAt?.seconds || 0;
-    return timeB - timeA;
+    const getTime = (val) => {
+      if (!val) return Date.now();
+      if (val.seconds) return val.seconds * 1000;
+      if (val instanceof Date) return val.getTime();
+      if (typeof val.getTime === "function") return val.getTime();
+      return 0;
+    };
+    return getTime(b.createdAt) - getTime(a.createdAt);
   });
 
   const displayedItems = filteredItems.slice(0, visibleCount);

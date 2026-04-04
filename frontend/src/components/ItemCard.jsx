@@ -87,8 +87,12 @@ export default function ItemCard({ item }) {
   const sellerName =
     item.sellerName || editData?.name || editData?.fullName || "Unknown Seller";
 
+  const safeDate = item.createdAt 
+    ? (item.createdAt.seconds ? new Date(item.createdAt.seconds * 1000) : new Date(item.createdAt))
+    : new Date();
+
   const formattedDate = item.createdAt
-    ? new Date(item.createdAt.seconds * 1000).toLocaleString()
+    ? safeDate.toLocaleString()
     : "Just now";
 
   const conditionColor =
@@ -377,7 +381,7 @@ export default function ItemCard({ item }) {
           >
             <AccessTimeIcon sx={{ fontSize: 15, color: "#94a3b8" }} />
             <Typography sx={{ fontSize: 11.5, color: "#64748b", fontWeight: 700 }}>
-              {item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString(undefined, {
+              {item.createdAt ? safeDate.toLocaleDateString(undefined, {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric'
