@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Grid, Card, CardContent, CardMedia, Button, IconButton,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert,
-    Chip, Divider
+    Chip, Divider, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,6 +11,10 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import logo from '../assets/logo.png';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import EmptyState from '../components/EmptyState';
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
 import { auth, db } from '../firebase';
 import { doc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +26,8 @@ export default function MyListings() {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+    const [showConfetti, setShowConfetti] = useState(false);
+    const { width, height } = useWindowSize();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -91,6 +97,10 @@ export default function MyListings() {
             await updateDoc(itemRef, { status: "sold" });
             setUserItems(prev => prev.map(item => item.id === itemId ? { ...item, status: "sold" } : item));
             setSnackbar({ open: true, message: "Marked as sold", severity: "success" });
+            
+            // Show confetti
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 5000);
         } catch (error) {
             console.error(error);
             setSnackbar({ open: true, message: "Failed to update status", severity: "error" });
@@ -100,6 +110,8 @@ export default function MyListings() {
     return (
         <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
             <Navbar />
+            
+            {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} />}
 
             <Box sx={{ p: { xs: 2, md: 5 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
@@ -273,9 +285,16 @@ export default function MyListings() {
                     ))}
                 </Box>
                 ) : (
-                    <Typography sx={{ color: '#64748b', fontSize: '1.1rem', mt: 2 }}>You have not posted any listings yet.</Typography>
+                    <EmptyState 
+                        title="You Have No Listings"
+                        description="Ready to clear some space? Post your first item and reach thousands of students on campus!"
+                        iconType="inventory"
+                        ctaText="Post an Item"
+                        ctaLink="/sell"
+                    />
                 )}
             </Box>
+            <Footer />
 
             {/* Edit Listing Modal */}
             <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
@@ -285,7 +304,31 @@ export default function MyListings() {
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
                         <TextField fullWidth label="Title" value={currentEditItem?.title || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))} />
-                        <TextField fullWidth label="Price" type="number" value={currentEditItem?.price || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))} />
+                        <TextField fullWidth multiline rows={3} label="Description" value={currentEditItem?.description || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, description: e.target.value }))} />
+                        <FormControl fullWidth>
+                            <InputLabel>Category</InputLabel>
+                            <Select label="Category" value={currentEditItem?.category || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, category: e.target.value }))}>
+                                <MenuItem value="Books & Notes">Books & Notes</MenuItem>
+                                <MenuItem value="Calculators">Calculators</MenuItem>
+                                <MenuItem value="Electronics">Electronics</MenuItem>
+                                <MenuItem value="Engineering Tools">Engineering Tools</MenuItem>
+                                <MenuItem value="Medical Tools">Medical Tools</MenuItem>
+                                <MenuItem value="Lab Equipment">Lab Equipment</MenuItem>
+                                <MenuItem value="Stationery">Stationery</MenuItem>
+                                <MenuItem value="Bags & Accessories">Bags & Accessories</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>Condition</InputLabel>
+                            <Select label="Condition" value={currentEditItem?.condition || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, condition: e.target.value }))}>
+                                <MenuItem value="New">New</MenuItem>
+                                <MenuItem value="Like New">Like New</MenuItem>
+                                <MenuItem value="Good">Good</MenuItem>
+                                <MenuItem value="Fair">Fair</MenuItem>
+                                <MenuItem value="Poor">Poor</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <TextField fullWidth label="Price (EGP)" type="number" value={currentEditItem?.price || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))} />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, IconButton, Grid, Button } from '@mui/material';
+import { Box, Typography, IconButton, Grid, Button, Skeleton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import EmptyState from '../components/EmptyState';
 import ItemCard from '../components/ItemCard';
 import { auth, db } from '../firebase';
 import { doc, onSnapshot, collection, query, getDocs } from 'firebase/firestore';
@@ -78,7 +80,11 @@ export default function Favourites() {
         </Box>
 
         {loading ? (
-          <Typography sx={{ color: '#64748b', fontSize: '1.1rem' }}>Loading favourites...</Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 3, width: "100%" }}>
+              <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
+              <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
+              <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
+          </Box>
         ) : items.length > 0 ? (
           <Box
             sx={{
@@ -96,9 +102,16 @@ export default function Favourites() {
             ))}
           </Box>
         ) : (
-          <Typography sx={{ color: '#64748b', fontSize: '1.1rem' }}>You have not added any favourites yet.</Typography>
+          <EmptyState 
+            title="No Favourites Yet"
+            description="You haven't added any items to your favourites. Start exploring to find items you like!"
+            iconType="favorite"
+            ctaText="Explore Items"
+            ctaLink="/home"
+          />
         )}
       </Box>
+      <Footer />
     </Box>
   );
 }

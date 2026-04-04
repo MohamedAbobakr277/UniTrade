@@ -10,13 +10,19 @@ import {
     IconButton,
     LinearProgress,
     Alert,
+    Snackbar,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useRef } from "react";
 import { db, auth } from "../firebase";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
 
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
@@ -37,6 +43,9 @@ export default function SellTool() {
     const [customUniversity, setCustomUniversity] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
+    const [showConfetti, setShowConfetti] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+    const { width, height } = useWindowSize();
     const navigate = useNavigate();
 
     const MAX_FILES = 5;
@@ -112,18 +121,6 @@ export default function SellTool() {
     };
 
     const handleSubmit = async () => {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        let userName = "User";
-        let userPhoto = "";
-
-        if (userSnap.exists()) {
-            const data = userSnap.data();
-            userName = data.name || "User";
-            userPhoto = data.photo || "";
-        }
-
         if (images.length === 0) {
             setError("Please upload at least one image.");
             return;
@@ -168,8 +165,14 @@ export default function SellTool() {
 
             setUploadProgress(100);
 
-            alert("Product posted successfully");
-            navigate("/home");
+            // Show confetti and success message
+            setShowConfetti(true);
+            setSnackbar({ open: true, message: "Item posted successfully! 🎉" });
+            
+            setTimeout(() => {
+                setShowConfetti(false);
+                navigate("/home");
+            }, 3000);
         } catch (err) {
             console.error(err);
             setError("Error posting item");
@@ -177,7 +180,12 @@ export default function SellTool() {
     };
 
     return (
-        <Box sx={{ backgroundColor: "#f5f7fb", minHeight: "100vh", p: 5 }}>
+        <Box sx={{ backgroundColor: "#f5f7fb", minHeight: "100vh" }}>
+            <Navbar />
+            
+            {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} />}
+
+            <Box sx={{ p: 5 }}>
             <Box
                 sx={{
                     maxWidth: 700,
@@ -188,6 +196,30 @@ export default function SellTool() {
                     boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
                 }}
             >
+                <Button
+                    startIcon={<ArrowBackIcon />}
+                    onClick={() => navigate(-1)}
+                    sx={{
+                        mb: 3,
+                        textTransform: "none",
+                        fontWeight: 700,
+                        color: "#64748b",
+                        bgcolor: "#f8fafc",
+                        px: 2.5,
+                        py: 0.8,
+                        borderRadius: "12px",
+                        border: "1px solid #e2e8f0",
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                            bgcolor: "#e2e8f0",
+                            color: "#0f172a",
+                            transform: "translateX(-4px)",
+                        },
+                    }}
+                >
+                    Back
+                </Button>
+
                 <Typography sx={{ fontSize: 26, fontWeight: 700, mb: 4 }}>
                     Sell Your Item
                 </Typography>
@@ -398,6 +430,24 @@ export default function SellTool() {
                     Post Item
                 </Button>
             </Box>
+            </Box>
+            <Footer />
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert 
+                    onClose={() => setSnackbar({ ...snackbar, open: false })} 
+                    severity="success" 
+                    variant="filled"
+                    sx={{ width: '100%', borderRadius: '12px', fontWeight: 600 }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

@@ -1,4 +1,4 @@
-import { Box, Typography, Avatar, Button } from "@mui/material";
+import { Box, Typography, Avatar, Button, Skeleton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import { useEffect, useState } from "react";
@@ -7,6 +7,8 @@ import { doc, getDoc, collection, query, where, getDocs } from "firebase/firesto
 import { db } from "../firebase";
 import Navbar from "../components/Navbar";
 import ItemCard from "../components/ItemCard";
+import Footer from "../components/Footer";
+import EmptyState from "../components/EmptyState";
 
 export default function SellerProfile() {
     const { id } = useParams();
@@ -61,10 +63,15 @@ export default function SellerProfile() {
         return (
             <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
                 <Navbar />
-                <Box sx={{ p: 5, display: "flex", justifyContent: "center" }}>
-                    <Typography sx={{ fontSize: 22, fontWeight: 700, color: "#64748b", mt: 10 }}>
-                        Loading seller profile...
-                    </Typography>
+                <Box sx={{ p: { xs: 2.5, md: 5 }, maxWidth: "1250px", mx: "auto" }}>
+                    <Skeleton variant="rectangular" width={100} height={36} sx={{ borderRadius: 2, mb: 3 }} />
+                    <Skeleton variant="rectangular" width="100%" height={160} sx={{ borderRadius: 4, mb: 5 }} />
+                    <Skeleton variant="text" width={250} height={40} sx={{ mb: 3 }} />
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 3 }}>
+                        <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
+                        <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
+                        <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
+                    </Box>
                 </Box>
             </Box>
         );
@@ -212,14 +219,15 @@ export default function SellerProfile() {
                             ))}
                         </Box>
                     ) : (
-                        <Box sx={{ textAlign: "center", py: 8, bgcolor: "#fff", borderRadius: "20px", border: "1px dashed #cbd5e1" }}>
-                            <Typography sx={{ fontSize: 18, fontWeight: 600, color: "#64748b" }}>
-                                This seller has no active listings.
-                            </Typography>
-                        </Box>
+                        <EmptyState 
+                          title="No Active Listings"
+                          description="This seller doesn't have any active items for sale right now. Check back later!"
+                          iconType="inventory"
+                        />
                     )}
                 </Box>
             </Box>
+            <Footer />
         </Box>
     );
 }

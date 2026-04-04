@@ -8,8 +8,11 @@ import {
     Grid,
     Chip,
     IconButton,
+    Skeleton,
+    Dialog,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -25,6 +28,7 @@ import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "fir
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function ItemDetails() {
     const { id } = useParams();
@@ -34,6 +38,7 @@ export default function ItemDetails() {
     const [sellerData, setSellerData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isZoomOpen, setIsZoomOpen] = useState(false);
 
     const [isFavorite, setIsFavorite] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -107,10 +112,32 @@ export default function ItemDetails() {
         return (
             <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
                 <Navbar />
-                <Box sx={{ p: 5, display: "flex", justifyContent: "center" }}>
-                    <Typography sx={{ fontSize: 22, fontWeight: 700, color: "#64748b", mt: 10 }}>
-                        Loading item details...
-                    </Typography>
+                <Box sx={{ py: { xs: 3, md: 4 }, display: "flex", justifyContent: "center" }}>
+                    <Box sx={{ width: "100%", maxWidth: "1250px", px: { xs: 2.5, md: 4 } }}>
+                        <Skeleton variant="rectangular" width={160} height={40} sx={{ borderRadius: 2, mb: 3 }} />
+                        <Grid container spacing={4}>
+                            <Grid item xs={12} sm={6} md={6} lg={7}>
+                                <Skeleton variant="rectangular" width="100%" height={460} sx={{ borderRadius: 4 }} />
+                                <Box sx={{ display: "flex", gap: 1.5, mt: 2 }}>
+                                    <Skeleton variant="rectangular" width={70} height={70} sx={{ borderRadius: 3 }} />
+                                    <Skeleton variant="rectangular" width={70} height={70} sx={{ borderRadius: 3 }} />
+                                    <Skeleton variant="rectangular" width={70} height={70} sx={{ borderRadius: 3 }} />
+                                </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={6} lg={5}>
+                                <Skeleton variant="text" width="80%" height={60} />
+                                <Skeleton variant="text" width="40%" height={80} sx={{ mb: 2 }} />
+                                <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+                                    <Skeleton variant="rectangular" width={100} height={40} sx={{ borderRadius: 2 }} />
+                                    <Skeleton variant="rectangular" width={100} height={40} sx={{ borderRadius: 2 }} />
+                                    <Skeleton variant="rectangular" width={140} height={40} sx={{ borderRadius: 2 }} />
+                                </Box>
+                                <Skeleton variant="rectangular" width="100%" height={120} sx={{ borderRadius: 2, mb: 4 }} />
+                                <Skeleton variant="rectangular" width="100%" height={80} sx={{ borderRadius: 4, mb: 3 }} />
+                                <Skeleton variant="rectangular" width="100%" height={56} sx={{ borderRadius: 3 }} />
+                            </Grid>
+                        </Grid>
+                    </Box>
                 </Box>
             </Box>
         );
@@ -197,10 +224,10 @@ export default function ItemDetails() {
                         Back to Listings
                     </Button>
 
-                    <Grid container spacing={4} alignItems="flex-start">
-                        {/* Left Column: Image Gallery */}
-                        <Grid item xs={12} sm={6} md={6} lg={7} sx={{ minWidth: 0 }}>
-                            <Box sx={{ position: { xs: "static", md: "sticky" }, top: "100px", minWidth: 0 }}>
+                    <Grid container spacing={{ xs: 1.5, sm: 4 }} alignItems="flex-start" wrap="nowrap">
+                        {/* Left Column: Image Gallery - Locked at 5/12 (~41%) */}
+                        <Grid item xs={5} sm={5} md={5} lg={5} sx={{ minWidth: 0, width: "41.6%", flexBasis: "41.6%" }}>
+                            <Box sx={{ position: { xs: "static", md: "sticky" }, top: "100px", minWidth: 0, width: "100%" }}>
                                 <Paper
                                     elevation={0}
                                     sx={{
@@ -211,18 +238,20 @@ export default function ItemDetails() {
                                         backgroundColor: "#fff",
                                         border: "1px solid #e2e8f0",
                                         boxShadow: "0 12px 30px rgba(15,23,42,0.04)",
-                                        height: { xs: "300px", sm: "350px", md: "420px", lg: "460px" },
+                                        height: { xs: "180px", sm: "300px", md: "350px", lg: "400px" },
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        mb: 2,
-                                        p: { xs: 2, sm: 3, md: 4 }
+                                        mb: 1.5,
+                                        p: { xs: 1, sm: 3, md: 4 },
+                                        width: "100%",
                                     }}
                                 >
                                     <Box
                                         component="img"
                                         src={imageUrl}
                                         alt={item.title}
+                                        onClick={() => setIsZoomOpen(true)}
                                         sx={{
                                             width: "100%",
                                             maxWidth: "100%",
@@ -230,6 +259,7 @@ export default function ItemDetails() {
                                             objectFit: "contain",
                                             borderRadius: "12px",
                                             transition: "opacity 0.3s ease",
+                                            cursor: "zoom-in",
                                         }}
                                     />
 
@@ -346,34 +376,31 @@ export default function ItemDetails() {
                             </Box>
                         </Grid>
 
-                        {/* Right Column: Details */}
-                        <Grid item xs={12} sm={6} md={6} lg={5} sx={{ minWidth: 0 }}>
+                        {/* Right Column: Details - Locked at 7/12 (~58%) */}
+                        <Grid item xs={7} sm={7} md={7} lg={7} sx={{ minWidth: 0, width: "58.3%", flexBasis: "58.3%" }}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
                                 {/* Title and Price */}
                                 <Box>
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: 26, md: 32 },
-                                            fontWeight: 800,
+                                            fontSize: { xs: 16, sm: 22, md: 32 },
+                                            fontWeight: 900,
                                             color: "#0f172a",
-                                            lineHeight: 1.25,
-                                            mb: 1,
+                                            lineHeight: 1.2,
+                                            mb: 0.5,
                                             wordBreak: "break-word",
                                             overflowWrap: "anywhere",
                                         }}
                                     >
                                         {item.title}
                                     </Typography>
-
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: 30, md: 36 },
-                                            fontWeight: 800,
-                                            background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
-                                            WebkitBackgroundClip: "text",
-                                            WebkitTextFillColor: "transparent",
+                                            fontSize: { xs: 20, sm: 26, md: 36 },
+                                            fontWeight: 900,
+                                            color: "#2563eb",
                                             letterSpacing: "-1px",
-                                            mb: 2,
+                                            mb: 1.5,
                                         }}
                                     >
                                         {item.price} EGP
@@ -381,25 +408,25 @@ export default function ItemDetails() {
                                 </Box>
 
                                 {/* Meta Info Chips */}
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 0.5 }}>
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 0.5 }}>
                                     {item.category && (
                                         <Chip
                                             icon={<CategoryIcon sx={{ fontSize: "16px !important", color: "#64748b !important" }} />}
                                             label={item.category}
-                                            sx={{ bgcolor: "#f1f5f9", color: "#475569", fontWeight: 600, borderRadius: "10px", py: 2, px: 0.5, border: '1px solid #e2e8f0' }}
+                                            sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid #e2e8f0' }}
                                         />
                                     )}
                                     {item.university && (
                                         <Chip
                                             icon={<LocationOnIcon sx={{ fontSize: "18px !important", color: "#64748b !important" }} />}
                                             label={item.university}
-                                            sx={{ bgcolor: "#f1f5f9", color: "#475569", fontWeight: 600, borderRadius: "10px", py: 2, px: 0.5, border: '1px solid #e2e8f0' }}
+                                            sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid #e2e8f0' }}
                                         />
                                     )}
                                     <Chip
                                         icon={<AccessTimeIcon sx={{ fontSize: "18px !important", color: "#64748b !important" }} />}
                                         label={`Posted ${formattedDate}`}
-                                        sx={{ bgcolor: "#f1f5f9", color: "#475569", fontWeight: 600, borderRadius: "10px", py: 2, px: 0.5, border: '1px solid #e2e8f0' }}
+                                        sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid #e2e8f0' }}
                                     />
                                 </Box>
 
@@ -426,27 +453,32 @@ export default function ItemDetails() {
                                         elevation={0}
                                         onClick={() => item.userId && navigate(`/seller/${item.userId}`)}
                                         sx={{
-                                            p: 2,
-                                            borderRadius: "16px",
+                                            p: 2.5,
+                                            borderRadius: "20px",
                                             bgcolor: "#ffffff",
                                             border: "1px solid #e2e8f0",
                                             display: "flex",
                                             alignItems: "center",
-                                            gap: 2,
+                                            gap: 2.5,
                                             cursor: "pointer",
-                                            transition: "all 0.2s",
-                                            "&:hover": { boxShadow: '0 6px 16px rgba(0,0,0,0.06)', transform: 'translateY(-2px)', borderColor: '#cbd5e1' }
+                                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                            boxShadow: "0 4px 12px rgba(15,23,42,0.02)",
+                                            "&:hover": { 
+                                                boxShadow: '0 12px 30px rgba(15,23,42,0.08)', 
+                                                transform: 'translateY(-4px)', 
+                                                borderColor: '#3b82f6' 
+                                            }
                                         }}
                                     >
                                         <Avatar
                                             src={sellerData?.profilePhoto || "/default-avatar.png"}
-                                            sx={{ width: 54, height: 54, border: "2px solid #e2e8f0" }}
+                                            sx={{ width: 60, height: 60, border: "2,5px solid #f1f5f9", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }}
                                         />
                                         <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
+                                            <Typography sx={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>
                                                 {sellerName}
                                             </Typography>
-                                            <Typography sx={{ fontSize: 13, color: "#64748b", fontWeight: 500, mt: 0.2 }}>
+                                            <Typography sx={{ fontSize: 14, color: "#64748b", fontWeight: 600, mt: 0.3 }}>
                                                 {sellerData?.major || "Verified Student"}
                                             </Typography>
                                         </Box>
@@ -457,22 +489,22 @@ export default function ItemDetails() {
                                 <Button
                                     fullWidth
                                     variant="contained"
-                                    startIcon={<ConnectWithoutContactIcon />}
+                                    startIcon={<ConnectWithoutContactIcon sx={{ fontSize: 22 }} />}
                                     sx={{
-                                        mt: 1,
-                                        py: 1.5,
-                                        borderRadius: "14px",
+                                        mt: 1.5,
+                                        py: 1.8,
+                                        borderRadius: "16px",
                                         textTransform: "none",
-                                        fontWeight: 800,
-                                        fontSize: 18,
-                                        background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
-                                        boxShadow: "0 10px 24px rgba(37,99,235,0.25)",
+                                        fontWeight: 900,
+                                        fontSize: 19,
+                                        background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                                        boxShadow: "0 10px 30px rgba(37,99,235,0.25)",
+                                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                         "&:hover": {
-                                            transform: "translateY(-3px)",
-                                            boxShadow: "0 14px 30px rgba(37,99,235,0.32)",
-                                            background: "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)",
+                                            transform: "translateY(-4px)",
+                                            boxShadow: "0 15px 40px rgba(37,99,235,0.35)",
+                                            background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
                                         },
-                                        transition: "all 0.2s ease"
                                     }}
                                 >
                                     Contact Seller
@@ -482,6 +514,50 @@ export default function ItemDetails() {
                     </Grid>
                 </Box>
             </Box>
+
+            {/* Full Screen Image Zoom Dialog */}
+            <Dialog 
+                open={isZoomOpen} 
+                onClose={() => setIsZoomOpen(false)} 
+                maxWidth="xl" 
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        backgroundColor: 'transparent',
+                        boxShadow: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden'
+                    }
+                }}
+            >
+                <IconButton
+                    onClick={() => setIsZoomOpen(false)}
+                    sx={{
+                        position: 'absolute',
+                        right: 16,
+                        top: 16,
+                        color: 'white',
+                        bgcolor: 'rgba(0,0,0,0.5)',
+                        '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
+                        zIndex: 10
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+                <Box
+                    component="img"
+                    src={imageUrl}
+                    alt="Zoomed product"
+                    sx={{
+                        maxWidth: '100%',
+                        maxHeight: '90vh',
+                        objectFit: 'contain',
+                        borderRadius: 2
+                    }}
+                />
+            </Dialog>
         </Box>
     );
 }

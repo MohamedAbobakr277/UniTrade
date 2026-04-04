@@ -25,9 +25,14 @@ import {
     Alert,
     InputAdornment,
     Chip,
+    FormControl,
+    InputLabel,
+    Select,
+    Skeleton,
 } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
@@ -297,7 +302,26 @@ export default function Profile() {
         }
     };
     if (!user) {
-        return <Typography sx={{ p: 5 }}>Loading profile...</Typography>;
+        return (
+            <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
+                <Navbar />
+                <Box sx={{ display: 'flex' }}>
+                    <Box sx={{ width: 280, borderRight: '1px solid #e2e8f0', bgcolor: 'white', minHeight: 'calc(100vh - 93px)', p: 3 }}>
+                       <Skeleton variant="text" width="80%" height={40} sx={{ mb: 3 }} />
+                       <Skeleton variant="rectangular" width="100%" height={48} sx={{ mb: 1, borderRadius: 2 }} />
+                       <Skeleton variant="rectangular" width="100%" height={48} sx={{ borderRadius: 2 }} />
+                    </Box>
+                    <Box sx={{ flex: 1, p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                       <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 4 }} />
+                       <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
+                          <Skeleton variant="rectangular" width={350} height={400} sx={{ borderRadius: 4, flexShrink: 0 }} />
+                          <Skeleton variant="rectangular" sx={{ flex: 1, borderRadius: 4, height: 400 }} />
+                       </Box>
+                    </Box>
+                </Box>
+                <Footer />
+            </Box>
+        );
     }
     return (
         <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
@@ -622,6 +646,37 @@ export default function Profile() {
                             value={currentEditItem?.title || ''}
                             onChange={(e) => setCurrentEditItem(prev => ({ ...prev, title: e.target.value }))}
                         />
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            label="Description"
+                            value={currentEditItem?.description || ''}
+                            onChange={(e) => setCurrentEditItem(prev => ({ ...prev, description: e.target.value }))}
+                        />
+                        <FormControl fullWidth>
+                            <InputLabel>Category</InputLabel>
+                            <Select label="Category" value={currentEditItem?.category || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, category: e.target.value }))}>
+                                <MenuItem value="Books & Notes">Books & Notes</MenuItem>
+                                <MenuItem value="Calculators">Calculators</MenuItem>
+                                <MenuItem value="Electronics">Electronics</MenuItem>
+                                <MenuItem value="Engineering Tools">Engineering Tools</MenuItem>
+                                <MenuItem value="Medical Tools">Medical Tools</MenuItem>
+                                <MenuItem value="Lab Equipment">Lab Equipment</MenuItem>
+                                <MenuItem value="Stationery">Stationery</MenuItem>
+                                <MenuItem value="Bags & Accessories">Bags & Accessories</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>Condition</InputLabel>
+                            <Select label="Condition" value={currentEditItem?.condition || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, condition: e.target.value }))}>
+                                <MenuItem value="New">New</MenuItem>
+                                <MenuItem value="Like New">Like New</MenuItem>
+                                <MenuItem value="Good">Good</MenuItem>
+                                <MenuItem value="Fair">Fair</MenuItem>
+                                <MenuItem value="Poor">Poor</MenuItem>
+                            </Select>
+                        </FormControl>
                         <TextField
                             fullWidth
                             label="Price"

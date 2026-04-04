@@ -6,8 +6,10 @@ import {
     Avatar,
     Typography,
     Badge,
+    Button,
 } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import AddIcon from "@mui/icons-material/Add";
 import logo from "../assets/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -119,6 +121,49 @@ export default function Navbar() {
                         gap: { xs: 1, md: 2 },
                     }}
                 >
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => navigate("/sell")}
+                        sx={{
+                            bgcolor: "#2563eb",
+                            color: "white",
+                            borderRadius: "14px",
+                            px: { xs: 2, md: 3 },
+                            py: 1.1,
+                            textTransform: "none",
+                            fontWeight: 700,
+                            boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+                            display: { xs: "none", sm: "flex" },
+                            "&:hover": {
+                                bgcolor: "#1d4ed8",
+                                transform: "translateY(-1px)",
+                                boxShadow: "0 6px 20px rgba(37, 99, 235, 0.3)",
+                            },
+                        }}
+                    >
+                        Sell
+                    </Button>
+
+                    {/* Mobile Sell Icon */}
+                    <IconButton
+                        onClick={() => navigate("/sell")}
+                        sx={{
+                            display: { xs: "flex", sm: "none" },
+                            width: 44,
+                            height: 44,
+                            borderRadius: "14px",
+                            backgroundColor: "#2563eb",
+                            color: "white",
+                            boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+                            "&:hover": {
+                                backgroundColor: "#1d4ed8",
+                            },
+                        }}
+                    >
+                        <AddIcon />
+                    </IconButton>
+
                     <IconButton
                         sx={{
                             width: 44,

@@ -102,12 +102,12 @@ export default function ItemCard({ item }) {
     <Card
       onClick={() => navigate(`/item/${item.id}`)}
       sx={{
-        borderRadius: "24px",
+        borderRadius: "20px",
         overflow: "hidden",
-        border: "1px solid #e2e8f0",
+        border: "1px solid #f1f5f9",
         backgroundColor: item.status === "sold" ? "#f8fafc" : "#ffffff",
-        boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
-        transition: "all 0.3s ease",
+        boxShadow: "0 4px 12px rgba(15,23,42,0.03)",
+        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         width: "100%",
         height: "100%",
         display: "flex",
@@ -115,8 +115,9 @@ export default function ItemCard({ item }) {
         cursor: item.status === "sold" ? "default" : "pointer",
         opacity: item.status === "sold" ? 0.8 : 1,
         "&:hover": {
-          transform: item.status === "sold" ? "none" : "translateY(-8px)",
-          boxShadow: item.status === "sold" ? "none" : "0 18px 40px rgba(15,23,42,0.12)",
+          transform: item.status === "sold" ? "none" : "translateY(-10px)",
+          boxShadow: item.status === "sold" ? "none" : "0 22px 48px rgba(15,23,42,0.12)",
+          borderColor: "#e2e8f0",
         },
       }}
     >
@@ -238,14 +239,15 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             fontWeight: 800,
-            fontSize: "1.05rem",
+            fontSize: "1.1rem",
             color: "#0f172a",
-            lineHeight: 1.4,
-            height: "54px",
+            lineHeight: 1.35,
+            height: "58px",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
+            mb: 0.5,
           }}
         >
           {item.title || "Untitled Item"}
@@ -256,58 +258,49 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             color: "#2563eb",
-            fontWeight: 800,
-            mt: 1.2,
-            fontSize: "1.25rem",
-            height: "38px",
+            fontWeight: 900,
+            mt: 0.5,
+            fontSize: "1.35rem",
+            height: "40px",
+            letterSpacing: "-0.5px",
           }}
         >
           {item.price ? `${item.price} EGP` : "Price not available"}
         </Typography>
 
-        {/* University */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            mt: 1.2,
-            height: "28px",
-          }}
-        >
-          <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
-          <Typography
-            component="span"
+        {/* University & Condition Meta */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mt: 1.5, mb: 1.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+            <LocationOnIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
+            <Typography
+              sx={{
+                fontSize: "0.85rem",
+                color: "#64748b",
+                fontWeight: 600,
+                maxWidth: "110px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item.university || "University"}
+            </Typography>
+          </Box>
+          <Box
             sx={{
-              fontSize: "0.92rem",
-              color: "#64748b",
-              fontWeight: 500,
-              display: "-webkit-box",
-              WebkitLineClamp: 1,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
+              px: 1,
+              py: 0.4,
+              borderRadius: "8px",
+              bgcolor: `${conditionColor}12`,
+              color: conditionColor,
+              fontSize: "0.75rem",
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
             }}
           >
-            {item.university || "University not specified"}
-          </Typography>
-        </Box>
-
-        {/* Condition */}
-        <Box sx={{ mt: 1.2, height: "32px" }}>
-          <Chip
-            icon={<VerifiedOutlinedIcon />}
-            label={item.condition || "Condition not specified"}
-            size="small"
-            sx={{
-              backgroundColor: `${conditionColor}12`,
-              color: conditionColor,
-              fontWeight: 700,
-              borderRadius: "10px",
-              "& .MuiChip-icon": {
-                color: conditionColor,
-              },
-            }}
-          />
+            {item.condition || "Used"}
+          </Box>
         </Box>
 
         {/* Description - always reserve height */}
@@ -329,87 +322,66 @@ export default function ItemCard({ item }) {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Divider sx={{ my: 2 }} />
-
-        {/* Footer / Seller */}
+        {/* Footer / Seller - Large & Clean Premium Style */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-start",
-            gap: 1.5,
-            minHeight: "58px",
-            flexWrap: "wrap",
+            justifyContent: "space-between",
+            mt: 2.2,
+            pt: 2.2,
             pb: 1,
+            borderTop: "1.5px solid rgba(15, 23, 42, 0.04)",
+            gap: 2,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.2,
-              minWidth: 0,
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Avatar
               src={editData?.profilePhoto || "/default-avatar.png"}
-              sx={{
-                width: 42,
-                height: 42,
-                border: "2px solid #e2e8f0",
-                flexShrink: 0,
-              }}
+              sx={{ width: 42, height: 42, border: "2px solid #f1f5f9", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
             />
             <Box sx={{ minWidth: 0 }}>
-              <Typography
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "#0f172a",
+              <Typography 
+                sx={{ 
+                  fontSize: 14.5, 
+                  fontWeight: 800, 
+                  color: "#0f172a", 
                   lineHeight: 1.2,
-                  wordBreak: "break-word",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  maxWidth: { xs: "70px", sm: "110px" } 
                 }}
               >
                 {sellerName}
               </Typography>
-              <Typography
-                sx={{
-                  fontSize: 12.5,
-                  color: "#64748b",
-                  mt: 0.3,
-                }}
-              >
+              <Typography sx={{ fontSize: 12, color: "#94a3b8", fontWeight: 500, mt: 0.2 }}>
                 Student Seller
               </Typography>
             </Box>
           </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 0.6,
-              backgroundColor: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              px: 1.1,
-              py: 0.7,
-              borderRadius: "12px",
-              fontSize: 12.5,
-              color: "#64748b",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
+          <Box 
+            sx={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 0.8,
+                bgcolor: "#f8fafc",
+                border: "1px solid #e2e8f0",
+                borderRadius: "20px",
+                px: 1.5,
+                py: 0.8,
+                flexShrink: 0,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.02)"
             }}
           >
             <AccessTimeIcon sx={{ fontSize: 15, color: "#94a3b8" }} />
-            <Typography
-              component="span"
-              sx={{
-                fontSize: 12.5,
-                color: "#64748b",
-                fontWeight: 500,
-              }}
-            >
-              {formattedDate}
+            <Typography sx={{ fontSize: 11.5, color: "#64748b", fontWeight: 700 }}>
+              {item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+              }) : "Just now"}
             </Typography>
           </Box>
         </Box>
