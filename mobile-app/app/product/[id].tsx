@@ -18,7 +18,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where,
-  getDocs, addDoc, deleteDoc, limit
+  getDocs, addDoc, deleteDoc,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
@@ -37,7 +37,7 @@ type Product = {
   userId?: string;
   sellerName?: string;
   phone?: string;
-  sold?: boolean; // أضفنا حقل sold هنا
+  sold?: boolean;
 };
 
 function timeAgo(timestamp: any): string {
@@ -63,6 +63,7 @@ export default function ProductDetails() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [sellerPhoto, setSellerPhoto] = useState("");
+  const [sellerPhone, setSellerPhone] = useState("");
   const [sellerId, setSellerId] = useState("");
   const [activeImage, setActiveImage] = useState(0);
   const [favorite, setFavorite] = useState(false);
@@ -89,6 +90,7 @@ export default function ProductDetails() {
                 u.profilePhoto || u.photoURL || u.photo ||
                 "https://cdn-icons-png.flaticon.com/512/149/149071.png"
               );
+              setSellerPhone(u.phoneNumber || u.phone || "");
             }
           }
         }
@@ -106,33 +108,33 @@ export default function ProductDetails() {
     if (!product) return;
     const fetchRecommended = async () => {
       try {
-        let q;
-        
-        // التحقق من وجود category لتجنب أخطاء الفايربيز
-        if (product.category) {
-          q = query(
+        // query by category only — filter sold client-side to avoid composite index
+        const snap = await getDocs(
+          query(
             collection(db, "products"),
-            where("category", "==", product.category),
-            limit(15) // جلب عدد بسيط للفلترة
-          );
-        } else {
-          q = query(
-            collection(db, "products"),
-            limit(15)
-          );
-        }
-
-        const snap = await getDocs(q);
-        
-        // الفلترة في ناحية التطبيق لتجنب أخطاء الـ Indexes المعقدة
+            where("category", "==", product.category ?? "")
+          )
+        );
         const results = snap.docs
           .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
-          .filter((p) => p.id !== product.id && p.sold !== true) // استبعاد المنتج الحالي والمباع
-          .slice(0, 6); // عرض 6 منتجات فقط
+          .filter((p) => p.id !== product.id && !p.sold)
+          .slice(0, 6);
 
-        setRecommended(results);
+        // fallback: if same category has < 2 results, fetch recent products instead
+        if (results.length < 2) {
+          const fallback = await getDocs(
+            query(collection(db, "products"), where("sold", "==", false))
+          );
+          const fallbackResults = fallback.docs
+            .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
+            .filter((p) => p.id !== product.id)
+            .slice(0, 6);
+          setRecommended(fallbackResults);
+        } else {
+          setRecommended(results);
+        }
       } catch (e) {
-        console.log("Error fetching recommended:", e);
+        console.log("recommended error:", e);
       }
     };
     fetchRecommended();
@@ -173,8 +175,11 @@ export default function ProductDetails() {
   const shareProduct = () =>
     product && Share.share({ message: `${product.title} — EGP ${Number(product.price).toLocaleString()}` });
 
-  const phone = product?.phone || "";
-  const openWhatsApp = () => Linking.openURL(`https://wa.me/${phone}`);
+  const phone = sellerPhone || product?.phone || "";
+  const openWhatsApp = () => {
+    const cleaned = phone.replace(/\D/g, "");
+    Linking.openURL(`https://wa.me/${cleaned}`);
+  };
   const callSeller = () => Linking.openURL(`tel:${phone}`);
   const sendSMS = () => Linking.openURL(`sms:${phone}`);
 
