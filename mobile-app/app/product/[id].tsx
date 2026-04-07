@@ -18,7 +18,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where,
-  getDocs, addDoc, deleteDoc,
+  getDocs, addDoc, deleteDoc, limit
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
@@ -37,6 +37,7 @@ type Product = {
   userId?: string;
   sellerName?: string;
   phone?: string;
+  sold?: boolean; // أضفنا حقل sold هنا
 };
 
 function timeAgo(timestamp: any): string {
@@ -62,10 +63,12 @@ export default function ProductDetails() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [sellerPhoto, setSellerPhoto] = useState("");
+  const [sellerId, setSellerId] = useState("");
   const [activeImage, setActiveImage] = useState(0);
   const [favorite, setFavorite] = useState(false);
   const [zoom, setZoom] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [recommended, setRecommended] = useState<Product[]>([]);
 
   /* ─── Fetch product ─── */
   useEffect(() => {
@@ -78,6 +81,7 @@ export default function ProductDetails() {
           const data: any = snap.data();
           setProduct({ id: snap.id, ...data });
           if (data.userId) {
+            setSellerId(data.userId);
             const uSnap = await getDoc(doc(db, "users", data.userId));
             if (uSnap.exists()) {
               const u: any = uSnap.data();
@@ -96,6 +100,43 @@ export default function ProductDetails() {
     };
     fetch();
   }, [id]);
+
+  /* ─── Fetch recommended ─── */
+  useEffect(() => {
+    if (!product) return;
+    const fetchRecommended = async () => {
+      try {
+        let q;
+        
+        // التحقق من وجود category لتجنب أخطاء الفايربيز
+        if (product.category) {
+          q = query(
+            collection(db, "products"),
+            where("category", "==", product.category),
+            limit(15) // جلب عدد بسيط للفلترة
+          );
+        } else {
+          q = query(
+            collection(db, "products"),
+            limit(15)
+          );
+        }
+
+        const snap = await getDocs(q);
+        
+        // الفلترة في ناحية التطبيق لتجنب أخطاء الـ Indexes المعقدة
+        const results = snap.docs
+          .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
+          .filter((p) => p.id !== product.id && p.sold !== true) // استبعاد المنتج الحالي والمباع
+          .slice(0, 6); // عرض 6 منتجات فقط
+
+        setRecommended(results);
+      } catch (e) {
+        console.log("Error fetching recommended:", e);
+      }
+    };
+    fetchRecommended();
+  }, [product]);
 
   /* ─── Check favourite ─── */
   useEffect(() => {
@@ -264,7 +305,11 @@ export default function ProductDetails() {
 
           {/* Seller card */}
           <Text style={[s.sectionLabel, { color: theme.text }]}>Seller</Text>
-          <View style={[s.sellerCard, { backgroundColor: theme.card }]}>
+          <TouchableOpacity
+            style={[s.sellerCard, { backgroundColor: theme.card }]}
+            onPress={() => sellerId && router.push({ pathname: "/seller/[sellerId]", params: { sellerId } })}
+            activeOpacity={0.8}
+          >
             <Image source={{ uri: sellerPhoto }} style={s.sellerAvatar} />
             <View style={{ flex: 1 }}>
               <Text style={[s.sellerName, { color: theme.text }]}>
@@ -276,7 +321,50 @@ export default function ProductDetails() {
               <Feather name="shield" size={13} color="#16a34a" />
               <Text style={s.sellerBadgeText}>Verified</Text>
             </View>
-          </View>
+            <Feather name="chevron-right" size={18} color="#94a3b8" />
+          </TouchableOpacity>
+
+          {/* Recommended */}
+          {recommended.length > 0 && (
+            <>
+              <View style={[s.divider, { backgroundColor: theme.card }]} />
+              <Text style={[s.sectionLabel, { color: theme.text }]}>You May Also Like</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
+              >
+                {recommended.map((item) => {
+                  const img =
+                    Array.isArray(item.images) && item.images.length > 0
+                      ? item.images[0]
+                      : "https://via.placeholder.com/150";
+                  const condS = CONDITION_COLOR[item.condition || ""] || CONDITION_COLOR["Used"];
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[s.recCard, { backgroundColor: theme.card }]}
+                      onPress={() => router.push({ pathname: "/product/[id]", params: { id: item.id } })}
+                      activeOpacity={0.85}
+                    >
+                      <Image source={{ uri: img }} style={s.recImage} />
+                      {item.condition && (
+                        <View style={[s.recBadge, { backgroundColor: condS.bg }]}>
+                          <Text style={[s.recBadgeText, { color: condS.text }]}>{item.condition}</Text>
+                        </View>
+                      )}
+                      <View style={s.recBody}>
+                        <Text style={[s.recTitle, { color: theme.text }]} numberOfLines={1}>
+                          {item.title}
+                        </Text>
+                        <Text style={s.recPrice}>EGP {Number(item.price).toLocaleString()}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </>
+          )}
 
         </View>
 
@@ -454,6 +542,31 @@ const s = StyleSheet.create({
   smsBtn: { backgroundColor: "#eff6ff", borderWidth: 1.5, borderColor: "#bfdbfe" },
   callBtn: { backgroundColor: "#2563eb" },
   contactText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+
+  /* Recommended */
+  recCard: {
+    width: 150,
+    borderRadius: 14,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  recImage: { width: 150, height: 130, resizeMode: "cover" },
+  recBadge: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  recBadgeText: { fontSize: 10, fontWeight: "700" },
+  recBody: { padding: 10 },
+  recTitle: { fontSize: 13, fontWeight: "600", marginBottom: 3 },
+  recPrice: { fontSize: 13, fontWeight: "700", color: "#2563eb" },
 
   /* Zoom */
   zoomModal: {
