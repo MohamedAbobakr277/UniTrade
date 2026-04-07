@@ -10,7 +10,14 @@ import {
     IconButton,
     Skeleton,
     Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Slide,
+    Snackbar,
+    Alert
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -22,13 +29,19 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { useEffect, useState } from "react";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import PhoneIcon from "@mui/icons-material/Phone";
+import { useEffect, useState, forwardRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
+const Transition = forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function ItemDetails() {
     const { id } = useParams();
@@ -39,6 +52,9 @@ export default function ItemDetails() {
     const [loading, setLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isZoomOpen, setIsZoomOpen] = useState(false);
+    const [isContactOpen, setIsContactOpen] = useState(false);
+    const [showPhone, setShowPhone] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const [isFavorite, setIsFavorite] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -463,10 +479,10 @@ export default function ItemDetails() {
                                             cursor: "pointer",
                                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                             boxShadow: "0 4px 12px rgba(15,23,42,0.02)",
-                                            "&:hover": { 
-                                                boxShadow: '0 12px 30px rgba(15,23,42,0.08)', 
-                                                transform: 'translateY(-4px)', 
-                                                borderColor: '#3b82f6' 
+                                            "&:hover": {
+                                                boxShadow: '0 12px 30px rgba(15,23,42,0.08)',
+                                                transform: 'translateY(-4px)',
+                                                borderColor: '#3b82f6'
                                             }
                                         }}
                                     >
@@ -506,6 +522,7 @@ export default function ItemDetails() {
                                             background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
                                         },
                                     }}
+                                    onClick={() => setIsContactOpen(true)}
                                 >
                                     Contact Seller
                                 </Button>
@@ -515,11 +532,186 @@ export default function ItemDetails() {
                 </Box>
             </Box>
 
+            {/* Contact Seller Dialog */}
+            <Dialog
+                open={isContactOpen}
+                onClose={() => {
+                    setIsContactOpen(false);
+                    setTimeout(() => setShowPhone(false), 300); // reset state on close animation
+                }}
+                TransitionComponent={Transition}
+                keepMounted
+                PaperProps={{
+                    sx: {
+                        borderRadius: { xs: "24px 24px 0 0", sm: "24px" },
+                        m: { xs: 0, sm: 2 },
+                        position: { xs: "absolute", sm: "relative" },
+                        bottom: { xs: 0, sm: "auto" },
+                        width: "100%",
+                        p: { xs: 2.5, sm: 3.5 },
+                        maxWidth: { xs: "100%", sm: "440px" },
+                        boxShadow: "0 -8px 40px rgba(0,0,0,0.1)",
+                        border: "1px solid rgba(255,255,255,0.8)",
+                    }
+                }}
+            >
+                {/* 1. Header */}
+                <DialogTitle sx={{ fontWeight: 900, color: "#0f172a", p: 0, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "1.3rem" }}>
+                    Contact Seller
+                    <IconButton onClick={() => setIsContactOpen(false)} size="small" sx={{ color: "#64748b", bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+
+                <DialogContent sx={{ p: 0 }}>
+                    {/* 2. Seller Info Section */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1.5 }}>
+                        <Avatar
+                            src={sellerData?.profilePhoto || "/default-avatar.png"}
+                            sx={{ width: 56, height: 56, border: "2px solid #f1f5f9" }}
+                        />
+                        <Box>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>
+                                    {sellerName}
+                                </Typography>
+                                {(sellerData?.isVerified || sellerData?.major) && <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: "1.1rem" }} />}
+                            </Box>
+                            <Typography sx={{ fontSize: "0.9rem", color: "#64748b", fontWeight: 500 }}>
+                                Verified User
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Typography sx={{ color: "#475569", mb: 3.5, fontSize: "0.95rem", fontWeight: 500 }}>
+                        Choose how you want to contact the seller
+                    </Typography>
+
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                        {/* 3. Primary Action: WhatsApp */}
+                        <Box>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<WhatsAppIcon sx={{ fontSize: "24px !important" }} />}
+                                onClick={() => {
+                                    const phone = sellerData?.phoneNumber || sellerData?.phone;
+                                    if (phone) {
+                                        let formattedPhone = phone.replace(/[^0-9]/g, '');
+                                        if (formattedPhone.startsWith('01')) {
+                                            formattedPhone = '2' + formattedPhone;
+                                        }
+                                        const message = encodeURIComponent(`Hi, I'm interested in your item: "${item.title}". Is it still available?`);
+                                        window.open(`https://wa.me/${formattedPhone}?text=${message}`, '_blank');
+                                    } else {
+                                        alert('Phone number not available for this seller.');
+                                    }
+                                }}
+                                sx={{
+                                    py: 1.8,
+                                    borderRadius: "16px",
+                                    textTransform: "none",
+                                    fontWeight: 800,
+                                    fontSize: "1.05rem",
+                                    color: "#ffffff",
+                                    backgroundColor: "#0aac45ff",
+                                    boxShadow: "0 8px 20px rgba(37, 211, 102, 0.25)",
+                                    "&:hover": {
+                                        backgroundColor: "#128c4fff",
+                                        boxShadow: "0 10px 24px rgba(37, 211, 102, 0.35)",
+                                    },
+                                }}
+                            >
+                                Chat on WhatsApp
+                            </Button>
+                            <Typography sx={{ textAlign: "center", mt: 1.2, color: "#94a3b8", fontSize: "0.85rem", fontWeight: 500 }}>
+                                You will continue in WhatsApp
+                            </Typography>
+                        </Box>
+
+                        <Divider variant="middle" sx={{ borderColor: "#e2e8f0" }} />
+
+                        {/* 4. Phone Number Section */}
+                        <Box
+                            sx={{
+                                p: 2,
+                                borderRadius: "16px",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "flex-start",
+                                gap: 1.5,
+                                border: "1px solid #e2e8f0",
+                                bgcolor: "#f8fafc",
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: "100%" }}>
+                                <Avatar sx={{ bgcolor: "rgba(15, 23, 42, 0.06)", color: "#475569", width: 44, height: 44 }}>
+                                    <PhoneIcon />
+                                </Avatar>
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography sx={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.2 }}>
+                                        Phone Number
+                                    </Typography>
+
+                                    {showPhone ? (
+                                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 0.5 }}>
+                                            <Typography sx={{ fontSize: "1.1rem", color: "#0f172a", fontWeight: 800, letterSpacing: "0.5px" }}>
+                                                {(sellerData?.phoneNumber || sellerData?.phone) || "Unavailable"}
+                                            </Typography>
+                                            {(sellerData?.phoneNumber || sellerData?.phone) && (
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => {
+                                                        const num = sellerData?.phoneNumber || sellerData?.phone;
+                                                        if (num) {
+                                                            navigator.clipboard.writeText(num);
+                                                            setSnackbarOpen(true);
+                                                        }
+                                                    }}
+                                                    sx={{ color: "#3b82f6", bgcolor: "rgba(59, 130, 246, 0.1)", "&:hover": { bgcolor: "rgba(59, 130, 246, 0.2)" } }}
+                                                >
+                                                    <ContentCopyIcon fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                        </Box>
+                                    ) : (
+                                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 0.5 }}>
+                                            <Typography sx={{ fontSize: "1.1rem", color: "#0f172a", fontWeight: 800, letterSpacing: "2px" }}>
+                                                +20 1•• ••• ••••
+                                            </Typography>
+                                            <Button
+                                                variant="text"
+                                                size="small"
+                                                onClick={() => setShowPhone(true)}
+                                                sx={{ textTransform: "none", fontWeight: 800, color: "#3b82f6" }}
+                                            >
+                                                Show Number
+                                            </Button>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+
+            {/* Snackbar for Copy Confirmation */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%', borderRadius: "12px", fontWeight: 600 }}>
+                    Number copied to clipboard!
+                </Alert>
+            </Snackbar>
+
             {/* Full Screen Image Zoom Dialog */}
-            <Dialog 
-                open={isZoomOpen} 
-                onClose={() => setIsZoomOpen(false)} 
-                maxWidth="xl" 
+            <Dialog
+                open={isZoomOpen}
+                onClose={() => setIsZoomOpen(false)}
+                maxWidth="xl"
                 fullWidth
                 PaperProps={{
                     sx: {
