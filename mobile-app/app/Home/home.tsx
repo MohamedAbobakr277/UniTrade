@@ -73,7 +73,20 @@ const CATEGORIES = [
   { name: "Furniture", icon: "box" },
 ];
 
-const CONDITIONS = ["New", "Like New", "Used"];
+const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor", "Used"];
+
+const ALL_UNIVERSITIES = [
+  "Cairo University", "Ain Shams University", "Alexandria University",
+  "Mansoura University", "Assiut University", "Helwan University",
+  "Tanta University", "Zagazig University", "Suez Canal University",
+  "Al-Azhar University", "German University in Cairo",
+  "British University in Egypt", "October 6 University",
+  "Future University in Egypt", "AASTMT", "Nile University",
+  "Misr International University", "MSA University", "Pharos University",
+  "Sohag University", "Beni-Suef University", "Fayoum University",
+  "South Valley University", "Kafr El Sheikh University",
+  "Damanhour University", "Others",
+];
 
 /* ══════════════════════════════════════════════ */
 export default function HomeScreen() {
@@ -185,7 +198,13 @@ export default function HomeScreen() {
   };
 
   /* ─── Derived data ─── */
-  const universities = [...new Set(items.map((i) => i.university).filter(Boolean))];
+  // merge universities from products + static list, deduplicated
+  const universities = [
+    ...new Set([
+      ...ALL_UNIVERSITIES,
+      ...items.map((i) => i.university).filter(Boolean),
+    ]),
+  ];
 
   const filteredItems = items.filter((item) => {
     const q = search.toLowerCase();
@@ -382,6 +401,7 @@ export default function HomeScreen() {
           <Animated.View
             style={[
               s.sheet,
+              { backgroundColor: theme.card },
               {
                 transform: [
                   {
@@ -397,17 +417,17 @@ export default function HomeScreen() {
             {...panResponder.panHandlers}
           >
             {/* Handle */}
-            <View style={s.sheetHandle} />
+            <View style={[s.sheetHandle, { backgroundColor: theme.background }]} />
 
             <View style={s.sheetHeader}>
-              <Text style={s.sheetTitle}>Filters</Text>
+              <Text style={[s.sheetTitle, { color: theme.text }]}>Filters</Text>
               <TouchableOpacity onPress={() => setFilterVisible(false)}>
-                <Feather name="x" size={20} color="#64748b" />
+                <Feather name="x" size={20} color={theme.text} />
               </TouchableOpacity>
             </View>
 
             {/* University */}
-            <Text style={s.filterLabel}>University</Text>
+            <Text style={[s.filterLabel, { color: theme.text }]}>University</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -438,7 +458,7 @@ export default function HomeScreen() {
             </ScrollView>
 
             {/* Condition */}
-            <Text style={s.filterLabel}>Condition</Text>
+            <Text style={[s.filterLabel, { color: theme.text }]}>Condition</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -469,7 +489,7 @@ export default function HomeScreen() {
             </ScrollView>
 
             {/* Price range */}
-            <Text style={s.filterLabel}>Price Range (EGP)</Text>
+            <Text style={[s.filterLabel, { color: theme.text }]}>Price Range (EGP)</Text>
             <View style={s.priceRow}>
               <TextInput
                 keyboardType="numeric"
@@ -477,7 +497,7 @@ export default function HomeScreen() {
                 onChangeText={setMinPrice}
                 placeholder="Min"
                 placeholderTextColor="#94a3b8"
-                style={s.priceInput}
+                style={[s.priceInput, { backgroundColor: theme.background, color: theme.text, borderColor: theme.background }]}
               />
               <Text style={{ color: "#94a3b8", paddingHorizontal: 8 }}>—</Text>
               <TextInput
@@ -486,7 +506,7 @@ export default function HomeScreen() {
                 onChangeText={setMaxPrice}
                 placeholder="Max"
                 placeholderTextColor="#94a3b8"
-                style={s.priceInput}
+                style={[s.priceInput, { backgroundColor: theme.background, color: theme.text, borderColor: theme.background }]}
               />
             </View>
 
