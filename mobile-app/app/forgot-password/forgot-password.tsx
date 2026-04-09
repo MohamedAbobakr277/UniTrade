@@ -1,0 +1,104 @@
+// app/forgot-password.tsx
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+  Image,
+  Alert,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useTheme } from "../../constants/ThemeContext";
+import styles from "./forgot-styles";
+
+// Import Firebase auth service
+import { forgotPassword } from "../services/auth"; 
+
+const ForgotPassword: React.FC = () => {
+
+  const { theme } = useTheme();
+
+  const router = useRouter();
+  const [email, setEmail] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleNext = async () => {
+    if (!email || !emailRegex.test(email)) {
+      setError("Please enter a valid email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await forgotPassword(email);
+      Alert.alert(
+        "Success",
+        "Password reset email sent. Check your inbox."
+      );
+      router.push("/reset-password/reset-password");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View style={[styles.container,{backgroundColor:theme.background}]}>
+      
+      <StatusBar barStyle={theme.background === "#121212" ? "light-content" : "dark-content"} />
+
+      <Image
+        source={require("../../assets/images/logo.png")}
+        style={styles.logo}
+      />
+
+      <Text style={[styles.title,{color:theme.text}]}>
+        Reset Password
+      </Text>
+
+      <TextInput
+        placeholder="Enter your email"
+        placeholderTextColor="#9ca3af"
+        value={email}
+        onChangeText={(text) => {
+          setEmail(text);
+          setError("");
+        }}
+        style={[
+          styles.input,
+          {color:theme.text},
+          error && { borderColor: "red" }
+        ]}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <TouchableOpacity
+        onPress={handleNext}
+        disabled={loading}
+        style={{ opacity: loading ? 0.6 : 1 }}
+      >
+        <LinearGradient
+          colors={["#3B82F6", "#2563EB"]}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Sending..." : "Continue"}
+          </Text>
+        </LinearGradient>
+      </TouchableOpacity>
+
+    </View>
+  );
+};
+
+export default ForgotPassword;
