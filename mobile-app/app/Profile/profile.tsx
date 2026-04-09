@@ -97,9 +97,11 @@ export default function Profile() {
       },
     ]);
 
-  /* ─── Mark sold ─── */
-  const markSold = (id: string) =>
-    updateDoc(doc(db, "products", id), { sold: true });
+  /* ─── Toggle status ─── */
+  const toggleStatus = (item: any) => {
+    const newStatus = item.status === "sold" ? "available" : "sold";
+    updateDoc(doc(db, "products", item.id), { status: newStatus });
+  };
 
   /* ─── Upload image ─── */
   const uploadImage = async (uri: string) => {
@@ -248,7 +250,7 @@ export default function Profile() {
           return (
             <View key={item.id} style={[s.productCard, { backgroundColor: theme.card }]}>
               <View>
-                {item.sold && (
+                {item.status === "sold" && (
                   <View style={s.soldBadge}>
                     <Text style={s.soldBadgeText}>SOLD</Text>
                   </View>
@@ -278,12 +280,12 @@ export default function Profile() {
                 </View>
 
                 <TouchableOpacity
-                  style={[s.soldToggle, item.sold && s.soldToggleActive]}
-                  onPress={() => markSold(item.id)}
+                  style={[s.soldToggle, item.status === "sold" && s.soldToggleActive]}
+                  onPress={() => toggleStatus(item)}
                 >
-                  <Feather name="check-circle" size={13} color={item.sold ? "#fff" : "#64748b"} />
-                  <Text style={[s.soldToggleText, item.sold && { color: "#fff" }]}>
-                    {item.sold ? "Sold" : "Mark Sold"}
+                  <Feather name="check-circle" size={13} color={item.status === "sold" ? "#fff" : "#64748b"} />
+                  <Text style={[s.soldToggleText, item.status === "sold" && { color: "#fff" }]}>
+                    {item.status === "sold" ? "Sold" : "Mark Sold"}
                   </Text>
                 </TouchableOpacity>
               </View>

@@ -21,9 +21,11 @@ import {
   onSnapshot,
   query,
   where,
-  addDoc,
-  deleteDoc,
   getDocs,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 import BottomNav from "../../components/BottomNav";
@@ -38,7 +40,7 @@ interface Product {
   condition: string;
   category: string;
   userId: string;
-  sold: boolean;
+  status?: string;
   createdAt?: { toDate: () => Date };
 }
 
@@ -140,7 +142,7 @@ export default function HomeScreen() {
     const unsub = onSnapshot(collection(db, "products"), (snap) => {
       const data = snap.docs
         .map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Product, "id">) }))
-        .filter((item) => !item.sold);
+        .filter((item) => item.status !== "sold");
       setItems(data);
     });
     return unsub;
@@ -160,9 +162,12 @@ export default function HomeScreen() {
   useEffect(() => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    getDocs(
-      query(collection(db, "favorites"), where("userId", "==", uid))
-    ).then((snap) => setFavorites(snap.docs.map((d) => d.data().productId)));
+    const unsub = onSnapshot(doc(db, "users", uid), (snap) => {
+      if (snap.exists()) {
+        setFavorites(snap.data().favourites || []);
+      }
+    });
+    return unsub;
   }, []);
 
   /* ─── Toggle favorite ─── */
@@ -170,20 +175,15 @@ export default function HomeScreen() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
 
-    const snap = await getDocs(
-      query(
-        collection(db, "favorites"),
-        where("userId", "==", uid),
-        where("productId", "==", productId)
-      )
-    );
-
-    if (snap.empty) {
-      await addDoc(collection(db, "favorites"), { userId: uid, productId });
-      setFavorites((prev) => [...prev, productId]);
-    } else {
-      snap.forEach((d) => deleteDoc(d.ref));
-      setFavorites((prev) => prev.filter((id) => id !== productId));
+    try {
+      const userRef = doc(db, "users", uid);
+      if (favorites.includes(productId)) {
+        await updateDoc(userRef, { favourites: arrayRemove(productId) });
+      } else {
+        await updateDoc(userRef, { favourites: arrayUnion(productId) });
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
     }
   };
 

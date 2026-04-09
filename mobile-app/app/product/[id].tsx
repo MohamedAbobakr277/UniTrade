@@ -18,7 +18,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where,
-  getDocs, addDoc, deleteDoc,
+  getDocs, addDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
@@ -37,7 +37,7 @@ type Product = {
   userId?: string;
   sellerName?: string;
   phone?: string;
-  sold?: boolean;
+  status?: string;
 };
 
 function timeAgo(timestamp: any): string {
@@ -117,17 +117,15 @@ export default function ProductDetails() {
         );
         const results = snap.docs
           .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
-          .filter((p) => p.id !== product.id && !p.sold)
+          .filter((p) => p.id !== product.id && p.status !== "sold")
           .slice(0, 6);
 
         // fallback: if same category has < 2 results, fetch recent products instead
         if (results.length < 2) {
-          const fallback = await getDocs(
-            query(collection(db, "products"), where("sold", "==", false))
-          );
+          const fallback = await getDocs(query(collection(db, "products")));
           const fallbackResults = fallback.docs
             .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
-            .filter((p) => p.id !== product.id)
+            .filter((p) => p.id !== product.id && p.status !== "sold")
             .slice(0, 6);
           setRecommended(fallbackResults);
         } else {
@@ -142,33 +140,29 @@ export default function ProductDetails() {
 
   /* ─── Check favourite ─── */
   useEffect(() => {
-    const check = async () => {
-      const user = auth.currentUser;
-      if (!user || !product) return;
-      const snap = await getDocs(query(
-        collection(db, "favorites"),
-        where("userId", "==", user.uid),
-        where("productId", "==", product.id)
-      ));
-      setFavorite(!snap.empty);
-    };
-    check();
+    const user = auth.currentUser;
+    if (!user || !product) return;
+    const unsub = onSnapshot(doc(db, "users", user.uid), (snap) => {
+      if (snap.exists()) {
+        const favs = snap.data().favourites || [];
+        setFavorite(favs.includes(product.id));
+      }
+    });
+    return unsub;
   }, [product]);
 
   const toggleFavorite = async () => {
     const user = auth.currentUser;
     if (!user || !product) return;
-    const snap = await getDocs(query(
-      collection(db, "favorites"),
-      where("userId", "==", user.uid),
-      where("productId", "==", product.id)
-    ));
-    if (snap.empty) {
-      await addDoc(collection(db, "favorites"), { userId: user.uid, productId: product.id });
-      setFavorite(true);
-    } else {
-      snap.forEach((d) => deleteDoc(d.ref));
-      setFavorite(false);
+    try {
+      const userRef = doc(db, "users", user.uid);
+      if (favorite) {
+        await updateDoc(userRef, { favourites: arrayRemove(product.id) });
+      } else {
+        await updateDoc(userRef, { favourites: arrayUnion(product.id) });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

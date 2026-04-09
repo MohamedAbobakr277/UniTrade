@@ -34,7 +34,7 @@ type Product = {
   price: number;
   images?: string[];
   condition?: string;
-  sold?: boolean;
+  status?: string;
 };
 
 const CONDITION_COLOR: Record<string, { bg: string; text: string }> = {
@@ -100,17 +100,17 @@ export default function SellerProfile() {
         <View>
           <Image 
             source={{ uri: img }} 
-            style={[s.cardImage, item.sold && { opacity: 0.5 }]} // تقليل شفافية الصورة لو مباع
+            style={[s.cardImage, item.status === "sold" && { opacity: 0.5 }]} // تقليل شفافية الصورة لو مباع
           />
           
           {/* علامة المنتج المباع */}
-          {item.sold && (
+          {item.status === "sold" && (
             <View style={s.soldBadge}>
               <Text style={s.soldText}>Sold</Text>
             </View>
           )}
 
-          {item.condition && !item.sold && (
+          {item.condition && item.status !== "sold" && (
             <View style={[s.condBadge, { backgroundColor: condS.bg }]}>
               <Text style={[s.condText, { color: condS.text }]}>{item.condition}</Text>
             </View>
@@ -118,12 +118,12 @@ export default function SellerProfile() {
         </View>
         <View style={s.cardBody}>
           <Text 
-            style={[s.cardTitle, { color: theme.text }, item.sold && { textDecorationLine: "line-through", color: "#94a3b8" }]} 
+            style={[s.cardTitle, { color: theme.text }, item.status === "sold" && { textDecorationLine: "line-through", color: "#94a3b8" }]} 
             numberOfLines={1}
           >
             {item.title}
           </Text>
-          <Text style={[s.cardPrice, item.sold && { color: "#94a3b8" }]}>
+          <Text style={[s.cardPrice, item.status === "sold" && { color: "#94a3b8" }]}>
             EGP {Number(item.price).toLocaleString()}
           </Text>
         </View>

@@ -12,10 +12,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import {
-collection,
-onSnapshot,
-query,
-where
+  collection,
+  onSnapshot,
+  doc
 } from "firebase/firestore";
 
 import { auth, db } from "../services/firebase";
@@ -30,51 +29,39 @@ const router = useRouter();
 const [favorites,setFavorites] = useState<any[]>([]);
 
 useEffect(()=>{
+  const uid = auth.currentUser?.uid;
+  if(!uid) return;
 
-const uid = auth.currentUser?.uid;
-
-if(!uid) return;
-
-const q = query(
-collection(db,"favorites"),
-where("userId","==",uid)
-);
-
-const unsubscribe = onSnapshot(q,(snapshot)=>{
-
-const data = snapshot.docs.map(doc=>doc.data().productId);
-
-loadProducts(data);
-
-});
-
-return unsubscribe;
-
+  const unsubscribe = onSnapshot(doc(db, "users", uid), (snapshot)=>{
+    const data = snapshot.data();
+    loadProducts(data?.favourites || []);
+  });
+  return unsubscribe;
 },[]);
 
 
 
 const loadProducts = (ids:string[])=>{
+  if (!ids || ids.length === 0) {
+    setFavorites([]);
+    return;
+  }
+  const unsubscribe = onSnapshot(collection(db,"products"),(snapshot)=>{
+    const allProducts = snapshot.docs.map(doc=>{
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        status: data.status
+      };
+    });
 
-const unsubscribe = onSnapshot(collection(db,"products"),(snapshot)=>{
+    const favProducts = allProducts.filter(
+      item => ids.includes(item.id) && item.status !== "sold"
+    );
 
-const allProducts = snapshot.docs.map(doc=>{
-const data = doc.data();
-return {
-id: doc.id,
-...data,
-sold: data.sold ?? false
-};
-});
-
-const favProducts = allProducts.filter(
-item => ids.includes(item.id) && !item.sold
-);
-
-setFavorites(favProducts);
-
-});
-
+    setFavorites(favProducts);
+  });
 };
 
 

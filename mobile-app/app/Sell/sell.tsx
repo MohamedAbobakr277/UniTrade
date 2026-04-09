@@ -142,7 +142,7 @@ export default function Sell() {
         sellerName,
         sellerEmail: auth.currentUser?.email || "",
         sellerPhoto,
-        sold: false,
+        status: "available",
         createdAt: new Date(),
       });
 
