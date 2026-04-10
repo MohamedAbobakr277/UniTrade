@@ -4,7 +4,7 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 
-export default function EmptyState({ title, description, iconType, ctaText, ctaLink }) {
+export default function EmptyState({ title, description, iconType, ctaText, ctaLink, onCtaClick }) {
   const navigate = useNavigate();
 
   const getIcon = () => {
@@ -45,7 +45,7 @@ export default function EmptyState({ title, description, iconType, ctaText, ctaL
       {ctaText && ctaLink && (
         <Button
           variant="contained"
-          onClick={() => navigate(ctaLink)}
+          onClick={() => onCtaClick ? onCtaClick() : navigate(ctaLink)}
           sx={{
             bgcolor: "#2563eb",
             borderRadius: "14px",

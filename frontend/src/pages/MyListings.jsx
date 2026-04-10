@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function MyListings() {
     const [userItems, setUserItems] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [isEditListingModalOpen, setIsEditListingModalOpen] = useState(false);
     const [currentEditItem, setCurrentEditItem] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -107,9 +108,15 @@ export default function MyListings() {
         }
     };
 
+    const displayedItems = userItems.filter(item => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return (item.title?.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q) || item.category?.toLowerCase().includes(q));
+    });
+
     return (
         <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
-            <Navbar />
+            <Navbar items={userItems} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
             
             {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} />}
 
@@ -142,7 +149,7 @@ export default function MyListings() {
                     <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', m: 0 }}>My Listings</Typography>
                 </Box>
 
-                {userItems.length > 0 ? (
+                {displayedItems.length > 0 ? (
                     <Box
                         sx={{
                             display: "grid",
@@ -152,7 +159,7 @@ export default function MyListings() {
                             alignItems: "stretch",
                         }}
                     >
-                    {userItems.map((item) => (
+                    {displayedItems.map((item) => (
                         <Box key={item.id} sx={{ display: 'flex' }}>
                             <Card
                                 sx={{
@@ -286,11 +293,12 @@ export default function MyListings() {
                 </Box>
                 ) : (
                     <EmptyState 
-                        title="You Have No Listings"
-                        description="Ready to clear some space? Post your first item and reach thousands of students on campus!"
+                        title={searchQuery ? "No Matches Found" : "You Have No Listings"}
+                        description={searchQuery ? `No listings matched "${searchQuery}".` : "Ready to clear some space? Post your first item and reach thousands of students on campus!"}
                         iconType="inventory"
-                        ctaText="Post an Item"
-                        ctaLink="/sell"
+                        ctaText={searchQuery ? "Clear Search" : "Post an Item"}
+                        ctaLink={searchQuery ? "#" : "/sell"}
+                        onCtaClick={searchQuery ? () => setSearchQuery("") : undefined}
                     />
                 )}
             </Box>

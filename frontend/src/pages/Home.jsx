@@ -1,20 +1,22 @@
-import { Box, Typography, Paper, Chip, Fab, FormControl, Select, MenuItem } from "@mui/material";
+import { Box, Typography, Paper, Chip, Fab, FormControl, Select, MenuItem, Button } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SortIcon from "@mui/icons-material/Sort";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import CategoryBar from "../components/CategoryBar";
-import TopSection from "../components/Topsection";
 import ItemCard from "../components/ItemCard";
 import Footer from "../components/Footer";
 import EmptyState from "../components/EmptyState";
 import { useState, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
 
 export default function Home() {
+  const routeLocation = useLocation();
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedUniversity, setSelectedUniversity] = useState("All Universities");
   const [priceRange, setPriceRange] = useState([0, 7000]);
@@ -22,6 +24,17 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("newest");
   const [visibleCount, setVisibleCount] = useState(50);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Read search term passed from other pages via navigate state
+  useEffect(() => {
+    const q = routeLocation.state?.q;
+    if (q !== undefined) {
+      setSearch(q);
+      setSubmittedSearch(q);
+      // Clear state so back-navigation doesn't re-apply it
+      window.history.replaceState({}, "");
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,7 +85,7 @@ export default function Home() {
   const filteredItems = items.filter((item) => {
     const itemTitle = item.title?.toLowerCase() || "";
     const itemDescription = item.description?.toLowerCase() || "";
-    const searchValue = search.toLowerCase();
+    const searchValue = submittedSearch.toLowerCase();
     // condition filtering
     const matchCondition =
       selectedConditions.length === 0 ||
@@ -88,8 +101,10 @@ export default function Home() {
       (selectedUniversity === "Others" && !standardUniversities.includes(item.university));
 
     const matchSearch =
+      !searchValue ||
       itemTitle.includes(searchValue) ||
-      itemDescription.includes(searchValue);
+      itemDescription.includes(searchValue) ||
+      (item.category?.toLowerCase() || "").includes(searchValue);
 
     const matchCategory =
       selectedCategory === "All" || item.category === selectedCategory;
@@ -124,9 +139,15 @@ export default function Home() {
           background: "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 35%, #eef4ff 100%)",
         }}
       >
-        <Navbar />
-
-        <TopSection search={search} setSearch={setSearch} />
+        <Navbar
+          search={search}
+          setSearch={setSearch}
+          items={items}
+          onSearch={(term) => {
+            setSubmittedSearch(term);
+            setVisibleCount(50);
+          }}
+        />
 
         <Box sx={{ px: { xs: 2, md: 5 }, py: { xs: 3, md: 4 } }}>
           <CategoryBar selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
@@ -261,9 +282,21 @@ export default function Home() {
                 </>
               ) : (
                 <EmptyState
-                  title="No Items Found"
-                  description="We couldn't find any items matching your current filters. Try adjusting your search or filters to see more results."
+                  title={submittedSearch ? "No Matches Found" : "No Items Found"}
+                  description={submittedSearch 
+                    ? `No items matched "${submittedSearch}". Try clearing your search or adjusting your filters.`
+                    : "We couldn't find any items matching your current filters. Try adjusting your filters to see more results."
+                  }
                   iconType="shopping"
+                  ctaText={submittedSearch ? "Clear Search" : "Clear Filters"}
+                  ctaLink="#"
+                  onCtaClick={() => {
+                    setSearch("");
+                    setSubmittedSearch("");
+                    setSelectedCategory("All");
+                    setSelectedUniversity("All Universities");
+                    setPriceRange([0, 7000]);
+                  }}
                 />
               )}
             </Box>
