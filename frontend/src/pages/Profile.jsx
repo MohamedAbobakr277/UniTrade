@@ -407,6 +407,22 @@ export default function Profile() {
                                     <BusinessIcon fontSize="small" />
                                     <Typography variant="body2">{user.university}</Typography>
                                 </Box>
+
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 4, mt: 2 }}>
+                                    <Box>
+                                        <Typography sx={{ fontSize: 20, fontWeight: 800, color: "#2563eb", lineHeight: 1 }}>
+                                            {userItems.filter(i => i.status !== "sold").length}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 11, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Available</Typography>
+                                    </Box>
+                                    <Box sx={{ width: "1.5px", height: "25px", bgcolor: "#f1f5f9" }} />
+                                    <Box>
+                                        <Typography sx={{ fontSize: 20, fontWeight: 800, color: "#ef4444", lineHeight: 1 }}>
+                                            {userItems.filter(i => i.status === "sold").length}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 11, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Sold</Typography>
+                                    </Box>
+                                </Box>
                             </Box>
                             <Box sx={{ display: 'flex', gap: 2 }}>
                                 <Button variant="outlined" startIcon={<EditIcon />} sx={{ borderRadius: 3, textTransform: 'none', px: 3 }} onClick={handleOpenEditModal}>Edit Profile</Button>

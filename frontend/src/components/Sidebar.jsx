@@ -24,7 +24,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ selectedUniversity, setSelectedUniversity, priceRange, setPriceRange, selectedConditions, setSelectedConditions, }) {
-    const [price, setPrice] = useState([0, 7000]);
     const navigate = useNavigate();
 
     return (
@@ -204,7 +203,7 @@ export default function Sidebar({ selectedUniversity, setSelectedUniversity, pri
                             onChange={(e, newValue) => setPriceRange(newValue)}
                             valueLabelDisplay="auto"
                             min={0}
-                            max={7000}
+                            max={100000}
                             sx={{
                                 color: "#2563eb",
                                 "& .MuiSlider-thumb": {
@@ -223,61 +222,45 @@ export default function Sidebar({ selectedUniversity, setSelectedUniversity, pri
 
                         <Box
                             sx={{
-                                mt: 1.2,
+                                mt: 1.5,
                                 display: "flex",
-                                justifyContent: "space-between",
                                 alignItems: "center",
                                 gap: 1,
-                                flexWrap: "wrap",
                             }}
                         >
                             <Box
                                 sx={{
-                                    px: 1.2,
-                                    py: 0.7,
+                                    flex: 1,
+                                    px: 1,
+                                    py: 0.8,
                                     borderRadius: "10px",
                                     backgroundColor: "#ffffff",
                                     border: "1px solid #e2e8f0",
+                                    textAlign: "center"
                                 }}
                             >
-                                <Typography
-                                    sx={{
-                                        color: "#334155",
-                                        fontWeight: 700,
-                                        fontSize: "0.9rem",
-                                    }}
-                                >
-                                    EGP {price[0]}
+                                <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>From</Typography>
+                                <Typography sx={{ color: "#334155", fontWeight: 800, fontSize: "0.85rem" }}>
+                                    EGP {priceRange[0]}
                                 </Typography>
                             </Box>
 
-                            <Typography
-                                sx={{
-                                    color: "#94a3b8",
-                                    fontSize: "0.85rem",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                to
-                            </Typography>
+                            <Typography sx={{ color: "#94a3b8", fontSize: "0.8rem", fontWeight: 700 }}>—</Typography>
 
                             <Box
                                 sx={{
-                                    px: 1.2,
-                                    py: 0.7,
+                                    flex: 1,
+                                    px: 1,
+                                    py: 0.8,
                                     borderRadius: "10px",
                                     backgroundColor: "#ffffff",
                                     border: "1px solid #e2e8f0",
+                                    textAlign: "center"
                                 }}
                             >
-                                <Typography
-                                    sx={{
-                                        color: "#334155",
-                                        fontWeight: 700,
-                                        fontSize: "0.9rem",
-                                    }}
-                                >
-                                    EGP {price[1]}
+                                <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>To</Typography>
+                                <Typography sx={{ color: "#334155", fontWeight: 800, fontSize: "0.85rem" }}>
+                                    EGP {priceRange[1]}
                                 </Typography>
                             </Box>
                         </Box>

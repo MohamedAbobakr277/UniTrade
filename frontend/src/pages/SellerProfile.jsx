@@ -125,6 +125,8 @@ export default function SellerProfile() {
     }
 
     const sellerName = seller.name || (seller.firstName ? seller.firstName + " " + seller.lastName : "Unknown Seller");
+    const availableItems = sellerItems.filter(item => item.status !== "sold").length;
+    const soldItems = sellerItems.filter(item => item.status === "sold").length;
 
     return (
         <Box sx={{ minHeight: "100vh", background: "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)", pb: 10 }}>
@@ -192,13 +194,13 @@ export default function SellerProfile() {
 
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: { xs: "center", sm: "flex-start" }, gap: 4 }}>
                                 <Box>
-                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#2563eb", lineHeight: 1 }}>{sellerItems.length}</Typography>
-                                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Listings</Typography>
+                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#2563eb", lineHeight: 1 }}>{availableItems}</Typography>
+                                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Available</Typography>
                                 </Box>
                                 <Box sx={{ width: "2px", height: "30px", bgcolor: "#f1f5f9" }} />
                                 <Box>
-                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#10b981", lineHeight: 1 }}>100%</Typography>
-                                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Verified</Typography>
+                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#ef4444", lineHeight: 1 }}>{soldItems}</Typography>
+                                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Sold</Typography>
                                 </Box>
                             </Box>
                         </Box>

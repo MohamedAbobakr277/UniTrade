@@ -19,7 +19,7 @@ export default function Home() {
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedUniversity, setSelectedUniversity] = useState("All Universities");
-  const [priceRange, setPriceRange] = useState([0, 7000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [selectedConditions, setSelectedConditions] = useState([]); // array of strings: ["New", "Like New", ...]
   const [sortBy, setSortBy] = useState("newest");
   const [visibleCount, setVisibleCount] = useState(50);
@@ -109,9 +109,8 @@ export default function Home() {
     const matchCategory =
       selectedCategory === "All" || item.category === selectedCategory;
 
-    // status filtering (only show available items)
-    const matchStatus =
-      item.status === "available" || item.status === undefined;
+    // status filtering (show everything except sold items)
+    const matchStatus = item.status !== "sold";
 
     return matchSearch && matchCategory && matchStatus && matchCondition && matchPrice && matchUniversity;
   }).sort((a, b) => {
