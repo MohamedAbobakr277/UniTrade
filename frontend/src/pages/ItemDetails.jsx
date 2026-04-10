@@ -600,8 +600,21 @@ export default function ItemDetails() {
                                         if (formattedPhone.startsWith('01')) {
                                             formattedPhone = '2' + formattedPhone;
                                         }
-                                        const message = encodeURIComponent(`Hi, I'm interested in your item: "${item.title}". Is it still available?`);
-                                        window.open(`https://wa.me/${formattedPhone}?text=${message}`, '_blank');
+                                        const message = `Hi! 👋
+
+I'm interested in your listing on UniTrade:
+
+📦 *${item.title}*
+💰 Price: EGP ${item.price}
+✅ Condition: ${item.condition || "Not specified"}
+📍 University: ${item.university || "Not specified"}
+
+Is it still available?`;
+
+                                        window.open(
+                                            `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURI(message)}`,
+                                            "_blank"
+                                        );
                                     } else {
                                         alert('Phone number not available for this seller.');
                                     }
