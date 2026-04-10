@@ -602,14 +602,14 @@ export default function ItemDetails() {
                                         }
                                         const message = `Hi! 👋
 
-I'm interested in your listing on UniTrade:
+                                                            I'm interested in your listing on UniTrade:
 
-📦 *${item.title}*
-💰 Price: EGP ${item.price}
-✅ Condition: ${item.condition || "Not specified"}
-📍 University: ${item.university || "Not specified"}
+                                                            📦 *${item.title}*
+                                                            💰 Price: EGP ${item.price}
+                                                            ✅ Condition: ${item.condition || "Not specified"}
+                                                            📍 University: ${item.university || "Not specified"}
 
-Is it still available?`;
+                                                            Is it still available?`;
 
                                         window.open(
                                             `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURI(message)}`,
