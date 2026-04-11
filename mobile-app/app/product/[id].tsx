@@ -12,6 +12,7 @@ import {
   StatusBar,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -171,11 +172,35 @@ export default function ProductDetails() {
 
   const phone = sellerPhone || product?.phone || "";
   const openWhatsApp = () => {
-    const cleaned = phone.replace(/\D/g, "");
-    Linking.openURL(`https://wa.me/${cleaned}`);
+    if (!product) return;
+
+    // make a phone number
+    let cleaned = phone.replace(/\D/g, "");
+    if (cleaned.startsWith("0")) {
+      cleaned = "2" + cleaned;
+    } else if (cleaned.startsWith("1") && cleaned.length < 12) {
+      cleaned = "20" + cleaned;
+    }
+
+    // make a message
+    const message = `Hi! 👋\n\nI'm interested in your listing on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
+
+    // make it encoded
+    const encodedMessage = encodeURIComponent(message);
+
+    // make a link
+    const url = `https://wa.me/${cleaned}?text=${encodedMessage}`;
+
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert("Error", "WhatsApp is not installed on this device");
+      }
+    });
   };
+
   const callSeller = () => Linking.openURL(`tel:${phone}`);
-  const sendSMS = () => Linking.openURL(`sms:${phone}`);
 
   /* ─── States ─── */
   if (loading) {
@@ -376,10 +401,6 @@ export default function ProductDetails() {
           <Feather name="message-circle" size={18} color="#fff" />
           <Text style={s.contactText}>WhatsApp</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[s.contactBtn, s.smsBtn]} onPress={sendSMS}>
-          <Feather name="mail" size={18} color="#2563eb" />
-          <Text style={[s.contactText, { color: "#2563eb" }]}>SMS</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={[s.contactBtn, s.callBtn]} onPress={callSeller}>
           <Feather name="phone" size={18} color="#fff" />
           <Text style={s.contactText}>Call</Text>
@@ -538,7 +559,6 @@ const s = StyleSheet.create({
     borderRadius: 12,
   },
   whatsappBtn: { backgroundColor: "#22c55e" },
-  smsBtn: { backgroundColor: "#eff6ff", borderWidth: 1.5, borderColor: "#bfdbfe" },
   callBtn: { backgroundColor: "#2563eb" },
   contactText: { color: "#fff", fontWeight: "700", fontSize: 13 },
 
