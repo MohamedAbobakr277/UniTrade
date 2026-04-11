@@ -12,6 +12,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Favourites() {
   const [items, setItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -47,9 +48,19 @@ export default function Favourites() {
     };
   }, []);
 
+  const displayedItems = items.filter((item) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      item.title?.toLowerCase().includes(q) ||
+      item.description?.toLowerCase().includes(q) ||
+      item.category?.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <Box sx={{ minHeight: "100vh", background: "#f8fbff" }}>
-      <Navbar />
+      <Navbar items={items} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
       <Box sx={{ p: { xs: 2, md: 5 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
           <Button
@@ -85,7 +96,7 @@ export default function Favourites() {
               <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
               <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 4 }} />
           </Box>
-        ) : items.length > 0 ? (
+        ) : displayedItems.length > 0 ? (
           <Box
             sx={{
               display: "grid",
@@ -95,7 +106,7 @@ export default function Favourites() {
               alignItems: "stretch",
             }}
           >
-            {items.map((item) => (
+            {displayedItems.map((item) => (
               <Box key={item.id} sx={{ display: 'flex' }}>
                 <ItemCard item={item} />
               </Box>
@@ -103,11 +114,12 @@ export default function Favourites() {
           </Box>
         ) : (
           <EmptyState 
-            title="No Favourites Yet"
-            description="You haven't added any items to your favourites. Start exploring to find items you like!"
+            title={searchQuery ? "No Matches Found" : "No Favourites Yet"}
+            description={searchQuery ? `No favourites matched "${searchQuery}".` : "You haven't added any items to your favourites. Start exploring to find items you like!"}
             iconType="favorite"
-            ctaText="Explore Items"
-            ctaLink="/home"
+            ctaText={searchQuery ? "Clear Search" : "Explore Items"}
+            ctaLink={searchQuery ? "#" : "/home"}
+            onCtaClick={searchQuery ? () => setSearchQuery("") : undefined}
           />
         )}
       </Box>
