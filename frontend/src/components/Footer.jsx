@@ -76,6 +76,7 @@ export default function Footer() {
               ].map((social) => (
                 <IconButton
                   key={social.label}
+                  aria-label={social.label}
                   size="small"
                   sx={{
                     bgcolor: "#f1f5f9",

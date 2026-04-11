@@ -289,6 +289,15 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         {inputValue && (
                             <Box sx={{ pr: 2, display: "flex", alignItems: "center" }}>
                                 <ClearIcon
+                                    aria-label="Clear search"
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            e.preventDefault();
+                                            handleClear();
+                                        }
+                                    }}
                                     onClick={handleClear}
                                     sx={{ color: "#94a3b8", fontSize: "1.1rem", cursor: "pointer", "&:hover": { color: "#475569" } }}
                                 />
@@ -404,6 +413,15 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                         {term}
                                                     </Typography>
                                                     <ClearIcon
+                                                        aria-label={`Remove ${term} from recent searches`}
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === "Enter" || e.key === " ") {
+                                                                e.preventDefault();
+                                                                handleRemoveRecent(e, term);
+                                                            }
+                                                        }}
                                                         onClick={(e) => handleRemoveRecent(e, term)}
                                                         sx={{ color: "#cbd5e1", fontSize: "0.95rem", cursor: "pointer", "&:hover": { color: "#64748b" }, transition: "color 0.15s" }}
                                                     />
@@ -480,6 +498,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     </Button>
 
                     <IconButton
+                        aria-label="Sell item"
                         onClick={() => navigate("/sell")}
                         sx={{
                             display: { xs: "flex", sm: "none" },
@@ -494,6 +513,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     </IconButton>
 
                     <IconButton
+                        aria-label="Notifications"
                         sx={{
                             width: 42, height: 42,
                             borderRadius: "12px",

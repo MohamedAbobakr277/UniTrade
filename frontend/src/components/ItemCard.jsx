@@ -214,6 +214,7 @@ export default function ItemCard({ item }) {
         )}
 
         <IconButton
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           onClick={toggleFavorite}
           sx={{
             position: "absolute",
