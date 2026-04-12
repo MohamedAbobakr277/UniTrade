@@ -77,6 +77,7 @@ export default function Footer() {
                 <IconButton
                   key={social.label}
                   size="small"
+                  aria-label={social.label}
                   sx={{
                     bgcolor: "#f1f5f9",
                     color: "#475569",
