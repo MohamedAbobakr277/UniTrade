@@ -8,6 +8,7 @@ import {
     InputBase,
     Paper,
     Divider,
+    Tooltip,
 } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AddIcon from "@mui/icons-material/Add";
@@ -479,34 +480,40 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         Sell
                     </Button>
 
-                    <IconButton
-                        onClick={() => navigate("/sell")}
-                        sx={{
-                            display: { xs: "flex", sm: "none" },
-                            width: 42, height: 42,
-                            borderRadius: "12px",
-                            backgroundColor: "#2563eb",
-                            color: "white",
-                            "&:hover": { backgroundColor: "#1d4ed8" },
-                        }}
-                    >
-                        <AddIcon />
-                    </IconButton>
+                    <Tooltip title="Sell an item">
+                        <IconButton
+                            onClick={() => navigate("/sell")}
+                            aria-label="Sell an item"
+                            sx={{
+                                display: { xs: "flex", sm: "none" },
+                                width: 42, height: 42,
+                                borderRadius: "12px",
+                                backgroundColor: "#2563eb",
+                                color: "white",
+                                "&:hover": { backgroundColor: "#1d4ed8" },
+                            }}
+                        >
+                            <AddIcon />
+                        </IconButton>
+                    </Tooltip>
 
-                    <IconButton
-                        sx={{
-                            width: 42, height: 42,
-                            borderRadius: "12px",
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #e2e8f0",
-                            transition: "all 0.25s ease",
-                            "&:hover": { backgroundColor: "#eef4ff", borderColor: "#bfdbfe", transform: "translateY(-1px)" },
-                        }}
-                    >
-                        <Badge color="error" variant="dot" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-                            <NotificationsNoneIcon sx={{ color: "#334155" }} />
-                        </Badge>
-                    </IconButton>
+                    <Tooltip title="Notifications">
+                        <IconButton
+                            aria-label="Notifications"
+                            sx={{
+                                width: 42, height: 42,
+                                borderRadius: "12px",
+                                backgroundColor: "#ffffff",
+                                border: "1px solid #e2e8f0",
+                                transition: "all 0.25s ease",
+                                "&:hover": { backgroundColor: "#eef4ff", borderColor: "#bfdbfe", transform: "translateY(-1px)" },
+                            }}
+                        >
+                            <Badge color="error" variant="dot" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+                                <NotificationsNoneIcon sx={{ color: "#334155" }} />
+                            </Badge>
+                        </IconButton>
+                    </Tooltip>
 
                     <Avatar
                         src={editData?.profilePhoto || "/default-avatar.png"}
