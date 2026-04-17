@@ -19,23 +19,22 @@ import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../constants/ThemeContext";
 import { Feather } from "@expo/vector-icons";
 
-// ─── الإعدادات ───
+// ─── Settings ───
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
-// المفتاح الجديد الذي أرسلته
-const GEMINI_API_KEY = "AIzaSyCKPw___oEWBJpFNftyLmBvRnifI9u1RX0";
+// Read strictly from EXPO_PUBLIC environment variables
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 const CATEGORIES = [
   { name: "Books & Notes", icon: "book" },
   { name: "Calculators", icon: "hash" },
-  { name: "Laptops & Tablets", icon: "monitor" },
-  { name: "Electronics", icon: "headphones" },
+  { name: "Electronics", icon: "monitor" },
   { name: "Engineering Tools", icon: "tool" },
   { name: "Medical Tools", icon: "plus-square" },
   { name: "Lab Equipment", icon: "activity" },
   { name: "Stationery", icon: "edit-3" },
   { name: "Bags & Accessories", icon: "briefcase" },
-  { name: "Furniture", icon: "box" },
+
 ];
 
 const CONDITIONS = [
@@ -54,6 +53,7 @@ export default function Sell() {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiTitleLoading, setAiTitleLoading] = useState(false);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -116,6 +116,48 @@ export default function Sell() {
       );
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  const handleAITitleAutoFill = async () => {
+    if (!title.trim()) return Alert.alert("Error", "Please enter a title first");
+    
+    setAiTitleLoading(true);
+    try {
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+      
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: `Marketplace Assistant: I have a product with the title "${title}". Output ONLY a raw JSON with reasonable estimates: {"description": "write a catchy description in Egyptian Arabic", "price": "estimated price in EGP as a number string", "category": "one of: Books & Notes, Calculators, Electronics, Engineering Tools, Medical Tools, Lab Equipment, Stationery, Bags & Accessories"}.` }
+            ]
+          }]
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        let rawText = data.candidates[0].content.parts[0].text;
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const cleanJson = JSON.parse(jsonMatch[0]);
+          if (cleanJson.description) setDescription(cleanJson.description);
+          if (cleanJson.price) setPrice(String(cleanJson.price).replace(/[^0-9]/g, ""));
+          if (CATEGORIES.some(c => c.name === cleanJson.category)) {
+            setCategory(cleanJson.category);
+          }
+        }
+      }
+    } catch (e: any) {
+      console.error("DEBUG ERROR:", e.message);
+      Alert.alert("Technical Issue", "Failed to generate details from title.");
+    } finally {
+      setAiTitleLoading(false);
     }
   };
 
@@ -224,7 +266,14 @@ export default function Sell() {
         )}
 
         <View style={s.fieldGroup}>
-          <Text style={[s.label, { color: theme.text }]}>Title *</Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <Text style={[s.label, { color: theme.text, marginBottom: 0 }]}>Title *</Text>
+            {title.trim().length > 0 && (
+              <TouchableOpacity onPress={handleAITitleAutoFill} disabled={aiTitleLoading}>
+                {aiTitleLoading ? <ActivityIndicator size="small" color="#8b5cf6" /> : <Text style={{ color: "#8b5cf6", fontSize: 13, fontWeight: "600" }}>✨ Auto-fill details</Text>}
+              </TouchableOpacity>
+            )}
+          </View>
           <TextInput placeholder="Item name" placeholderTextColor="#9ca3af" value={title} onChangeText={setTitle} style={[s.input, { backgroundColor: theme.card, color: theme.text, borderColor: border }]} />
         </View>
 
