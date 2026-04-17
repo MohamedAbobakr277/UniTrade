@@ -61,17 +61,15 @@ const AVATAR_PLACEHOLDER =
   "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=80&q=80";
 
 const CATEGORIES = [
-  { name: "All", icon: "home" },
-  { name: "Books & Notes", icon: "book" },
-  { name: "Calculators", icon: "hash" },
-  { name: "Laptops & Tablets", icon: "monitor" },
-  { name: "Electronics", icon: "headphones" },
-  { name: "Engineering Tools", icon: "tool" },
-  { name: "Medical Tools", icon: "plus-square" },
-  { name: "Lab Equipment", icon: "activity" },
-  { name: "Stationery", icon: "edit-3" },
-  { name: "Bags & Accessories", icon: "briefcase" },
-  { name: "Furniture", icon: "box" },
+  { name: "All",                icon: "home",        color: "#2563eb", bg: "#dbeafe" },
+  { name: "Books & Notes",      icon: "book",        color: "#d97706", bg: "#fef3c7" },
+  { name: "Calculators",        icon: "hash",        color: "#16a34a", bg: "#dcfce7" },
+  { name: "Electronics",        icon: "headphones",  color: "#0891b2", bg: "#cffafe" },
+  { name: "Engineering Tools",  icon: "tool",        color: "#ea580c", bg: "#ffedd5" },
+  { name: "Medical Tools",      icon: "plus-square", color: "#0284c7", bg: "#e0f2fe" },
+  { name: "Lab Equipment",      icon: "activity",    color: "#65a30d", bg: "#ecfccb" },
+  { name: "Stationery",         icon: "edit-3",      color: "#c026d3", bg: "#fae8ff" },
+  { name: "Bags & Accessories", icon: "briefcase",   color: "#b45309", bg: "#fef9c3" },
 ];
 
 const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor", "Used"];
