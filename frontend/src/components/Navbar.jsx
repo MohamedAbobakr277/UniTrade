@@ -480,6 +480,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     </Button>
 
                     <IconButton
+                        aria-label="Add new listing"
                         onClick={() => navigate("/sell")}
                         sx={{
                             display: { xs: "flex", sm: "none" },
@@ -494,6 +495,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     </IconButton>
 
                     <IconButton
+                        aria-label="View notifications"
                         sx={{
                             width: 42, height: 42,
                             borderRadius: "12px",
