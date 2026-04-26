@@ -18,7 +18,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 
 export default function ItemCard({ item }) {
   const [editData, setEditData] = useState(null);
@@ -213,21 +213,24 @@ export default function ItemCard({ item }) {
           />
         )}
 
-        <IconButton
-          onClick={toggleFavorite}
-          sx={{
-            position: "absolute",
-            bottom: 14,
-            right: 14,
-            backgroundColor: "#ffffff",
-            color: isFavorite ? "#ef4444" : "#94a3b8",
-            "&:hover": { backgroundColor: "#f8fafc" },
-            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-            zIndex: 20,
-          }}
-        >
-          {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-        </IconButton>
+        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} placement="top">
+          <IconButton
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            onClick={toggleFavorite}
+            sx={{
+              position: "absolute",
+              bottom: 14,
+              right: 14,
+              backgroundColor: "#ffffff",
+              color: isFavorite ? "#ef4444" : "#94a3b8",
+              "&:hover": { backgroundColor: "#f8fafc" },
+              boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+              zIndex: 20,
+            }}
+          >
+            {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <CardContent
