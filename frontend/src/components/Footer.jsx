@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Typography, Link, IconButton, Divider } from "@mui/material";
+import { Box, Container, Grid, Typography, Link, IconButton, Divider, Tooltip } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -74,22 +74,24 @@ export default function Footer() {
                 { icon: <LinkedInIcon />, label: "LinkedIn" },
                 { icon: <InstagramIcon />, label: "Instagram" },
               ].map((social) => (
-                <IconButton
-                  key={social.label}
-                  size="small"
-                  sx={{
-                    bgcolor: "#f1f5f9",
-                    color: "#475569",
-                    "&:hover": {
-                      bgcolor: "#2563eb",
-                      color: "#ffffff",
-                      transform: "translateY(-2px)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  {social.icon}
-                </IconButton>
+                <Tooltip key={social.label} title={social.label} arrow placement="top">
+                  <IconButton
+                    aria-label={social.label}
+                    size="small"
+                    sx={{
+                      bgcolor: "#f1f5f9",
+                      color: "#475569",
+                      "&:hover": {
+                        bgcolor: "#2563eb",
+                        color: "#ffffff",
+                        transform: "translateY(-2px)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {social.icon}
+                  </IconButton>
+                </Tooltip>
               ))}
             </Box>
           </Grid>
