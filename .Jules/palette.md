@@ -1,0 +1,3 @@
+## 2024-05-17 - Missing Tooltips and ARIA labels on Icon-only Buttons
+**Learning:** Icon-only buttons without `aria-label`s are not accessible to screen reader users, and without `Tooltip`s they lack visual context for sighted users. The `IconButton` component from Material UI must always include an `aria-label` and should be wrapped in a `<Tooltip>` to provide context.
+**Action:** Always add descriptive `aria-label` attributes to icon-only buttons and wrap them in Tooltips to enhance accessibility and user experience.
