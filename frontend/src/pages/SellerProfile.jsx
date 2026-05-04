@@ -23,11 +23,14 @@ import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact
 import { useEffect, useState, forwardRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { db, auth } from "../firebase";
 import Navbar from "../components/Navbar";
 import ItemCard from "../components/ItemCard";
 import Footer from "../components/Footer";
 import EmptyState from "../components/EmptyState";
+import StarRatingDisplay from "../components/StarRatingDisplay";
+import StarRatingInput from "../components/StarRatingInput";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -43,6 +46,14 @@ export default function SellerProfile() {
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [showPhone, setShowPhone] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setCurrentUser(user);
+        });
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -188,6 +199,10 @@ export default function SellerProfile() {
                                 <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: 24 }} />
                             </Box>
                             
+                            <Box sx={{ display: "flex", justifyContent: { xs: "center", sm: "flex-start" }, mb: 1.5 }}>
+                                <StarRatingDisplay averageRating={seller.averageRating} ratingsCount={seller.ratingsCount} size="medium" />
+                            </Box>
+                            
                             <Typography sx={{ fontSize: 16, color: "#64748b", fontWeight: 500, mb: 2 }}>
                                 {seller.major || "Student"} • {seller.university || "University not provided"}
                             </Typography>
@@ -230,6 +245,13 @@ export default function SellerProfile() {
                             Contact Seller
                         </Button>
                     </Box>
+
+                    {/* Rate Seller Section */}
+                    {currentUser && currentUser.uid !== id && (
+                        <Box sx={{ mb: 5 }}>
+                            <StarRatingInput sellerId={id} currentUser={currentUser} />
+                        </Box>
+                    )}
 
                     {/* Listings Grid */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>

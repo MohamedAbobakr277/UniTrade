@@ -38,6 +38,7 @@ import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import StarRatingDisplay from "../components/StarRatingDisplay";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -494,6 +495,9 @@ export default function ItemDetails() {
                                             <Typography sx={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>
                                                 {sellerName}
                                             </Typography>
+                                            <Box sx={{ mt: 0.5, mb: 0.5 }}>
+                                                <StarRatingDisplay averageRating={sellerData?.averageRating} ratingsCount={sellerData?.ratingsCount} size="small" />
+                                            </Box>
                                             <Typography sx={{ fontSize: 14, color: "#64748b", fontWeight: 600, mt: 0.3 }}>
                                                 {sellerData?.major || "Verified Student"}
                                             </Typography>

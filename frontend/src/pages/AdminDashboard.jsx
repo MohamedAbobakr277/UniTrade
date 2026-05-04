@@ -1,32 +1,32 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 
-import AdminHeader        from "../features/admin/components/AdminHeader";
-import AdminSidebar       from "../features/admin/components/AdminSidebar";
-import DashboardOverview  from "../features/admin/components/DashboardOverview";
-import ListingsTable      from "../features/admin/components/ListingsTable";
-import UsersTable         from "../features/admin/components/UsersTable";
-import EditListingModal   from "../features/admin/components/EditListingModal";
+import AdminHeader from "../features/admin/components/AdminHeader";
+import AdminSidebar from "../features/admin/components/AdminSidebar";
+import DashboardOverview from "../features/admin/components/DashboardOverview";
+import ListingsTable from "../features/admin/components/ListingsTable";
+import UsersTable from "../features/admin/components/UsersTable";
+import EditListingModal from "../features/admin/components/EditListingModal";
 import DeleteConfirmModal from "../features/admin/components/DeleteConfirmModal";
-import UserDetailModal    from "../features/admin/components/UserDetailModal";
+import UserDetailModal from "../features/admin/components/UserDetailModal";
 
 import { useAdminListings } from "../features/admin/hooks/useAdminListings";
-import { useAdminUsers }    from "../features/admin/hooks/useAdminUsers";
+import { useAdminUsers } from "../features/admin/hooks/useAdminUsers";
 
 export default function AdminDashboard() {
-  const [activeTab,  setActiveTab]  = useState("dashboard");
-  const [collapsed,  setCollapsed]  = useState(false);
-
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [collapsed, setCollapsed] = useState(false);
+  // sadas
   const {
     listings,
-    editTarget,   openEdit,   closeEdit,   saveEdit,
+    editTarget, openEdit, closeEdit, saveEdit,
     deleteTarget, openDelete, closeDelete, confirmDelete,
   } = useAdminListings();
 
-  const { 
+  const {
     users,
-    selectedUser, 
-    openUserDetail, 
+    selectedUser,
+    openUserDetail,
     closeUserDetail,
     toggleBanStatus,
     toggleAdminRole,
@@ -79,21 +79,21 @@ export default function AdminDashboard() {
             />
           )}
           {activeTab === "users" && (
-            <UsersTable 
-              users={users} 
-              onViewUser={openUserDetail} 
+            <UsersTable
+              users={users}
+              onViewUser={openUserDetail}
             />
           )}
         </Box>
       </Box>
 
       {/* ── Modals ── */}
-      <EditListingModal   item={editTarget}   onClose={closeEdit}   onSave={saveEdit} />
+      <EditListingModal item={editTarget} onClose={closeEdit} onSave={saveEdit} />
       <DeleteConfirmModal item={deleteTarget} onClose={closeDelete} onConfirm={confirmDelete} />
-      <UserDetailModal 
-        user={selectedUser} 
+      <UserDetailModal
+        user={selectedUser}
         listings={listings}
-        onClose={closeUserDetail} 
+        onClose={closeUserDetail}
         onToggleBan={toggleBanStatus}
         onToggleRole={toggleAdminRole}
         onDelete={confirmDeleteUser}
