@@ -11,8 +11,8 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import BackpackIcon from "@mui/icons-material/Backpack";
 
 export default function CategoryBar({
-    selectedCategory,
-    setSelectedCategory,
+    selectedCategories = [],
+    setSelectedCategories,
 }) {
     const categories = [
         {
@@ -113,61 +113,79 @@ export default function CategoryBar({
                     flexWrap: "wrap",
                 }}
             >
-                {categories.map((cat) => (
-                    <Chip
-                        key={cat.label}
-                        label={cat.label}
-                        icon={cat.icon}
-                        onClick={() => setSelectedCategory(cat.label)}
-                        sx={{
-                            px: 1.8,
-                            py: 2.7,
-                            fontWeight: 700,
-                            fontSize: "0.95rem",
-                            borderRadius: "14px",
-                            border:
-                                selectedCategory === cat.label
-                                    ? "1px solid #2563eb"
-                                    : "1px solid #e2e8f0",
-                            background:
-                                selectedCategory === cat.label
-                                    ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
-                                    : "#f8fafc",
-                            color:
-                                selectedCategory === cat.label ? "#ffffff" : "#0f172a",
-                            boxShadow:
-                                selectedCategory === cat.label
-                                    ? "0 8px 18px rgba(37,99,235,0.22)"
-                                    : "0 2px 8px rgba(15,23,42,0.03)",
-                            transition: "all 0.25s ease",
-                            cursor: "pointer",
-                            "& .MuiChip-label": {
-                                px: 0.5,
-                            },
-                            "& .MuiChip-icon": {
-                                color:
-                                    selectedCategory === cat.label
-                                        ? "#ffffff"
-                                        : cat.iconColor,
-                                marginLeft: "6px",
-                                marginRight: "6px",
-                                fontSize: "1.1rem",
-                            },
-                            "&:hover": {
-                                transform: "translateY(-2px)",
+                {categories.map((cat) => {
+                    const isSelected = cat.label === "All" 
+                        ? selectedCategories.length === 0 
+                        : selectedCategories.includes(cat.label);
+
+                    const handleToggle = () => {
+                        if (cat.label === "All") {
+                            setSelectedCategories([]);
+                        } else {
+                            if (selectedCategories.includes(cat.label)) {
+                                setSelectedCategories(selectedCategories.filter(c => c !== cat.label));
+                            } else {
+                                setSelectedCategories([...selectedCategories, cat.label]);
+                            }
+                        }
+                    };
+
+                    return (
+                        <Chip
+                            key={cat.label}
+                            label={cat.label}
+                            icon={cat.icon}
+                            onClick={handleToggle}
+                            sx={{
+                                px: 1.8,
+                                py: 2.7,
+                                fontWeight: 700,
+                                fontSize: "0.95rem",
+                                borderRadius: "14px",
+                                border:
+                                    isSelected
+                                        ? "1px solid #2563eb"
+                                        : "1px solid #e2e8f0",
                                 background:
-                                    selectedCategory === cat.label
-                                        ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
-                                        : "#eef4ff",
-                                borderColor: "#2563eb",
+                                    isSelected
+                                        ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
+                                        : "#f8fafc",
+                                color:
+                                    isSelected ? "#ffffff" : "#0f172a",
                                 boxShadow:
-                                    selectedCategory === cat.label
-                                        ? "0 10px 22px rgba(37,99,235,0.28)"
-                                        : "0 6px 14px rgba(37,99,235,0.08)",
-                            },
-                        }}
-                    />
-                ))}
+                                    isSelected
+                                        ? "0 8px 18px rgba(37,99,235,0.22)"
+                                        : "0 2px 8px rgba(15,23,42,0.03)",
+                                transition: "all 0.25s ease",
+                                cursor: "pointer",
+                                "& .MuiChip-label": {
+                                    px: 0.5,
+                                },
+                                "& .MuiChip-icon": {
+                                    color:
+                                        isSelected
+                                            ? "#ffffff"
+                                            : cat.iconColor,
+                                    marginLeft: "6px",
+                                    marginRight: "6px",
+                                    fontSize: "1.1rem",
+                                },
+                                "&:hover": {
+                                    transform: "translateY(-2px)",
+                                    background:
+                                        isSelected
+                                            ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
+                                            : "#eef4ff",
+                                    borderColor: "#2563eb",
+                                    boxShadow:
+                                        isSelected
+                                            ? "0 10px 22px rgba(37,99,235,0.28)"
+                                            : "0 6px 14px rgba(37,99,235,0.08)",
+                                },
+                            }}
+                        />
+                    );
+                })}
             </Box>
         </Paper>
     );

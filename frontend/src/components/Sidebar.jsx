@@ -2,8 +2,6 @@ import {
     Box,
     Typography,
     Button,
-    Select,
-    MenuItem,
     Slider,
     FormControl,
     FormGroup,
@@ -11,7 +9,6 @@ import {
     Checkbox,
     Divider,
     Paper,
-    InputLabel,
 } from "@mui/material";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
@@ -19,11 +16,11 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MultiSelectUniversitiesDropdown from "./MultiSelectUniversitiesDropdown";
 
-export default function Sidebar({ selectedUniversity, setSelectedUniversity, priceRange, setPriceRange, selectedConditions, setSelectedConditions, }) {
+export default function Sidebar({ selectedUniversities, setSelectedUniversities, priceRange, setPriceRange, selectedConditions, setSelectedConditions, }) {
     const navigate = useNavigate();
 
     return (
@@ -123,45 +120,10 @@ export default function Sidebar({ selectedUniversity, setSelectedUniversity, pri
                         </Typography>
                     </Box>
 
-                    <FormControl fullWidth size="small">
-                        <InputLabel sx={{ color: "#64748b" }}>University</InputLabel>
-                        <Select
-                            value={selectedUniversity}
-                            onChange={(e) => setSelectedUniversity(e.target.value)}
-                            sx={{
-                                borderRadius: "14px",
-                                backgroundColor: "#f8fafc",
-                                "& .MuiOutlinedInput-notchedOutline": {
-                                    borderColor: "#dbe3ee",
-                                },
-                                "&:hover .MuiOutlinedInput-notchedOutline": {
-                                    borderColor: "#2563eb",
-                                },
-                                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                    borderColor: "#2563eb",
-                                },
-                            }}
-                        >
-                            <MenuItem value="All Universities">All Universities</MenuItem>
-                            <MenuItem value="Cairo University">Cairo University</MenuItem>
-                            <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
-                            <MenuItem value="Alexandria University">Alexandria University</MenuItem>
-                            <MenuItem value="Mansoura University">Mansoura University</MenuItem>
-                            <MenuItem value="Assiut University">Assiut University</MenuItem>
-                            <MenuItem value="Helwan University">Helwan University</MenuItem>
-                            <MenuItem value="Tanta University">Tanta University</MenuItem>
-                            <MenuItem value="Zagazig University">Zagazig University</MenuItem>
-                            <MenuItem value="Suez Canal University">Suez Canal University</MenuItem>
-                            <MenuItem value="Al-Azhar University">Al-Azhar University</MenuItem>
-                            <MenuItem value="German University in Cairo">German University in Cairo</MenuItem>
-                            <MenuItem value="British University in Egypt">British University in Egypt</MenuItem>
-                            <MenuItem value="October 6 University">October 6 University</MenuItem>
-                            <MenuItem value="Future University in Egypt">Future University in Egypt</MenuItem>
-                            <MenuItem value="AASTMT">AASTMT</MenuItem>
-                            <MenuItem value="Nile University">Nile University</MenuItem>
-                            <MenuItem value="Others">Others</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <MultiSelectUniversitiesDropdown 
+                        selectedUniversities={selectedUniversities} 
+                        setSelectedUniversities={setSelectedUniversities} 
+                    />
                 </Box>
 
                 <Divider sx={{ mb: 3 }} />

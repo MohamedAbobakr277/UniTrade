@@ -8,7 +8,7 @@ import ItemCard from "../components/ItemCard";
 import Footer from "../components/Footer";
 import EmptyState from "../components/EmptyState";
 import { useState, useEffect } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
 
@@ -17,8 +17,8 @@ export default function Home() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedUniversity, setSelectedUniversity] = useState("All Universities");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedUniversities, setSelectedUniversities] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [selectedConditions, setSelectedConditions] = useState([]); // array of strings: ["New", "Like New", ...]
   const [sortBy, setSortBy] = useState("newest");
@@ -49,8 +49,18 @@ export default function Home() {
   };
 
   useEffect(() => {
+    let q = collection(db, "products");
+
+    if (selectedCategories.length > 0) {
+      q = query(q, where("category", "in", selectedCategories.slice(0, 10)));
+    }
+    
+    if (selectedCategories.length === 0 && selectedUniversities.length > 0) {
+      q = query(q, where("university", "in", selectedUniversities.slice(0, 10)));
+    }
+
     const unsubscribe = onSnapshot(
-      collection(db, "products"),
+      q,
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -72,7 +82,7 @@ export default function Home() {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [selectedCategories, selectedUniversities]);
 
   const standardUniversities = [
     "Cairo University", "Ain Shams University", "Alexandria University",
@@ -96,9 +106,9 @@ export default function Home() {
 
     // university filtering
     const matchUniversity =
-      selectedUniversity === "All Universities" ||
-      item.university === selectedUniversity ||
-      (selectedUniversity === "Others" && !standardUniversities.includes(item.university));
+      selectedUniversities.length === 0 ||
+      selectedUniversities.includes(item.university) ||
+      (selectedUniversities.includes("Others") && !standardUniversities.includes(item.university));
 
     const matchSearch =
       !searchValue ||
@@ -107,7 +117,7 @@ export default function Home() {
       (item.category?.toLowerCase() || "").includes(searchValue);
 
     const matchCategory =
-      selectedCategory === "All" || item.category === selectedCategory;
+      selectedCategories.length === 0 || selectedCategories.includes(item.category);
 
     // status filtering (show everything except sold items)
     const matchStatus = item.status !== "sold";
@@ -149,7 +159,7 @@ export default function Home() {
         />
 
         <Box sx={{ px: { xs: 2, md: 5 }, py: { xs: 3, md: 4 } }}>
-          <CategoryBar selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+          <CategoryBar selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} />
 
           <Box
             sx={{
@@ -161,8 +171,8 @@ export default function Home() {
             }}
           >
             <Sidebar
-              selectedUniversity={selectedUniversity}
-              setSelectedUniversity={setSelectedUniversity}
+              selectedUniversities={selectedUniversities}
+              setSelectedUniversities={setSelectedUniversities}
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               selectedConditions={selectedConditions}
@@ -292,9 +302,9 @@ export default function Home() {
                   onCtaClick={() => {
                     setSearch("");
                     setSubmittedSearch("");
-                    setSelectedCategory("All");
-                    setSelectedUniversity("All Universities");
-                    setPriceRange([0, 7000]);
+                    setSelectedCategories([]);
+                    setSelectedUniversities([]);
+                    setPriceRange([0, 100000]);
                   }}
                 />
               )}
