@@ -204,15 +204,20 @@ export default function Profile() {
         }
     };
     const handleSaveListing = async () => {
+        const qty = parseInt(currentEditItem?.quantityAvailable);
+        if (isNaN(qty) || qty < 0) {
+            setSnackbar({ open: true, message: "Available Quantity must be a number ≥ 0", severity: "error" });
+            return;
+        }
         try {
-
+            const updatedItem = { ...currentEditItem, quantityAvailable: qty };
             const itemRef = doc(db, "products", currentEditItem.id);
 
-            await setDoc(itemRef, currentEditItem, { merge: true });
+            await setDoc(itemRef, updatedItem, { merge: true });
 
             setUserItems(prev =>
                 prev.map(item =>
-                    item.id === currentEditItem.id ? currentEditItem : item
+                    item.id === currentEditItem.id ? updatedItem : item
                 )
             );
 
@@ -699,6 +704,15 @@ export default function Profile() {
                             type="number"
                             value={currentEditItem?.price || ''}
                             onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Available Quantity"
+                            type="number"
+                            value={currentEditItem?.quantityAvailable ?? 1}
+                            onChange={(e) => setCurrentEditItem(prev => ({ ...prev, quantityAvailable: e.target.value }))}
+                            inputProps={{ min: 0, step: 1 }}
+                            helperText="Number of units available (0 = out of stock)"
                         />
                     </Box>
                 </DialogContent>
