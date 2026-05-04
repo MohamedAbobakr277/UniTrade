@@ -43,7 +43,7 @@ export default function MyListings() {
                 id: doc.id,
                 ...doc.data()
             }));
-            
+
             items.sort((a, b) => {
                 const timeA = a.createdAt?.seconds || 0;
                 const timeB = b.createdAt?.seconds || 0;
@@ -60,10 +60,16 @@ export default function MyListings() {
     };
 
     const handleSaveListing = async () => {
+        const qty = parseInt(currentEditItem?.quantityAvailable);
+        if (isNaN(qty) || qty < 0) {
+            setSnackbar({ open: true, message: "Available Quantity must be a number ≥ 0", severity: "error" });
+            return;
+        }
         try {
+            const updatedItem = { ...currentEditItem, quantityAvailable: qty };
             const itemRef = doc(db, "products", currentEditItem.id);
-            await setDoc(itemRef, currentEditItem, { merge: true });
-            setUserItems(prev => prev.map(item => item.id === currentEditItem.id ? currentEditItem : item));
+            await setDoc(itemRef, updatedItem, { merge: true });
+            setUserItems(prev => prev.map(item => item.id === currentEditItem.id ? updatedItem : item));
             setIsEditListingModalOpen(false);
             setSnackbar({ open: true, message: "Listing updated successfully", severity: "success" });
         } catch (error) {
@@ -98,7 +104,7 @@ export default function MyListings() {
             await updateDoc(itemRef, { status: "sold" });
             setUserItems(prev => prev.map(item => item.id === itemId ? { ...item, status: "sold" } : item));
             setSnackbar({ open: true, message: "Marked as sold", severity: "success" });
-            
+
             // Show confetti
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 5000);
@@ -117,7 +123,7 @@ export default function MyListings() {
     return (
         <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
             <Navbar items={userItems} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
-            
+
             {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} />}
 
             <Box sx={{ p: { xs: 2, md: 5 } }}>
@@ -159,140 +165,140 @@ export default function MyListings() {
                             alignItems: "stretch",
                         }}
                     >
-                    {displayedItems.map((item) => (
-                        <Box key={item.id} sx={{ display: 'flex' }}>
-                            <Card
-                                sx={{
-                                    borderRadius: "24px",
-                                    overflow: "hidden",
-                                    border: "1px solid #e2e8f0",
-                                    backgroundColor: "#ffffff",
-                                    boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
-                                    transition: "all 0.3s ease",
-                                    width: "100%",
-                                    height: "100%",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    "&:hover": {
-                                        transform: "translateY(-8px)",
-                                        boxShadow: "0 18px 40px rgba(15,23,42,0.12)",
-                                    },
-                                    position: 'relative'
-                                }}
-                            >
-                                <Box sx={{ position: "relative", overflow: "hidden" }}>
-                                    <Box sx={{
-                                        position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
-                                        fontSize: 12, fontWeight: 700, color: 'white', zIndex: 2,
-                                        bgcolor: item.status === "sold" ? '#ef4444' : '#10b981',
-                                        boxShadow: "0 6px 18px rgba(0,0,0,0.15)"
-                                    }}>
-                                        {item.status === "sold" ? "SOLD" : "AVAILABLE"}
-                                    </Box>
-                                    <CardMedia
-                                        component="img"
-                                        height="220"
-                                        image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
-                                        sx={{
-                                            width: "100%",
-                                            objectFit: "cover",
-                                            display: "block",
-                                            transition: "transform 0.35s ease",
-                                            "&:hover": {
-                                                transform: "scale(1.04)",
-                                            },
-                                        }}
-                                    />
-                                </Box>
-
-                                <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                                    <Typography 
-                                        variant="h6" 
-                                        sx={{ 
-                                            fontWeight: 800, 
-                                            fontSize: "1.05rem", 
-                                            color: "#0f172a", 
-                                            lineHeight: 1.4, 
-                                            height: "54px",
-                                            display: "-webkit-box", 
-                                            WebkitLineClamp: 2, 
-                                            WebkitBoxOrient: "vertical", 
-                                            overflow: "hidden" 
-                                        }}
-                                    >
-                                        {item.title || "Untitled Item"}
-                                    </Typography>
-
-                                    <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
-                                        {item.price ? `${item.price} EGP` : "Price not available"}
-                                    </Typography>
-
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
-                                        <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
-                                        <Typography component="span" sx={{ fontSize: "0.92rem", color: "#64748b", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                                            {item.university || "University not specified"}
-                                        </Typography>
-                                    </Box>
-
-                                    <Box sx={{ mt: 1.2, height: "32px" }}>
-                                        <Chip
-                                            icon={<VerifiedOutlinedIcon />}
-                                            label={item.condition || "Condition not specified"}
-                                            size="small"
+                        {displayedItems.map((item) => (
+                            <Box key={item.id} sx={{ display: 'flex' }}>
+                                <Card
+                                    sx={{
+                                        borderRadius: "24px",
+                                        overflow: "hidden",
+                                        border: "1px solid #e2e8f0",
+                                        backgroundColor: "#ffffff",
+                                        boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
+                                        transition: "all 0.3s ease",
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        "&:hover": {
+                                            transform: "translateY(-8px)",
+                                            boxShadow: "0 18px 40px rgba(15,23,42,0.12)",
+                                        },
+                                        position: 'relative'
+                                    }}
+                                >
+                                    <Box sx={{ position: "relative", overflow: "hidden" }}>
+                                        <Box sx={{
+                                            position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
+                                            fontSize: 12, fontWeight: 700, color: 'white', zIndex: 2,
+                                            bgcolor: item.status === "sold" ? '#ef4444' : '#10b981',
+                                            boxShadow: "0 6px 18px rgba(0,0,0,0.15)"
+                                        }}>
+                                            {item.status === "sold" ? "SOLD" : "AVAILABLE"}
+                                        </Box>
+                                        <CardMedia
+                                            component="img"
+                                            height="220"
+                                            image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
                                             sx={{
-                                                backgroundColor: `${item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b"}12`,
-                                                color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b",
-                                                fontWeight: 700,
-                                                borderRadius: "10px",
-                                                "& .MuiChip-icon": { color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b" },
+                                                width: "100%",
+                                                objectFit: "cover",
+                                                display: "block",
+                                                transition: "transform 0.35s ease",
+                                                "&:hover": {
+                                                    transform: "scale(1.04)",
+                                                },
                                             }}
                                         />
                                     </Box>
 
-                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
-                                        {item.description || "No description available"}
-                                    </Typography>
-                                    
-                                    <Box sx={{ flexGrow: 1 }} />
-                                    <Divider sx={{ my: 2 }} />
+                                    <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                                        <Typography
+                                            variant="h6"
+                                            sx={{
+                                                fontWeight: 800,
+                                                fontSize: "1.05rem",
+                                                color: "#0f172a",
+                                                lineHeight: 1.4,
+                                                height: "54px",
+                                                display: "-webkit-box",
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: "vertical",
+                                                overflow: "hidden"
+                                            }}
+                                        >
+                                            {item.title || "Untitled Item"}
+                                        </Typography>
 
-                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: "58px", width: "100%" }}>
-                                        {item.status !== "sold" && (
-                                            <Button 
-                                                fullWidth 
-                                                variant="contained" 
-                                                size="small" 
-                                                sx={{ borderRadius: "10px", textTransform: 'none', bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' }, height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, boxShadow: 'none' }} 
-                                                onClick={() => handleMarkAsSold(item.id)}
+                                        <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
+                                            {item.price ? `${item.price} EGP` : "Price not available"}
+                                        </Typography>
+
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
+                                            <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
+                                            <Typography component="span" sx={{ fontSize: "0.92rem", color: "#64748b", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                                {item.university || "University not specified"}
+                                            </Typography>
+                                        </Box>
+
+                                        <Box sx={{ mt: 1.2, height: "32px" }}>
+                                            <Chip
+                                                icon={<VerifiedOutlinedIcon />}
+                                                label={item.condition || "Condition not specified"}
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: `${item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b"}12`,
+                                                    color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b",
+                                                    fontWeight: 700,
+                                                    borderRadius: "10px",
+                                                    "& .MuiChip-icon": { color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b" },
+                                                }}
+                                            />
+                                        </Box>
+
+                                        <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
+                                            {item.description || "No description available"}
+                                        </Typography>
+
+                                        <Box sx={{ flexGrow: 1 }} />
+                                        <Divider sx={{ my: 2 }} />
+
+                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: "58px", width: "100%" }}>
+                                            {item.status !== "sold" && (
+                                                <Button
+                                                    fullWidth
+                                                    variant="contained"
+                                                    size="small"
+                                                    sx={{ borderRadius: "10px", textTransform: 'none', bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' }, height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, boxShadow: 'none' }}
+                                                    onClick={() => handleMarkAsSold(item.id)}
+                                                >
+                                                    Sold
+                                                </Button>
+                                            )}
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                size="small"
+                                                startIcon={<EditIcon sx={{ fontSize: '1.1rem !important', mr: -0.5 }} />}
+                                                sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: '#e2e8f0', color: '#334155', '&:hover': { borderColor: '#cbd5e1', bgcolor: '#f8fafc' } }}
+                                                onClick={() => handleOpenEditListing(item)}
                                             >
-                                                Sold
+                                                Edit
                                             </Button>
-                                        )}
-                                        <Button 
-                                            fullWidth 
-                                            variant="outlined" 
-                                            size="small" 
-                                            startIcon={<EditIcon sx={{ fontSize: '1.1rem !important', mr: -0.5 }}/>} 
-                                            sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: '#e2e8f0', color: '#334155', '&:hover': { borderColor: '#cbd5e1', bgcolor: '#f8fafc' } }} 
-                                            onClick={() => handleOpenEditListing(item)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <IconButton 
-                                            size="small" 
-                                            sx={{ bgcolor: '#f1f5f9', borderRadius: "10px", color: '#64748b', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }} 
-                                            onClick={() => handleOpenDeleteConfirm(item.id)}
-                                        >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        </Box>
-                    ))}
-                </Box>
+                                            <IconButton
+                                                size="small"
+                                                sx={{ bgcolor: '#f1f5f9', borderRadius: "10px", color: '#64748b', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }}
+                                                onClick={() => handleOpenDeleteConfirm(item.id)}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Box>
+                        ))}
+                    </Box>
                 ) : (
-                    <EmptyState 
+                    <EmptyState
                         title={searchQuery ? "No Matches Found" : "You Have No Listings"}
                         description={searchQuery ? `No listings matched "${searchQuery}".` : "Ready to clear some space? Post your first item and reach thousands of students on campus!"}
                         iconType="inventory"
@@ -337,6 +343,7 @@ export default function MyListings() {
                             </Select>
                         </FormControl>
                         <TextField fullWidth label="Price (EGP)" type="number" value={currentEditItem?.price || ''} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))} />
+                        <TextField fullWidth label="Available Quantity" type="number" value={currentEditItem?.quantityAvailable ?? 1} onChange={(e) => setCurrentEditItem(prev => ({ ...prev, quantityAvailable: e.target.value }))} inputProps={{ min: 0, step: 1 }} helperText="Number of units available (0 = out of stock)" />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>

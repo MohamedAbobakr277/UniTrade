@@ -15,7 +15,8 @@ import {
     DialogActions,
     Slide,
     Snackbar,
-    Alert
+    Alert,
+    TextField
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -26,6 +27,8 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CategoryIcon from "@mui/icons-material/Category";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -56,6 +59,7 @@ export default function ItemDetails() {
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [showPhone, setShowPhone] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [buyerQuantity, setBuyerQuantity] = useState(1);
 
     const [isFavorite, setIsFavorite] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -461,6 +465,81 @@ export default function ItemDetails() {
 
                                 <Divider sx={{ borderColor: "#e2e8f0" }} />
 
+                                {/* Stock Status & Quantity Selector */}
+                                <Box>
+                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#0f172a", mb: 1.5 }}>
+                                        Availability
+                                    </Typography>
+                                    {(() => {
+                                        const stock = item.quantityAvailable ?? 1;
+                                        const isOutOfStock = stock === 0;
+                                        const isLowStock = stock > 0 && stock <= 3;
+                                        return (
+                                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+                                                    <Chip
+                                                        icon={<InventoryIcon sx={{ fontSize: "18px !important", color: isOutOfStock ? "#ef4444 !important" : isLowStock ? "#f59e0b !important" : "#10b981 !important" }} />}
+                                                        label={isOutOfStock ? "Out of stock" : `In stock: ${stock} item${stock !== 1 ? 's' : ''}`}
+                                                        sx={{
+                                                            bgcolor: isOutOfStock ? "#fef2f2" : isLowStock ? "#fffbeb" : "#f0fdf4",
+                                                            color: isOutOfStock ? "#ef4444" : isLowStock ? "#d97706" : "#16a34a",
+                                                            fontWeight: 700,
+                                                            borderRadius: "12px",
+                                                            py: 2.2,
+                                                            px: 0.5,
+                                                            border: `1px solid ${isOutOfStock ? "#fecaca" : isLowStock ? "#fde68a" : "#bbf7d0"}`,
+                                                            fontSize: "0.9rem",
+                                                        }}
+                                                    />
+                                                    {isLowStock && (
+                                                        <Chip
+                                                            icon={<WarningAmberIcon sx={{ fontSize: "16px !important", color: "#f59e0b !important" }} />}
+                                                            label="Low stock"
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: "#fffbeb",
+                                                                color: "#d97706",
+                                                                fontWeight: 700,
+                                                                borderRadius: "10px",
+                                                                border: "1px solid #fde68a",
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Box>
+                                                {!isOutOfStock && item.status !== "sold" && (
+                                                    <TextField
+                                                        type="number"
+                                                        label="Quantity you want to buy"
+                                                        value={buyerQuantity}
+                                                        onChange={(e) => {
+                                                            const val = parseInt(e.target.value);
+                                                            if (isNaN(val) || val < 1) {
+                                                                setBuyerQuantity(1);
+                                                            } else if (val > stock) {
+                                                                setBuyerQuantity(stock);
+                                                            } else {
+                                                                setBuyerQuantity(val);
+                                                            }
+                                                        }}
+                                                        inputProps={{ min: 1, max: stock, step: 1 }}
+                                                        size="small"
+                                                        sx={{
+                                                            maxWidth: 220,
+                                                            '& .MuiOutlinedInput-root': {
+                                                                borderRadius: '12px',
+                                                                fontWeight: 700,
+                                                            }
+                                                        }}
+                                                        helperText={`Max: ${stock}`}
+                                                    />
+                                                )}
+                                            </Box>
+                                        );
+                                    })()}
+                                </Box>
+
+                                <Divider sx={{ borderColor: "#e2e8f0" }} />
+
                                 {/* Seller Section */}
                                 <Box>
                                     <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#0f172a", mb: 1.5 }}>
@@ -612,6 +691,7 @@ I'm interested in your listing on *UniTrade*:
 💰 Price: *EGP ${item.price}*
 ✅ Condition: *${item.condition || "Not specified"}*
 📍 University: *${item.university || "Not specified"}*
+🔢 Quantity requested: *${buyerQuantity}*
 
 Is it still available? 😊`;
 
