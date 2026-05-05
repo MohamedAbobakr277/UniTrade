@@ -11,8 +11,10 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useLocation } from 'react-router-dom';
 
 export default function AIChatbot() {
+    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [showWelcome, setShowWelcome] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -41,21 +43,23 @@ export default function AIChatbot() {
     }, []);
 
     useEffect(() => {
-        // Show premium welcome bubble after 2.5 seconds
+        if (!currentUser) return; // Only start timers after user is logged in
+
+        // Show premium welcome bubble after 5 seconds
         const showTimer = setTimeout(() => {
             if (!isOpen) setShowWelcome(true);
-        }, 2500);
+        }, 5000);
 
-        // Automatically hide it after 8 seconds (gives them 5.5s to read it)
+        // Automatically hide it after 12 seconds (gives them 7s to read it)
         const hideTimer = setTimeout(() => {
             setShowWelcome(false);
-        }, 8000);
+        }, 12000);
 
         return () => {
             clearTimeout(showTimer);
             clearTimeout(hideTimer);
         };
-    }, [isOpen]);
+    }, [isOpen, currentUser]);
 
     useEffect(() => {
         if (isOpen && messages.length === 0) {
@@ -123,9 +127,18 @@ export default function AIChatbot() {
         } catch (error) {
             console.error("AI Fetch Error:", error);
             setIsTyping(false);
+            
+            // Check if it's a Google Rate Limit / Quota Error
+            let errorMessage = error.message || "Make sure your backend server is running on port 5000!";
+            if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('429')) {
+                errorMessage = "I'm receiving too many messages right now! Please wait 60 seconds and ask me again.";
+            } else {
+                errorMessage = `Error connecting: ${errorMessage}`;
+            }
+
             setMessages(prev => [...prev, { 
                 id: Date.now() + 1, 
-                text: `Error connecting: ${error.message || "Make sure your backend server is running on port 5000!"}`, 
+                text: errorMessage, 
                 sender: 'ai' 
             }]);
         }
@@ -138,6 +151,8 @@ export default function AIChatbot() {
         }
     };
 
+    // Strict Security Check: Hide on Login/Signup pages regardless of auth state caching
+    if (['/login', '/signup', '/'].includes(location.pathname)) return null; 
     if (!currentUser) return null; // Only show for logged in users
 
     return (
@@ -158,16 +173,18 @@ export default function AIChatbot() {
                     slotProps={{
                         tooltip: {
                             sx: {
-                                bgcolor: 'rgba(15, 23, 42, 0.95)',
+                                bgcolor: 'rgba(255, 255, 255, 0.95)',
                                 backdropFilter: 'blur(10px)',
-                                boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                boxShadow: '0 8px 30px rgba(37,99,235,0.15)',
+                                border: '1px solid rgba(0,0,0,0.05)',
                                 borderRadius: '12px',
                                 p: 1,
-                                ml: 2
+                                ml: 2,
+                                color: '#0f172a'
                             }
                         },
                         arrow: {
-                            sx: { color: 'rgba(15, 23, 42, 0.95)' }
+                            sx: { color: 'rgba(255, 255, 255, 0.95)' }
                         }
                     }}
                 >
@@ -214,7 +231,7 @@ export default function AIChatbot() {
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: 1.5,
-                        animation: 'messageSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards',
+                        transition: 'all 0.3s ease-in-out'
                     }}
                 >
                     <IconButton 
@@ -334,7 +351,7 @@ export default function AIChatbot() {
                                     boxShadow: msg.sender === 'user' ? '0 10px 25px -5px rgba(37,99,235,0.4)' : '0 4px 15px rgba(0,0,0,0.03)',
                                     border: msg.sender === 'ai' ? '1px solid rgba(0,0,0,0.04)' : 'none',
                                 }}>
-                                    <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.95rem', lineHeight: 1.6, fontWeight: 400 }}>
+                                    <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.95rem', lineHeight: 1.6, fontWeight: 400, wordBreak: 'break-word' }}>
                                         {msg.text}
                                     </Typography>
                                 </Box>
