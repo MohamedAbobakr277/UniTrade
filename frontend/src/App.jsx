@@ -12,9 +12,11 @@ import ItemDetails from "./pages/ItemDetails";
 import MyListings from "./pages/MyListings";
 import Favourites from "./pages/Favourites";
 import SellerProfile from "./pages/SellerProfile";
+import AIChatbot from "./components/AIChatbot";
 
 export default function App() {
   return (
+    <>
     <Routes>
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/login" replace />} />
@@ -96,5 +98,7 @@ export default function App() {
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
+    <AIChatbot />
+    </>
   );
 }
