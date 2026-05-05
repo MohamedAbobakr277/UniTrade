@@ -1,5 +1,6 @@
 import { db } from "../firebase";
 import { runTransaction, doc, serverTimestamp, getDoc } from "firebase/firestore";
+import { createNotification } from "./notifications";
 
 /**
  * Submits or updates a rating for a seller.
@@ -58,6 +59,25 @@ export const submitRating = async (sellerId, reviewerId, newRating) => {
             }, { merge: true });
         });
         
+        // Fetch reviewer name to send notification
+        try {
+            const reviewerRef = doc(db, "users", reviewerId);
+            const reviewerSnap = await getDoc(reviewerRef);
+            let reviewerName = "A user";
+            if (reviewerSnap.exists()) {
+                const data = reviewerSnap.data();
+                reviewerName = data.name || (data.firstName ? `${data.firstName} ${data.lastName}` : "A user");
+            }
+            
+            await createNotification(sellerId, {
+                type: "rating",
+                message: `${reviewerName} gave you a ${newRating}-star rating!`,
+                link: `/seller/${sellerId}`
+            });
+        } catch (notifError) {
+            console.error("Failed to send rating notification:", notifError);
+        }
+
         return { success: true };
     } catch (error) {
         console.error("Transaction failed: ", error);

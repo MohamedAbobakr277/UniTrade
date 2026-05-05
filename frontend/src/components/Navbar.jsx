@@ -21,6 +21,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { subscribeToNotifications, markNotificationAsRead } from "../services/notifications";
+import Popover from "@mui/material/Popover";
 
 const RECENT_KEY = "unitrade_recent_searches";
 const MAX_RECENT = 6;
@@ -65,8 +68,31 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
     const [recentSearches, setRecentSearches] = useState([]);
     const [activeIndex, setActiveIndex] = useState(-1);
     const [inputValue, setInputValue] = useState(search);
+    const [notifications, setNotifications] = useState([]);
+    const [notifAnchorEl, setNotifAnchorEl] = useState(null);
     const inputRef = useRef(null);
     const dropdownRef = useRef(null);
+
+    const unreadCount = notifications.filter(n => !n.read).length;
+    const isNotifOpen = Boolean(notifAnchorEl);
+    
+    const handleNotifClick = (event) => {
+        setNotifAnchorEl(event.currentTarget);
+    };
+    
+    const handleNotifClose = () => {
+        setNotifAnchorEl(null);
+    };
+
+    const handleNotifItemClick = async (notif) => {
+        if (!notif.read && auth.currentUser) {
+            await markNotificationAsRead(auth.currentUser.uid, notif.id);
+        }
+        setNotifAnchorEl(null);
+        if (notif.link) {
+            navigate(notif.link);
+        }
+    };
 
     // Sync inputValue when Home updates the search from outside (e.g. clear)
     useEffect(() => {
@@ -74,17 +100,34 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
     }, [search, isHome]);
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            if (!auth.currentUser) return;
+        let unsubNotifs;
+        const fetchUserData = async (user) => {
             try {
-                const userRef = doc(db, "users", auth.currentUser.uid);
+                const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
                 setEditData(userSnap.exists() ? userSnap.data() : {});
             } catch (error) {
                 setEditData({});
             }
         };
-        fetchUserData();
+
+        const unsubAuth = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchUserData(user);
+                unsubNotifs = subscribeToNotifications(user.uid, (notifs) => {
+                    setNotifications(notifs);
+                });
+            } else {
+                setEditData({});
+                setNotifications([]);
+                if (unsubNotifs) unsubNotifs();
+            }
+        });
+
+        return () => {
+            unsubAuth();
+            if (unsubNotifs) unsubNotifs();
+        };
     }, []);
 
     // Close dropdown when clicking outside
@@ -494,6 +537,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     </IconButton>
 
                     <IconButton
+                        onClick={handleNotifClick}
                         sx={{
                             width: 42, height: 42,
                             borderRadius: "12px",
@@ -503,10 +547,74 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             "&:hover": { backgroundColor: "#eef4ff", borderColor: "#bfdbfe", transform: "translateY(-1px)" },
                         }}
                     >
-                        <Badge color="error" variant="dot" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+                        <Badge badgeContent={unreadCount} color="error" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
                             <NotificationsNoneIcon sx={{ color: "#334155" }} />
                         </Badge>
                     </IconButton>
+
+                    <Popover
+                        open={isNotifOpen}
+                        anchorEl={notifAnchorEl}
+                        onClose={handleNotifClose}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        PaperProps={{
+                            sx: {
+                                mt: 1.5,
+                                width: 320,
+                                maxHeight: 400,
+                                borderRadius: "16px",
+                                boxShadow: "0 10px 40px rgba(15,23,42,0.12)",
+                                border: "1px solid #e2e8f0",
+                            }
+                        }}
+                    >
+                        <Box sx={{ p: 2, borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: "#0f172a" }}>
+                                Notifications
+                            </Typography>
+                        </Box>
+                        <Box sx={{ p: 0 }}>
+                            {notifications.length === 0 ? (
+                                <Box sx={{ p: 3, textAlign: "center" }}>
+                                    <NotificationsNoneIcon sx={{ fontSize: 40, color: "#cbd5e1", mb: 1 }} />
+                                    <Typography sx={{ color: "#64748b", fontSize: "0.9rem" }}>
+                                        No notifications yet
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                notifications.map((notif) => (
+                                    <Box
+                                        key={notif.id}
+                                        onClick={() => handleNotifItemClick(notif)}
+                                        sx={{
+                                            p: 2,
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            gap: 2,
+                                            alignItems: "flex-start",
+                                            backgroundColor: notif.read ? "#ffffff" : "#f0f6ff",
+                                            borderBottom: "1px solid #f1f5f9",
+                                            "&:hover": { backgroundColor: "#f8fafc" },
+                                            transition: "background 0.2s"
+                                        }}
+                                    >
+                                        <Box sx={{ flex: 1 }}>
+                                            <Typography sx={{ fontSize: "0.9rem", color: "#0f172a", fontWeight: notif.read ? 500 : 700 }}>
+                                                {notif.message}
+                                            </Typography>
+                                            <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", mt: 0.5 }}>
+                                                {notif.createdAt?.toDate ? notif.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                                            </Typography>
+                                        </Box>
+                                        {!notif.read && (
+                                            <Box sx={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#3b82f6", mt: 0.5 }} />
+                                        )}
+                                    </Box>
+                                ))
+                            )}
+                        </Box>
+                    </Popover>
 
                     <Avatar
                         src={editData?.profilePhoto || "/default-avatar.png"}

@@ -42,6 +42,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import StarRatingDisplay from "../components/StarRatingDisplay";
+import { createNotification } from "../services/notifications";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -93,6 +94,16 @@ export default function ItemDetails() {
                 await updateDoc(userRef, { favourites: arrayRemove(id) });
             } else {
                 await updateDoc(userRef, { favourites: arrayUnion(id) });
+                // Notify seller about the favorite
+                if (item && item.userId && item.userId !== currentUser.uid) {
+                    const likerName = currentUser.displayName || "A user";
+                    createNotification(item.userId, {
+                        type: "favorite",
+                        message: `${likerName} favorited your item: ${item.title}`,
+                        productId: item.id,
+                        link: `/item/${item.id}`
+                    });
+                }
             }
         } catch (err) {
             console.error("Error toggling favorite:", err);
@@ -694,6 +705,17 @@ I'm interested in your listing on *UniTrade*:
 🔢 Quantity requested: *${buyerQuantity}*
 
 Is it still available? 😊`;
+
+                                        // Create notification for seller
+                                        if (item.userId && currentUser && item.userId !== currentUser.uid) {
+                                            const buyerName = currentUser.displayName || "A user";
+                                            createNotification(item.userId, {
+                                                type: "interest",
+                                                message: `${buyerName} is interested in your item: ${item.title}`,
+                                                productId: item.id,
+                                                link: `/item/${item.id}`
+                                            });
+                                        }
 
                                         window.open(
                                             `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURI(message)}`,

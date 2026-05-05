@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 
 import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { createNotification } from "./notifications";
 
 /* ================= DYNAMIC BASE URL ================= */
 const baseUrl = window.location.origin;
@@ -142,6 +143,13 @@ export async function login(email, password) {
             });
 
             await deleteDoc(pendingRef);
+
+            // Send welcome notification
+            await createNotification(user.uid, {
+                type: "system",
+                message: "Welcome to UniTrade! Your account is verified and you can now post items.",
+                link: "/profile"
+            });
 
             userData = {
                 ...pendingData,
