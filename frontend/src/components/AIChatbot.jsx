@@ -88,12 +88,12 @@ export default function AIChatbot() {
         try {
             const validHistory = [];
             let lastRole = '';
-            
+
             chatHistory.forEach(msg => {
                 const currentRole = msg.sender === 'ai' ? 'model' : 'user';
                 // Skip the initial AI greeting to ensure sequence starts with 'user'
-                if (validHistory.length === 0 && currentRole === 'model') return; 
-                
+                if (validHistory.length === 0 && currentRole === 'model') return;
+
                 if (currentRole !== lastRole) {
                     validHistory.push({ role: currentRole, parts: [{ text: msg.text }] });
                     lastRole = currentRole;
@@ -103,11 +103,11 @@ export default function AIChatbot() {
             });
 
             if (validHistory.length > 0 && validHistory[0].role === 'user') {
-                 validHistory[0].parts[0].text = `System Prompt: You are a helpful, friendly, and concise support AI assistant for 'UniTrade', an exclusive peer-to-peer marketplace for Egyptian university students. Do not invent features that don't exist. Keep your answers short and polite.\n\nUser: ` + validHistory[0].parts[0].text;
+                validHistory[0].parts[0].text = `System Prompt: You are a helpful, friendly, and concise support AI assistant for 'UniTrade', an exclusive peer-to-peer marketplace for Egyptian university students. Do not invent features that don't exist. Keep your answers short and polite.\n\nUser: ` + validHistory[0].parts[0].text;
             }
 
-            const backendUrl = (import.meta.env.VITE_BACKEND_URL || "http://localhost:5000").replace(/\/$/, '');
-            
+            const backendUrl = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, '');
+
             const response = await fetch(`${backendUrl}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -115,19 +115,19 @@ export default function AIChatbot() {
             });
 
             const data = await response.json();
-            
+
             if (data.error) {
                 throw new Error(typeof data.error === 'string' ? data.error : data.error.message || "Unknown AI Error");
             }
 
             const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm not sure how to answer that.";
-            
+
             setIsTyping(false);
             setMessages(prev => [...prev, { id: Date.now() + 1, text: aiText, sender: 'ai' }]);
         } catch (error) {
             console.error("AI Fetch Error:", error);
             setIsTyping(false);
-            
+
             // Check if it's a Google Rate Limit / Quota Error
             let errorMessage = error.message || "Make sure your backend server is running on port 5000!";
             if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('429')) {
@@ -136,10 +136,10 @@ export default function AIChatbot() {
                 errorMessage = `Error connecting: ${errorMessage}`;
             }
 
-            setMessages(prev => [...prev, { 
-                id: Date.now() + 1, 
-                text: errorMessage, 
-                sender: 'ai' 
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: errorMessage,
+                sender: 'ai'
             }]);
         }
     };
@@ -152,13 +152,13 @@ export default function AIChatbot() {
     };
 
     // Strict Security Check: Hide on Login/Signup pages regardless of auth state caching
-    if (['/login', '/signup', '/'].includes(location.pathname)) return null; 
+    if (['/login', '/signup', '/'].includes(location.pathname)) return null;
     if (!currentUser) return null; // Only show for logged in users
 
     return (
         <>
             <Zoom in={!isOpen}>
-                <Tooltip 
+                <Tooltip
                     title={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5, px: 0.5 }}>
                             <AutoAwesomeIcon sx={{ fontSize: 16, color: '#60a5fa' }} />
@@ -234,8 +234,8 @@ export default function AIChatbot() {
                         transition: 'all 0.3s ease-in-out'
                     }}
                 >
-                    <IconButton 
-                        size="small" 
+                    <IconButton
+                        size="small"
                         onClick={(e) => { e.stopPropagation(); setShowWelcome(false); }}
                         sx={{ position: 'absolute', top: 4, right: 4, color: '#94a3b8', width: 20, height: 20, '&:hover': { color: '#0f172a', bgcolor: '#f1f5f9' } }}
                     >
@@ -275,16 +275,16 @@ export default function AIChatbot() {
                     }}
                 >
                     {/* Header (Glassmorphic) */}
-                    <Box sx={{ 
-                        background: 'rgba(255, 255, 255, 0.85)', 
+                    <Box sx={{
+                        background: 'rgba(255, 255, 255, 0.85)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
-                        color: '#0f172a', 
-                        px: 3, 
-                        py: 2.5, 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                        color: '#0f172a',
+                        px: 3,
+                        py: 2.5,
+                        display: 'flex',
+                        alignItems: 'center',
                         justifyContent: 'space-between',
                         zIndex: 2,
                     }}>
@@ -292,8 +292,8 @@ export default function AIChatbot() {
                             <Avatar sx={{ width: 28, height: 28, bgcolor: 'transparent' }}>
                                 {/* Decorative AI Icon */}
                                 <Box sx={{
-                                    width: 32, height: 32, 
-                                    borderRadius: '10px', 
+                                    width: 32, height: 32,
+                                    borderRadius: '10px',
                                     background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
@@ -331,20 +331,20 @@ export default function AIChatbot() {
                         </Typography>
 
                         {messages.map((msg) => (
-                            <Box 
-                                key={msg.id} 
-                                sx={{ 
-                                    display: 'flex', 
+                            <Box
+                                key={msg.id}
+                                sx={{
+                                    display: 'flex',
                                     justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                                     mb: 2.5,
                                     animation: 'messageSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards',
                                     transformOrigin: msg.sender === 'user' ? 'bottom right' : 'bottom left',
                                 }}
                             >
-                                <Box sx={{ 
-                                    maxWidth: '85%', 
+                                <Box sx={{
+                                    maxWidth: '85%',
                                     py: 1.5,
-                                    px: 2.5, 
+                                    px: 2.5,
                                     borderRadius: msg.sender === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
                                     background: msg.sender === 'user' ? 'linear-gradient(135deg, #1e3a8a, #2563eb)' : '#ffffff',
                                     color: msg.sender === 'user' ? '#ffffff' : '#0f172a',
@@ -357,12 +357,12 @@ export default function AIChatbot() {
                                 </Box>
                             </Box>
                         ))}
-                        
+
                         {isTyping && (
                             <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2.5, animation: 'messageSlideUp 0.4s ease forwards' }}>
-                                <Box sx={{ 
+                                <Box sx={{
                                     py: 2,
-                                    px: 2.5, 
+                                    px: 2.5,
                                     borderRadius: '20px 20px 20px 4px',
                                     backgroundColor: '#ffffff',
                                     boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
@@ -382,11 +382,11 @@ export default function AIChatbot() {
                     {/* Input Area (Floating Style) */}
                     <Box sx={{ p: 2.5, pt: 1, position: 'relative', bgcolor: '#f8fafc', borderTop: '1px solid rgba(0,0,0,0.03)' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', position: 'absolute', top: -16, left: 0, right: 0 }}>
-                            <IconButton 
+                            <IconButton
                                 onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                                sx={{ 
-                                    bgcolor: '#ffffff', 
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)', 
+                                sx={{
+                                    bgcolor: '#ffffff',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                                     border: '1px solid rgba(0,0,0,0.05)',
                                     '&:hover': { bgcolor: '#f8fafc', transform: 'translateY(2px)' },
                                     width: 32, height: 32,
@@ -396,7 +396,7 @@ export default function AIChatbot() {
                                 <KeyboardArrowDownIcon fontSize="small" sx={{ color: '#64748b' }} />
                             </IconButton>
                         </Box>
-                        
+
                         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                             <TextField
                                 fullWidth
@@ -424,10 +424,10 @@ export default function AIChatbot() {
                                 }}
                                 InputProps={{
                                     endAdornment: (
-                                        <IconButton 
+                                        <IconButton
                                             onClick={handleSend}
                                             disabled={!inputValue.trim() || isTyping}
-                                            sx={{ 
+                                            sx={{
                                                 color: inputValue.trim() ? '#ffffff' : '#cbd5e1',
                                                 bgcolor: inputValue.trim() ? '#2563eb' : 'transparent',
                                                 '&:hover': { bgcolor: inputValue.trim() ? '#1d4ed8' : 'transparent' },
@@ -442,7 +442,7 @@ export default function AIChatbot() {
                                 }}
                             />
                         </Box>
-                        
+
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mt: 1.5 }}>
                             <AutoAwesomeIcon sx={{ fontSize: 14, color: '#3b82f6' }} />
                             <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
@@ -452,7 +452,7 @@ export default function AIChatbot() {
                     </Box>
                 </Paper>
             </Slide>
-            
+
             <style>{`
                 @keyframes bounce {
                     0%, 80%, 100% { transform: scale(0); }
