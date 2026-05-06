@@ -27,13 +27,13 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 
 /* ─── Style Constants ─── */
-const DARK_BG = "linear-gradient(175deg, #0f172a 0%, #1e293b 100%)";
-const ACCENT = "#3b82f6";
-const ACCENT_HOVER = "#60a5fa";
-const TEXT_PRIMARY = "#f1f5f9";
-const TEXT_SECONDARY = "#94a3b8";
-const TEXT_MUTED = "#64748b";
-const DIVIDER_COLOR = "rgba(148,163,184,0.12)";
+const DARK_BG = "linear-gradient(175deg, #347aecff 0%, #164a9cff 100%)";
+const ACCENT = "#12284bff";
+const ACCENT_HOVER = "#174277ff";
+const TEXT_PRIMARY = "#140b66ff";
+const TEXT_SECONDARY = "#000000ff";
+const TEXT_MUTED = "#0f0646ff";
+const DIVIDER_COLOR = "#114ca5ff";
 
 const linkSx = {
   color: TEXT_SECONDARY,
@@ -79,7 +79,7 @@ const socials = [
   { icon: <InstagramIcon />, label: "Instagram", color: "#E4405F", href: "#" },
   { icon: <XIcon />, label: "X", color: "#ffffff", href: "#" },
   { icon: <LinkedInIcon />, label: "LinkedIn", color: "#0A66C2", href: "#" },
-  { icon: <WhatsAppIcon />, label: "WhatsApp", color: "#25D366", href: "https://wa.me/201234567890" },
+  { icon: <WhatsAppIcon />, label: "WhatsApp", color: "#25D366", href: "https://wa.me/201554104166" },
 ];
 
 /* ─── Quick Links ─── */
@@ -92,9 +92,9 @@ const quickLinks = [
 
 /* ─── Contact Info ─── */
 const contactInfo = [
-  { icon: <EmailOutlinedIcon sx={{ fontSize: 20 }} />, text: "support@unitrade.eg", href: "mailto:support@unitrade.eg" },
-  { icon: <PhoneOutlinedIcon sx={{ fontSize: 20 }} />, text: "+20 123 456 7890", href: "tel:+201234567890" },
-  { icon: <LocationOnOutlinedIcon sx={{ fontSize: 20 }} />, text: "Cairo, Egypt", href: null },
+  { icon: <EmailOutlinedIcon sx={{ fontSize: 20 }} />, text: "support@unitrade.eg", href: "mailto:[support@unitrade.eg]" },
+  { icon: <PhoneOutlinedIcon sx={{ fontSize: 20 }} />, text: "+20 155 410 4166", href: "tel:+201554104166" },
+  { icon: <LocationOnOutlinedIcon sx={{ fontSize: 20 }} />, text: "Giza, Egypt", href: null },
 ];
 
 export default function Footer() {
@@ -175,7 +175,7 @@ export default function Footer() {
                   src={logo}
                   alt="UniTrade Logo"
                   sx={{
-                    height: 46,
+                    height: 85,
                     width: "auto",
                     filter: "drop-shadow(0 2px 8px rgba(59,130,246,0.3))",
                   }}
