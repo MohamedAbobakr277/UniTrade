@@ -8,6 +8,7 @@ import {
   Divider,
   Fab,
   Zoom,
+  useTheme,
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -101,6 +102,19 @@ export default function Footer() {
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
+  /* ─── Dynamic Theme Colors ─── */
+  const footerBg = isDark 
+    ? "linear-gradient(180deg, #0f172a 0%, #020617 100%)" 
+    : DARK_BG;
+  
+  const currentTextPrimary = isDark ? "#ffffff" : TEXT_PRIMARY;
+  const currentTextSecondary = isDark ? "rgba(255,255,255,0.7)" : TEXT_SECONDARY;
+  const currentTextMuted = isDark ? "rgba(255,255,255,0.5)" : TEXT_MUTED;
+  const currentDivider = isDark ? "rgba(255,255,255,0.1)" : DIVIDER_COLOR;
+  const currentAccent = isDark ? "#3b82f6" : ACCENT;
 
   /* ─── Scroll Listener for Back-to-Top ─── */
   const handleScroll = useCallback(() => {
@@ -121,12 +135,14 @@ export default function Footer() {
       <Box
         component="footer"
         sx={{
-          background: DARK_BG,
+          background: footerBg,
           pt: { xs: 6, md: 8 },
           pb: 0,
           mt: "auto",
           position: "relative",
           overflow: "hidden",
+          borderTop: isDark ? "1px solid" : "none",
+          borderColor: "rgba(255,255,255,0.05)",
           /* Decorative glow */
           "&::before": {
             content: '""',
@@ -136,7 +152,9 @@ export default function Footer() {
             width: 380,
             height: 380,
             borderRadius: "50%",
-            background: `radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)`,
+            background: isDark 
+              ? `radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)`
+              : `radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)`,
             pointerEvents: "none",
           },
           "&::after": {
@@ -183,13 +201,13 @@ export default function Footer() {
                 <Box>
                   <Typography
                     variant="h6"
-                    sx={{ fontWeight: 800, color: TEXT_PRIMARY, lineHeight: 1, fontSize: "1.25rem" }}
+                    sx={{ fontWeight: 800, color: currentTextPrimary, lineHeight: 1, fontSize: "1.25rem" }}
                   >
                     UniTrade
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ color: ACCENT, fontWeight: 600, letterSpacing: "0.04em" }}
+                    sx={{ color: currentAccent, fontWeight: 600, letterSpacing: "0.04em" }}
                   >
                     Campus Marketplace
                   </Typography>
@@ -198,7 +216,7 @@ export default function Footer() {
 
               <Typography
                 sx={{
-                  color: TEXT_SECONDARY,
+                  color: currentTextSecondary,
                   mb: 3.5,
                   maxWidth: 320,
                   lineHeight: 1.75,
@@ -221,8 +239,8 @@ export default function Footer() {
                     aria-label={s.label}
                     size="small"
                     sx={{
-                      color: TEXT_MUTED,
-                      border: `1px solid ${DIVIDER_COLOR}`,
+                      color: isDark ? "rgba(255,255,255,0.8)" : TEXT_MUTED,
+                      border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : DIVIDER_COLOR}`,
                       backgroundColor: "rgba(255,255,255,0.04)",
                       width: 38,
                       height: 38,
@@ -244,16 +262,24 @@ export default function Footer() {
 
             {/* ════════════════════ QUICK LINKS ════════════════════ */}
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Typography sx={sectionTitleSx}>Quick Links</Typography>
+              <Typography sx={{ ...sectionTitleSx, color: currentTextPrimary, "&::after": { ...sectionTitleSx["&::after"], background: isDark ? currentAccent : sectionTitleSx["&::after"].background } }}>Quick Links</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1.5 }}>
                 {quickLinks.map((link) => (
                   <Link
                     key={link.name}
                     underline="none"
-                    sx={{ ...linkSx, cursor: "pointer" }}
+                    sx={{ 
+                      ...linkSx, 
+                      color: currentTextSecondary,
+                      cursor: "pointer",
+                      "&:hover": {
+                        ...linkSx["&:hover"],
+                        color: isDark ? "#fff" : "#ffffff",
+                      }
+                    }}
                     onClick={() => navigate(link.path)}
                   >
-                    <Box className="link-icon" sx={{ color: ACCENT, display: "flex", alignItems: "center", transition: "all 0.3s ease" }}>
+                    <Box className="link-icon" sx={{ color: currentAccent, display: "flex", alignItems: "center", transition: "all 0.3s ease" }}>
                       {link.icon}
                     </Box>
                     {link.name}
@@ -264,7 +290,7 @@ export default function Footer() {
 
             {/* ════════════════════ CONTACT ════════════════════ */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <Typography sx={sectionTitleSx}>Contact Us</Typography>
+              <Typography sx={{ ...sectionTitleSx, color: currentTextPrimary, "&::after": { ...sectionTitleSx["&::after"], background: isDark ? currentAccent : sectionTitleSx["&::after"].background } }}>Contact Us</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1.5 }}>
                 {contactInfo.map((item, idx) => (
                   <Box key={idx} sx={{ display: "flex", alignItems: "center" }}>
@@ -272,16 +298,23 @@ export default function Footer() {
                       <Link
                         href={item.href}
                         underline="none"
-                        sx={linkSx}
+                        sx={{ 
+                          ...linkSx, 
+                          color: currentTextSecondary,
+                          "&:hover": {
+                            ...linkSx["&:hover"],
+                            color: isDark ? "#fff" : "#ffffff",
+                          }
+                        }}
                       >
-                        <Box className="link-icon" sx={{ color: ACCENT, display: "flex", alignItems: "center", transition: "all 0.3s ease" }}>
+                        <Box className="link-icon" sx={{ color: currentAccent, display: "flex", alignItems: "center", transition: "all 0.3s ease" }}>
                           {item.icon}
                         </Box>
                         {item.text}
                       </Link>
                     ) : (
-                      <Box sx={{ ...linkSx, cursor: "default", "&:hover": { color: TEXT_SECONDARY, transform: "none" } }}>
-                        <Box sx={{ color: ACCENT, display: "flex", alignItems: "center" }}>
+                      <Box sx={{ ...linkSx, color: currentTextSecondary, cursor: "default", "&:hover": { color: currentTextSecondary, transform: "none" } }}>
+                        <Box sx={{ color: currentAccent, display: "flex", alignItems: "center" }}>
                           {item.icon}
                         </Box>
                         {item.text}
@@ -294,7 +327,7 @@ export default function Footer() {
           </Grid>
 
           {/* ════════════════════ DIVIDER ════════════════════ */}
-          <Divider sx={{ borderColor: DIVIDER_COLOR, mt: { xs: 5, md: 6 }, mb: 0 }} />
+          <Divider sx={{ borderColor: currentDivider, mt: { xs: 5, md: 6 }, mb: 0 }} />
 
           {/* ════════════════════ BOTTOM BAR ════════════════════ */}
           <Box
@@ -310,7 +343,7 @@ export default function Footer() {
             <Typography
               variant="body2"
               sx={{
-                color: TEXT_MUTED,
+                color: currentTextMuted,
                 fontWeight: 500,
                 fontSize: "0.82rem",
                 textAlign: { xs: "center", sm: "left" },
@@ -326,11 +359,11 @@ export default function Footer() {
                   href="#"
                   underline="none"
                   sx={{
-                    color: TEXT_MUTED,
+                    color: currentTextMuted,
                     fontSize: "0.82rem",
                     fontWeight: 500,
                     transition: "color 0.25s",
-                    "&:hover": { color: ACCENT_HOVER },
+                    "&:hover": { color: isDark ? "#fff" : ACCENT_HOVER },
                   }}
                 >
                   {text}
@@ -351,14 +384,14 @@ export default function Footer() {
             position: "fixed",
             bottom: 32,
             right: 32,
-            background: `linear-gradient(135deg, ${ACCENT} 0%, #6366f1 100%)`,
+            background: `linear-gradient(135deg, ${currentAccent} 0%, #6366f1 100%)`,
             color: "#fff",
             boxShadow: "0 6px 24px rgba(59,130,246,0.35)",
             transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
             "&:hover": {
               transform: "translateY(-3px)",
               boxShadow: "0 10px 32px rgba(59,130,246,0.45)",
-              background: `linear-gradient(135deg, ${ACCENT_HOVER} 0%, #818cf8 100%)`,
+              background: `linear-gradient(135deg, ${currentAccent} 0%, #818cf8 100%)`,
             },
             zIndex: 1100,
           }}
