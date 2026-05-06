@@ -9,7 +9,8 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where, getDocs,
-  setDoc, serverTimestamp,
+  setDoc, serverTimestamp, onSnapshot,
+  QuerySnapshot, DocumentData,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
@@ -283,18 +284,80 @@ export default function SellerProfile() {
   };
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const uSnap = await getDoc(doc(db, "users", uid));
-        if (uSnap.exists()) setSeller(uSnap.data() as SellerUser);
-        const snap = await getDocs(query(collection(db, "products"), where("userId", "==", uid)));
-        setProducts(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) })));
-        await loadRatings();
-      } catch (e) { console.log(e); }
-      finally { setLoading(false); }
-    };
-    load();
-  }, [uid]);
+  let unsubscribeRatings: any;
+
+  const load = async () => {
+    try {
+      const uSnap = await getDoc(doc(db, "users", uid));
+
+      if (uSnap.exists()) {
+        setSeller(uSnap.data() as SellerUser);
+      }
+
+      const snap = await getDocs(
+        query(collection(db, "products"), where("userId", "==", uid))
+      );
+
+      setProducts(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Product, "id">),
+        }))
+      );
+
+      // realtime ratings listener
+      unsubscribeRatings = onSnapshot(
+        collection(db, "ratings", uid, "userRatings"),
+        (snapshot) => {
+          const breakdown: Record<number, number> = {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+          };
+
+          let total = 0;
+          let myRating: number | null = null;
+          let myComment = "";
+
+          snapshot.forEach((d) => {
+            const data = d.data();
+            const r = data.rating as number;
+
+            if (r >= 1 && r <= 5) {
+              breakdown[r] = (breakdown[r] || 0) + 1;
+              total += r;
+            }
+
+            if (d.id === currentUid) {
+              myRating = r;
+              myComment = data.comment || "";
+            }
+          });
+
+          setRatingData({
+            average: snapshot.size > 0 ? total / snapshot.size : 0,
+            count: snapshot.size,
+            breakdown: breakdown as RatingData["breakdown"],
+            myRating,
+            myComment,
+          });
+        }
+      );
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  load();
+
+  return () => {
+    if (unsubscribeRatings) unsubscribeRatings();
+  };
+}, [uid]);
 
   const handleSubmitRating = async (rating: number, comment: string) => {
     if (!currentUid) return;
@@ -405,11 +468,11 @@ export default function SellerProfile() {
       {!isSelf && currentUid && (
         <RatingInputCard
           ratingData={ratingData}
-          sellerName={sellerName}
+          sellerName={sellerName} 
           onOpenModal={() => setShowModal(true)}
         />
       )}
-
+      
       {/* Listings header */}
       <View style={s.listingsHeader}>
         <Text style={[s.listingsTitle, { color: theme.text }]}>Seller Listings</Text>
