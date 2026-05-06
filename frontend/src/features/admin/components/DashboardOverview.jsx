@@ -6,6 +6,7 @@ import {
   Chip,
   Button,
   Divider,
+  useTheme,
 } from "@mui/material";
 import ListAltIcon             from "@mui/icons-material/ListAlt";
 import CheckCircleOutlineIcon  from "@mui/icons-material/CheckCircleOutline";
@@ -21,10 +22,18 @@ const CAT_COLORS = [
   "#2563eb","#10b981","#f59e0b","#8b5cf6",
   "#06b6d4","#ef4444","#ec4899","#64748b",
 ];
-const STATUS_CHIP = {
-  available: { label: "Available", bgcolor: "#ecfdf5", color: "#10b981" },
-  sold:      { label: "Sold",      bgcolor: "#fef2f2", color: "#ef4444" },
-};
+const STATUS_CHIP = (isDark) => ({
+  available: { 
+    label: "Available", 
+    bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", 
+    color: isDark ? "#34d399" : "#10b981" 
+  },
+  sold: { 
+    label: "Sold",      
+    bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2", 
+    color: isDark ? "#f87171" : "#ef4444" 
+  },
+});
 
 /* ─────────────────────────────────────────
    Stat card  (label top-left, icon top-right, big number below)
@@ -38,15 +47,16 @@ function StatCard({ label, value, Icon, iconBg, iconColor }) {
         minWidth: 0,
         p: "22px 24px",
         borderRadius: 3,
-        border: "1px solid #e2e8f0",
-        bgcolor: "white",
+        border: "1px solid",
+        borderColor: "divider",
+        bgcolor: "background.paper",
         display: "flex",
         flexDirection: "column",
         gap: 1.5,
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <Typography sx={{ fontSize: "0.83rem", fontWeight: 600, color: "#64748b" }}>
+        <Typography sx={{ fontSize: "0.83rem", fontWeight: 600, color: "text.secondary" }}>
           {label}
         </Typography>
         <Box
@@ -64,7 +74,7 @@ function StatCard({ label, value, Icon, iconBg, iconColor }) {
           <Icon />
         </Box>
       </Box>
-      <Typography sx={{ fontSize: "2.4rem", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>
+      <Typography sx={{ fontSize: "2.4rem", fontWeight: 800, color: "text.primary", lineHeight: 1 }}>
         {value}
       </Typography>
     </Paper>
@@ -79,11 +89,11 @@ function BreakdownRow({ label, count, color }) {
     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: color, flexShrink: 0 }} />
-        <Typography sx={{ fontSize: "0.88rem", color: "#475569", fontWeight: 500 }}>
+        <Typography sx={{ fontSize: "0.88rem", color: "text.secondary", fontWeight: 500 }}>
           {label}
         </Typography>
       </Box>
-      <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: "#0f172a" }}>
+      <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: "text.primary" }}>
         {count}
       </Typography>
     </Box>
@@ -95,6 +105,9 @@ function BreakdownRow({ label, count, color }) {
 ───────────────────────────────────────── */
 export default function DashboardOverview({ listings, users, onViewAll }) {
   const [selectedItem, setSelectedItem] = useState(null);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  const chips = STATUS_CHIP(isDark);
 
   const available = listings.filter((l) => l.status !== "sold").length;
   const sold      = listings.filter((l) => l.status === "sold").length;
@@ -111,10 +124,10 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
   const categoryBreakdown = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
 
   const stats = [
-    { label: "Total Listings", value: listings.length, Icon: ListAltIcon,            iconBg: "#eff6ff", iconColor: "#2563eb" },
-    { label: "Available",      value: available,        Icon: CheckCircleOutlineIcon, iconBg: "#ecfdf5", iconColor: "#10b981" },
-    { label: "Sold",           value: sold,             Icon: LocalOfferIcon,         iconBg: "#fffbeb", iconColor: "#f59e0b" },
-    { label: "Total Users",    value: users.length,     Icon: PeopleIcon,             iconBg: "#f5f3ff", iconColor: "#8b5cf6" },
+    { label: "Total Listings", value: listings.length, Icon: ListAltIcon,            iconBg: isDark ? "rgba(37, 99, 235, 0.15)" : "#eff6ff", iconColor: "#2563eb" },
+    { label: "Available",      value: available,        Icon: CheckCircleOutlineIcon, iconBg: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", iconColor: "#10b981" },
+    { label: "Sold",           value: sold,             Icon: LocalOfferIcon,         iconBg: isDark ? "rgba(245, 158, 11, 0.15)" : "#fffbeb", iconColor: "#f59e0b" },
+    { label: "Total Users",    value: users.length,     Icon: PeopleIcon,             iconBg: isDark ? "rgba(139, 92, 246, 0.15)" : "#f5f3ff", iconColor: "#8b5cf6" },
   ];
 
   return (
@@ -122,10 +135,10 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
 
       {/* Page title */}
       <Box>
-        <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>
+        <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "text.primary", letterSpacing: "-0.02em" }}>
           Dashboard Overview
         </Typography>
-        <Typography sx={{ color: "#64748b", fontSize: "0.88rem", mt: 0.4 }}>
+        <Typography sx={{ color: "text.secondary", fontSize: "0.88rem", mt: 0.4 }}>
           Monitor and manage all campus trade activities.
         </Typography>
       </Box>
@@ -144,8 +157,9 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           sx={{
             flex: "2 1 0",
             borderRadius: 3,
-            border: "1px solid #e2e8f0",
-            bgcolor: "white",
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
             overflow: "hidden",
           }}
         >
@@ -157,14 +171,15 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              borderBottom: "1px solid #f1f5f9",
+              borderBottom: "1px solid",
+              borderColor: "divider",
             }}
           >
             <Box>
-              <Typography sx={{ fontWeight: 700, color: "#0f172a", fontSize: "1rem" }}>
+              <Typography sx={{ fontWeight: 700, color: "text.primary", fontSize: "1rem" }}>
                 Recent Listings
               </Typography>
-              <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mt: 0.2 }}>
+              <Typography sx={{ fontSize: "0.78rem", color: "text.secondary", mt: 0.2 }}>
                 Latest posted student items
               </Typography>
             </Box>
@@ -180,12 +195,13 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
 
           {/* Rows */}
           {recentListings.length === 0 ? (
-            <Typography sx={{ p: 4, color: "#94a3b8", textAlign: "center" }}>
+            <Typography sx={{ p: 4, color: "text.secondary", textAlign: "center" }}>
               No listings yet.
             </Typography>
           ) : (
             recentListings.map((item, idx) => {
-              const chip = STATUS_CHIP[item.status] ?? STATUS_CHIP.available;
+              const chips = STATUS_CHIP(isDark);
+              const chip = chips[item.status] ?? chips.available;
               return (
                 <Box key={item.id}>
                   <Box
@@ -196,14 +212,14 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                       alignItems: "center",
                       gap: 2,
                       transition: "background 0.15s",
-                      "&:hover": { bgcolor: "#f8fafc" },
+                      "&:hover": { bgcolor: "background.subtle" },
                     }}
                   >
                     {/* Thumbnail */}
                     <Avatar
                       src={item.images?.[0]}
                       variant="rounded"
-                      sx={{ width: 44, height: 44, flexShrink: 0, bgcolor: "#e2e8f0" }}
+                      sx={{ width: 44, height: 44, flexShrink: 0, bgcolor: "background.subtle" }}
                     />
 
                     {/* Title + seller */}
@@ -212,7 +228,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                         sx={{
                           fontWeight: 600,
                           fontSize: "0.93rem",
-                          color: "#0f172a",
+                          color: "text.primary",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -220,7 +236,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                       >
                         {item.title}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mt: 0.25 }}>
+                      <Typography sx={{ fontSize: "0.78rem", color: "text.secondary", mt: 0.25 }}>
                         {item.sellerName ?? "—"}
                       </Typography>
                     </Box>
@@ -243,10 +259,10 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                     <Box
                       onClick={() => setSelectedItem(item)}
                       sx={{
-                        color: "#94a3b8",
+                        color: "text.secondary",
                         display: "flex",
                         cursor: "pointer",
-                        "&:hover": { color: "#2563eb" },
+                        "&:hover": { color: "primary.main" },
                         transition: "color 0.15s",
                       }}
                     >
@@ -267,9 +283,9 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           {/* Status Breakdown */}
           <Paper
             elevation={0}
-            sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid #e2e8f0", bgcolor: "white" }}
+            sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
           >
-            <Typography sx={{ fontWeight: 700, color: "#0f172a", mb: 2, fontSize: "1rem" }}>
+            <Typography sx={{ fontWeight: 700, color: "text.primary", mb: 2, fontSize: "1rem" }}>
               Status Breakdown
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
@@ -281,13 +297,13 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           {/* Category Breakdown */}
           <Paper
             elevation={0}
-            sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid #e2e8f0", bgcolor: "white" }}
+            sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
           >
-            <Typography sx={{ fontWeight: 700, color: "#0f172a", mb: 2, fontSize: "1rem" }}>
+            <Typography sx={{ fontWeight: 700, color: "text.primary", mb: 2, fontSize: "1rem" }}>
               Category Breakdown
             </Typography>
             {categoryBreakdown.length === 0 ? (
-              <Typography sx={{ fontSize: "0.85rem", color: "#94a3b8" }}>No data yet.</Typography>
+              <Typography sx={{ fontSize: "0.85rem", color: "text.secondary" }}>No data yet.</Typography>
             ) : (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                 {categoryBreakdown.map(([cat, count], idx) => (

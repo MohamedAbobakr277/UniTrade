@@ -13,6 +13,7 @@ import {
   TextField,
   InputAdornment,
   Avatar,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useState } from "react";
@@ -22,6 +23,8 @@ export default function UsersTable({
   onViewUser 
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   const filteredUsers = users.filter((u) => {
     const term = searchQuery.toLowerCase();
@@ -44,11 +47,11 @@ export default function UsersTable({
           placeholder="Search users..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ bgcolor: "white", width: 300, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+          sx={{ bgcolor: "background.paper", width: 300, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ color: "#94a3b8" }} />
+                <SearchIcon sx={{ color: "text.secondary" }} />
               </InputAdornment>
             ),
           }}
@@ -59,13 +62,15 @@ export default function UsersTable({
         sx={{
           borderRadius: 4,
           overflow: "hidden",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-          border: "1px solid #eef2f6",
+          boxShadow: isDark ? "none" : "0 4px 20px rgba(0,0,0,0.05)",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
         }}
       >
         <TableContainer>
           <Table size="small">
-            <TableHead sx={{ bgcolor: "#f8fafc" }}>
+            <TableHead sx={{ bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc" }}>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600, py: 1.5 }}>NAME</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>UNIVERSITY</TableCell>
@@ -77,7 +82,7 @@ export default function UsersTable({
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4, color: "#94a3b8" }}>
+                  <TableCell colSpan={5} align="center" sx={{ py: 4, color: "text.secondary" }}>
                     No users found matching "{searchQuery}"
                   </TableCell>
                 </TableRow>
@@ -91,7 +96,7 @@ export default function UsersTable({
                         sx={{
                           width: 40,
                           height: 40,
-                          bgcolor: "#2563eb",
+                          bgcolor: "primary.main",
                           fontSize: "1rem",
                           fontWeight: 700,
                         }}
@@ -106,10 +111,10 @@ export default function UsersTable({
                               : user.name ?? "—"}
                           </Typography>
                           {user.role === "admin" && (
-                            <Chip label="Admin" size="small" sx={{ height: 18, fontSize: "0.6rem", bgcolor: "#eff6ff", color: "#2563eb", fontWeight: 700 }} />
+                            <Chip label="Admin" size="small" sx={{ height: 18, fontSize: "0.6rem", bgcolor: isDark ? "rgba(37, 99, 235, 0.15)" : "#eff6ff", color: isDark ? "#60a5fa" : "#2563eb", fontWeight: 700 }} />
                           )}
                           {user.isBanned && (
-                            <Chip label="Banned" size="small" sx={{ height: 18, fontSize: "0.6rem", bgcolor: "#fef2f2", color: "#ef4444", fontWeight: 700 }} />
+                            <Chip label="Banned" size="small" sx={{ height: 18, fontSize: "0.6rem", bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2", color: isDark ? "#f87171" : "#ef4444", fontWeight: 700 }} />
                           )}
                         </Box>
                         <Typography variant="caption" color="text.secondary">
@@ -125,14 +130,18 @@ export default function UsersTable({
                       label={user.emailVerified ? "Verified" : "Pending"}
                       color={user.emailVerified ? "success" : "warning"}
                       size="small"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: "0.7rem",
-                        height: 24,
-                        bgcolor: user.emailVerified ? "#ecfdf5" : "#fffbeb",
-                        color: user.emailVerified ? "#10b981" : "#f59e0b",
-                      }}
-                    />
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "0.7rem",
+                          height: 24,
+                          bgcolor: user.emailVerified 
+                            ? (isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5")
+                            : (isDark ? "rgba(245, 158, 11, 0.15)" : "#fffbeb"),
+                          color: user.emailVerified 
+                            ? (isDark ? "#34d399" : "#10b981")
+                            : (isDark ? "#fbbf24" : "#f59e0b"),
+                        }}
+                      />
                   </TableCell>
                   <TableCell align="right" sx={{ py: 1 }}>
                     <Button

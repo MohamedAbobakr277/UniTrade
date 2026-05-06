@@ -8,6 +8,7 @@ import {
   MenuItem,
   Button,
   Box,
+  useTheme,
 } from "@mui/material";
 
 const CATEGORIES = [
@@ -33,6 +34,7 @@ const EMPTY_FORM = {
 
 export default function AddListingModal({ open, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const theme = useTheme();
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -48,7 +50,7 @@ export default function AddListingModal({ open, onClose, onSave }) {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: 4, p: 1 } }}
+      PaperProps={{ sx: { borderRadius: 4, p: 1, bgcolor: "background.paper", backgroundImage: "none" } }}
     >
       <DialogTitle sx={{ fontWeight: 800 }}>Add New Listing</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
@@ -108,7 +110,7 @@ export default function AddListingModal({ open, onClose, onSave }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          sx={{ bgcolor: "#2563eb", fontWeight: 700 }}
+          sx={{ bgcolor: "primary.main", fontWeight: 700 }}
         >
           Post Listing
         </Button>

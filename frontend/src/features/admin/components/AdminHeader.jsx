@@ -1,7 +1,11 @@
-import { Box, Typography, Avatar } from "@mui/material";
+import { Box, Typography, Avatar, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { IconButton, Tooltip } from "@mui/material";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import { useColorMode } from "../../../context/ThemeContext";
 
 const TAB_LABELS = {
   dashboard: "Dashboard Overview",
@@ -11,6 +15,9 @@ const TAB_LABELS = {
 
 export default function AdminHeader({ activeTab }) {
   const [adminName, setAdminName] = useState("Admin");
+  const theme = useTheme();
+  const colorMode = useColorMode();
+  const isDark = theme.palette.mode === "dark";
 
   useEffect(() => {
     const fetchAdminName = async () => {
@@ -38,8 +45,9 @@ export default function AdminHeader({ activeTab }) {
     <Box
       sx={{
         height: 64,
-        bgcolor: "white",
-        borderBottom: "1px solid #e2e8f0",
+        bgcolor: "background.paper",
+        borderBottom: "1px solid",
+        borderColor: "divider",
         px: 4,
         display: "flex",
         alignItems: "center",
@@ -50,38 +58,52 @@ export default function AdminHeader({ activeTab }) {
       {/* Breadcrumb */}
       <Box>
         <Typography
-          sx={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: 500, lineHeight: 1 }}
+          sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 500, lineHeight: 1 }}
         >
           Admin Dashboard
         </Typography>
         <Typography
-          sx={{ fontWeight: 700, color: "#0f172a", fontSize: "1rem", lineHeight: 1.4 }}
+          sx={{ fontWeight: 700, color: "text.primary", fontSize: "1rem", lineHeight: 1.4 }}
         >
           {TAB_LABELS[activeTab] ?? ""}
         </Typography>
       </Box>
 
-      {/* User info */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-        <Box sx={{ textAlign: "right" }}>
-          <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: "#0f172a", lineHeight: 1.2 }}>
-            {adminName}
-          </Typography>
-          <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8" }}>
-            Administrator
-          </Typography>
+      {/* Controls & User info */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+        <Tooltip title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+          <IconButton 
+            onClick={colorMode.toggleColorMode} 
+            sx={{ 
+              bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)",
+              "&:hover": { bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.06)" }
+            }}
+          >
+            {isDark ? <LightModeIcon sx={{ fontSize: 20 }} /> : <DarkModeIcon sx={{ fontSize: 20 }} />}
+          </IconButton>
+        </Tooltip>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Box sx={{ textAlign: "right" }}>
+            <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: "text.primary", lineHeight: 1.2 }}>
+              {adminName}
+            </Typography>
+            <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>
+              Administrator
+            </Typography>
+          </Box>
+          <Avatar
+            sx={{
+              bgcolor: "primary.main",
+              width: 36,
+              height: 36,
+              fontWeight: 700,
+              fontSize: "0.9rem",
+            }}
+          >
+            {initial}
+          </Avatar>
         </Box>
-        <Avatar
-          sx={{
-            bgcolor: "#2563eb",
-            width: 36,
-            height: 36,
-            fontWeight: 700,
-            fontSize: "0.9rem",
-          }}
-        >
-          {initial}
-        </Avatar>
       </Box>
     </Box>
   );

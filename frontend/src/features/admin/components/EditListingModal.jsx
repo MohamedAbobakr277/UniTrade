@@ -12,6 +12,7 @@ import {
   Typography,
   Divider,
   Chip,
+  useTheme,
 } from "@mui/material";
 
 const CATEGORIES = [
@@ -41,6 +42,8 @@ export default function EditListingModal({ item, onClose, onSave }) {
     condition:   "",
     status:      "available",
   });
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   useEffect(() => {
     if (item) {
@@ -64,7 +67,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: 4, overflow: "hidden" } }}
+      PaperProps={{ sx: { borderRadius: 4, overflow: "hidden", bgcolor: "background.paper", backgroundImage: "none" } }}
     >
       {/* Header with item preview */}
       <Box
@@ -74,21 +77,22 @@ export default function EditListingModal({ item, onClose, onSave }) {
           gap: 2,
           px: 3,
           py: 2.5,
-          bgcolor: "#f8fafc",
-          borderBottom: "1px solid #e2e8f0",
+          bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc",
+          borderBottom: "1px solid",
+          borderColor: "divider",
         }}
       >
         <Avatar
           src={item?.images?.[0]}
           variant="rounded"
-          sx={{ width: 48, height: 48, bgcolor: "#e2e8f0" }}
+          sx={{ width: 48, height: 48, bgcolor: "background.subtle" }}
         />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography
             sx={{
               fontWeight: 700,
               fontSize: "0.95rem",
-              color: "#0f172a",
+              color: "text.primary",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -96,7 +100,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
           >
             {item?.title ?? "Edit Listing"}
           </Typography>
-          <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8" }}>
+          <Typography sx={{ fontSize: "0.78rem", color: "text.secondary" }}>
             Seller: {item?.sellerName ?? "—"}
           </Typography>
         </Box>
@@ -104,8 +108,12 @@ export default function EditListingModal({ item, onClose, onSave }) {
           label={form.status === "sold" ? "Sold" : "Available"}
           size="small"
           sx={{
-            bgcolor: form.status === "sold" ? "#fef2f2" : "#ecfdf5",
-            color:   form.status === "sold" ? "#ef4444" : "#10b981",
+            bgcolor: form.status === "sold" 
+              ? (isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2")
+              : (isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5"),
+            color: form.status === "sold" 
+              ? (isDark ? "#f87171" : "#ef4444")
+              : (isDark ? "#34d399" : "#10b981"),
             fontWeight: 700,
             fontSize: "0.72rem",
           }}
@@ -197,7 +205,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
                       width: 8,
                       height: 8,
                       borderRadius: "50%",
-                      bgcolor: val === "sold" ? "#ef4444" : "#10b981",
+                      bgcolor: val === "sold" ? "error.main" : "success.main",
                     }}
                   />
                   {val === "sold" ? "Sold" : "Available"}
@@ -213,7 +221,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
                       width: 8,
                       height: 8,
                       borderRadius: "50%",
-                      bgcolor: value === "sold" ? "#ef4444" : "#10b981",
+                      bgcolor: value === "sold" ? "error.main" : "success.main",
                     }}
                   />
                   {label}
@@ -227,13 +235,13 @@ export default function EditListingModal({ item, onClose, onSave }) {
       <Divider />
 
       <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
-        <Button onClick={onClose} sx={{ fontWeight: 600, color: "#64748b" }}>
+        <Button onClick={onClose} sx={{ fontWeight: 600, color: "text.secondary" }}>
           Cancel
         </Button>
         <Button
           variant="contained"
           onClick={() => onSave(form)}
-          sx={{ bgcolor: "#2563eb", fontWeight: 700, textTransform: "none", borderRadius: 2, px: 3 }}
+          sx={{ bgcolor: "primary.main", fontWeight: 700, textTransform: "none", borderRadius: 2, px: 3 }}
         >
           Save Changes
         </Button>
