@@ -8,6 +8,7 @@ import {
   IconButton,
   Divider,
   Button,
+  useTheme,
 } from "@mui/material";
 import CloseIcon          from "@mui/icons-material/Close";
 import SchoolIcon         from "@mui/icons-material/School";
@@ -26,6 +27,8 @@ export default function UserDetailModal({
   onToggleRole, 
   onDelete 
 }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   if (!user) return null;
 
   const fullName = user.firstName && user.lastName 
@@ -52,12 +55,12 @@ export default function UserDetailModal({
       fullWidth
       maxWidth="sm"
       PaperProps={{
-        sx: { borderRadius: 4, overflow: "hidden", fontFamily: "'Outfit', sans-serif" }
+        sx: { borderRadius: 4, overflow: "hidden", fontFamily: "'Outfit', sans-serif", bgcolor: "background.paper", backgroundImage: "none" }
       }}
     >
       <DialogContent sx={{ p: 0 }}>
         {/* ── Header ── */}
-        <Box sx={{ position: "relative", bgcolor: "#f8fafc", p: 4, textAlign: "center", borderBottom: "1px solid #e2e8f0" }}>
+        <Box sx={{ position: "relative", bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc", p: 4, textAlign: "center", borderBottom: "1px solid", borderColor: "divider" }}>
           <IconButton
             onClick={onClose}
             size="small"
@@ -68,12 +71,12 @@ export default function UserDetailModal({
 
           <Avatar
             src={user.photoURL}
-            sx={{ width: 80, height: 80, mx: "auto", mb: 2, bgcolor: "#2563eb", fontSize: "2rem", fontWeight: 700 }}
+            sx={{ width: 80, height: 80, mx: "auto", mb: 2, bgcolor: "primary.main", fontSize: "2rem", fontWeight: 700 }}
           >
             {fullName.charAt(0).toUpperCase()}
           </Avatar>
           
-          <Typography sx={{ fontWeight: 800, fontSize: "1.4rem", color: "#0f172a" }}>
+          <Typography sx={{ fontWeight: 800, fontSize: "1.4rem", color: "text.primary" }}>
             {fullName}
           </Typography>
           
@@ -84,7 +87,7 @@ export default function UserDetailModal({
               label={user.emailVerified ? "Verified" : "Unverified"} 
               size="small" 
               color={user.emailVerified ? "success" : "default"} 
-              sx={{ fontWeight: 700, fontSize: "0.7rem" }} 
+              sx={{ fontWeight: 700, fontSize: "0.7rem", bgcolor: user.emailVerified ? (isDark ? "rgba(16, 185, 129, 0.15)" : "success.main") : "divider" }} 
             />
           </Box>
         </Box>
@@ -95,8 +98,8 @@ export default function UserDetailModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <EmailIcon sx={{ color: "#94a3b8" }} />
               <Box>
-                <Typography sx={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>University Email</Typography>
-                <Typography sx={{ fontSize: "0.95rem", color: "#0f172a", fontWeight: 500 }}>
+                <Typography sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 600 }}>University Email</Typography>
+                <Typography sx={{ fontSize: "0.95rem", color: "text.primary", fontWeight: 500 }}>
                   {user.universityEmail ?? user.email ?? "—"}
                 </Typography>
               </Box>
@@ -105,8 +108,8 @@ export default function UserDetailModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <SchoolIcon sx={{ color: "#94a3b8" }} />
               <Box>
-                <Typography sx={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>University & Faculty</Typography>
-                <Typography sx={{ fontSize: "0.95rem", color: "#0f172a", fontWeight: 500 }}>
+                <Typography sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 600 }}>University & Faculty</Typography>
+                <Typography sx={{ fontSize: "0.95rem", color: "text.primary", fontWeight: 500 }}>
                   {user.university ?? "—"} • {user.faculty ?? "—"}
                 </Typography>
               </Box>
@@ -115,8 +118,8 @@ export default function UserDetailModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <PhoneIcon sx={{ color: "#94a3b8" }} />
               <Box>
-                <Typography sx={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Phone Number</Typography>
-                <Typography sx={{ fontSize: "0.95rem", color: "#0f172a", fontWeight: 500 }}>
+                <Typography sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 600 }}>Phone Number</Typography>
+                <Typography sx={{ fontSize: "0.95rem", color: "text.primary", fontWeight: 500 }}>
                   {user.phoneNumber ?? "—"}
                 </Typography>
               </Box>
@@ -128,28 +131,28 @@ export default function UserDetailModal({
           {/* ── User Listings Stats & Mini List ── */}
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
-              <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a" }}>
+              <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "text.primary" }}>
                 User's Listings
               </Typography>
-              <Typography sx={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>
+              <Typography sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 600 }}>
                 {activeItems} Active • {soldItems} Sold
               </Typography>
             </Box>
             
             {userListings.length === 0 ? (
-              <Box sx={{ p: 2, bgcolor: "#f1f5f9", borderRadius: 2, textAlign: "center" }}>
-                <Typography sx={{ fontSize: "0.8rem", color: "#94a3b8" }}>No listings found for this user.</Typography>
+              <Box sx={{ p: 2, bgcolor: "background.subtle", borderRadius: 2, textAlign: "center" }}>
+                <Typography sx={{ fontSize: "0.8rem", color: "text.secondary" }}>No listings found for this user.</Typography>
               </Box>
             ) : (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 180, overflowY: "auto", pr: 1 }}>
                 {userListings.map(item => (
-                  <Box key={item.id} sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1, borderRadius: 2, border: "1px solid #e2e8f0", bgcolor: "#f8fafc" }}>
+                  <Box key={item.id} sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc" }}>
                     <Avatar src={item.images?.[0]} variant="rounded" sx={{ width: 36, height: 36 }} />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "text.primary", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {item.title}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.75rem", color: "#2563eb", fontWeight: 700 }}>
+                      <Typography sx={{ fontSize: "0.75rem", color: "primary.main", fontWeight: 700 }}>
                         {Number(item.price ?? 0).toLocaleString()} EGP
                       </Typography>
                     </Box>
@@ -158,8 +161,12 @@ export default function UserDetailModal({
                       size="small" 
                       sx={{ 
                         height: 20, fontSize: "0.6rem", fontWeight: 700, 
-                        bgcolor: item.status === "sold" ? "#fef2f2" : "#ecfdf5", 
-                        color: item.status === "sold" ? "#ef4444" : "#10b981" 
+                        bgcolor: item.status === "sold" 
+                          ? (isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2") 
+                          : (isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5"), 
+                        color: item.status === "sold" 
+                          ? (isDark ? "#f87171" : "#ef4444") 
+                          : (isDark ? "#34d399" : "#10b981") 
                       }} 
                     />
                   </Box>
@@ -171,7 +178,7 @@ export default function UserDetailModal({
           <Divider sx={{ my: 3 }} />
 
           {/* ── Admin Actions ── */}
-          <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a", mb: 2 }}>
+          <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "text.primary", mb: 2 }}>
             Danger Zone
           </Typography>
 
@@ -191,7 +198,7 @@ export default function UserDetailModal({
               color="primary"
               startIcon={isAdmin ? <PersonIcon /> : <AdminPanelSettingsIcon />}
               onClick={() => onToggleRole(user)}
-              sx={{ flex: 1, bgcolor: isAdmin ? "transparent" : "#2563eb", textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+              sx={{ flex: 1, bgcolor: isAdmin ? "transparent" : "primary.main", textTransform: "none", fontWeight: 700, borderRadius: 2 }}
             >
               {isAdmin ? "Demote" : "Make Admin"}
             </Button>

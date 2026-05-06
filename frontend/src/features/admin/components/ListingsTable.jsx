@@ -16,6 +16,7 @@ import {
   InputAdornment,
   MenuItem,
   Button,
+  useTheme,
 } from "@mui/material";
 import VisibilityOutlinedIcon  from "@mui/icons-material/VisibilityOutlined";
 import SearchIcon              from "@mui/icons-material/Search";
@@ -36,6 +37,8 @@ const CATEGORIES = [
 
 export default function ListingsTable({ listings, onEdit, onDelete }) {
   const [selectedItem, setSelectedItem] = useState(null);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,7 +68,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
   return (
     <Box sx={{ animation: "fadeIn 0.5s ease" }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary" }}>
           Listings Management
         </Typography>
       </Box>
@@ -77,11 +80,11 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
           placeholder="Search items or sellers..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ flex: 1, bgcolor: "white", "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+          sx={{ flex: 1, bgcolor: "background.subtle", "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{ color: "#94a3b8" }} />
+                <SearchIcon sx={{ color: "text.secondary" }} />
               </InputAdornment>
             ),
           }}
@@ -92,7 +95,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
           size="small"
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          sx={{ width: 220, bgcolor: "white", "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+          sx={{ width: 220, bgcolor: "background.subtle", "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
         >
           {CATEGORIES.map((c) => (
             <MenuItem key={c} value={c}>{c}</MenuItem>
@@ -104,7 +107,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
           size="small"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          sx={{ width: 160, bgcolor: "white", "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+          sx={{ width: 160, bgcolor: "background.subtle", "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
         >
           <MenuItem value="all">All Status</MenuItem>
           <MenuItem value="available">Available</MenuItem>
@@ -114,15 +117,17 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
 
       <Paper
         sx={{
-          borderRadius: 4,
+          borderRadius: 1,
           overflow: "hidden",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-          border: "1px solid #eef2f6",
+          boxShadow: isDark ? "none" : "0 4px 20px rgba(0,0,0,0.05)",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
         }}
       >
         <TableContainer>
           <Table size="small">
-            <TableHead sx={{ bgcolor: "#f8fafc" }}>
+            <TableHead sx={{ bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc" }}>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600, py: 1.5 }}>ITEM</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>PRICE</TableCell>
@@ -135,7 +140,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
             <TableBody>
               {filteredListings.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4, color: "#94a3b8" }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 4, color: "text.secondary" }}>
                     No listings found matching the current filters.
                   </TableCell>
                 </TableRow>
@@ -146,21 +151,21 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                       <Avatar src={item.images?.[0]} variant="rounded" />
                       <Box>
-                        <Typography sx={{ fontWeight: 700 }}>{item.title}</Typography>
+                        <Typography sx={{ fontWeight: 700, color: "text.primary" }}>{item.title}</Typography>
                         <Typography variant="caption" color="text.secondary">
                           ID: {item.id}
                         </Typography>
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: "#2563eb" }}>
+                  <TableCell sx={{ fontWeight: 800, color: "primary.main" }}>
                     {Number(item.price ?? 0).toLocaleString()} EGP
                   </TableCell>
                   <TableCell>
                     <Chip
                       label={item.category}
                       size="small"
-                      sx={{ bgcolor: "#f1f5f9", fontWeight: 600 }}
+                      sx={{ bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9", fontWeight: 600 }}
                     />
                   </TableCell>
                   {/* ✅ Bug fix: was item.user — now item.sellerName */}
@@ -170,8 +175,12 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
                       label={item.status === "sold" ? "Sold" : "Active"}
                       size="small"
                       sx={{
-                        bgcolor: item.status === "sold" ? "#fef2f2" : "#ecfdf5",
-                        color: item.status === "sold" ? "#dc2626" : "#10b981",
+                        bgcolor: item.status === "sold" 
+                          ? (isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2")
+                          : (isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5"),
+                        color: item.status === "sold" 
+                          ? (isDark ? "#f87171" : "#dc2626")
+                          : (isDark ? "#34d399" : "#10b981"),
                         fontWeight: 700,
                         fontSize: "0.7rem",
                       }}
@@ -184,7 +193,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
                       startIcon={<VisibilityOutlinedIcon />}
                       onClick={() => setSelectedItem(item)}
                       sx={{ 
-                        color: "#2563eb", 
+                        color: "primary.main", 
                         fontWeight: 700, 
                         textTransform: "none" 
                       }}

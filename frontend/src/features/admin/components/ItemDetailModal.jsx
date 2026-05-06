@@ -8,6 +8,7 @@ import {
   IconButton,
   Divider,
   Button,
+  useTheme,
 } from "@mui/material";
 import CloseIcon          from "@mui/icons-material/Close";
 import CalendarTodayIcon  from "@mui/icons-material/CalendarToday";
@@ -18,10 +19,18 @@ import WhatsAppIcon       from "@mui/icons-material/WhatsApp";
 import DeleteIcon         from "@mui/icons-material/Delete";
 import { useState } from "react";
 
-const STATUS_CHIP = {
-  available: { label: "Available", bgcolor: "#ecfdf5", color: "#10b981" },
-  sold:      { label: "Sold",      bgcolor: "#fef2f2", color: "#ef4444" },
-};
+const STATUS_CHIP = (isDark) => ({
+  available: { 
+    label: "Available", 
+    bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", 
+    color: isDark ? "#34d399" : "#10b981" 
+  },
+  sold: { 
+    label: "Sold",      
+    bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2", 
+    color: isDark ? "#f87171" : "#ef4444" 
+  },
+});
 
 const CONDITION_COLOR = {
   "New":       "#10b981",
@@ -33,11 +42,14 @@ const CONDITION_COLOR = {
 
 export default function ItemDetailModal({ item, onClose, onDelete }) {
   const [imgIdx, setImgIdx] = useState(0);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   if (!item) return null;
 
   const images   = item.images ?? (item.imageUrls ?? []);
-  const chip     = STATUS_CHIP[item.status] ?? STATUS_CHIP.available;
+  const chips    = STATUS_CHIP(isDark);
+  const chip     = chips[item.status] ?? chips.available;
   const date     = item.createdAt?.seconds
     ? new Date(item.createdAt.seconds * 1000).toLocaleDateString("en-EG", {
         year: "numeric", month: "short", day: "numeric",
@@ -56,13 +68,15 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
           borderRadius: 4,
           overflow: "hidden",
           fontFamily: "'Outfit', sans-serif",
+          bgcolor: "background.paper",
+          backgroundImage: "none",
         },
       }}
     >
       <DialogContent sx={{ p: 0 }}>
 
         {/* ── Image gallery ── */}
-        <Box sx={{ position: "relative", bgcolor: "#f1f5f9" }}>
+        <Box sx={{ position: "relative", bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9" }}>
           {images.length > 0 ? (
             <Box
               component="img"
@@ -73,7 +87,7 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
                 height: 280,
                 objectFit: "contain",
                 display: "block",
-                bgcolor: "#f8fafc",
+                bgcolor: isDark ? "rgba(255, 255, 255, 0.02)" : "#f8fafc",
               }}
             />
           ) : (
@@ -83,7 +97,7 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#94a3b8",
+                color: "text.secondary",
                 fontSize: "0.9rem",
               }}
             >
@@ -99,9 +113,10 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
               position: "absolute",
               top: 12,
               right: 12,
-              bgcolor: "rgba(255,255,255,0.9)",
+              bgcolor: isDark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.9)",
               backdropFilter: "blur(4px)",
-              "&:hover": { bgcolor: "white" },
+              color: isDark ? "white" : "inherit",
+              "&:hover": { bgcolor: isDark ? "rgba(0,0,0,0.7)" : "white" },
               boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
             }}
           >
@@ -118,8 +133,9 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
                 pb: 1.5,
                 pt: 1,
                 overflowX: "auto",
-                bgcolor: "#f8fafc",
-                borderTop: "1px solid #e2e8f0",
+                bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc",
+                borderTop: "1px solid",
+                borderColor: "divider",
               }}
             >
               {images.map((url, i) => (
@@ -136,7 +152,7 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
                     cursor: "pointer",
                     flexShrink: 0,
                     border: i === imgIdx
-                      ? "2px solid #2563eb"
+                      ? `2px solid ${theme.palette.primary.main}`
                       : "2px solid transparent",
                     opacity: i === imgIdx ? 1 : 0.6,
                     transition: "all 0.15s",
@@ -156,7 +172,7 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
               sx={{
                 fontWeight: 800,
                 fontSize: "1.2rem",
-                color: "#0f172a",
+                color: "text.primary",
                 flex: 1,
                 mr: 2,
                 letterSpacing: "-0.01em",
@@ -172,22 +188,22 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
           </Box>
 
           {/* Price */}
-          <Typography sx={{ fontSize: "1.6rem", fontWeight: 800, color: "#2563eb", mb: 2.5 }}>
+          <Typography sx={{ fontSize: "1.6rem", fontWeight: 800, color: "primary.main", mb: 2.5 }}>
             {Number(item.price ?? 0).toLocaleString()} EGP
           </Typography>
 
           {/* Info pills row */}
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2.5 }}>
             {item.category && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "#f1f5f9", borderRadius: 2, px: 1.5, py: 0.5 }}>
-                <CategoryIcon sx={{ fontSize: 14, color: "#64748b" }} />
-                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#475569" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "background.subtle", borderRadius: 2, px: 1.5, py: 0.5 }}>
+                <CategoryIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "text.secondary" }}>
                   {item.category}
                 </Typography>
               </Box>
             )}
             {item.condition && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "#f1f5f9", borderRadius: 2, px: 1.5, py: 0.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "background.subtle", borderRadius: 2, px: 1.5, py: 0.5 }}>
                 <LocalOfferIcon sx={{ fontSize: 14, color: condColor }} />
                 <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: condColor }}>
                   {item.condition}
@@ -195,16 +211,16 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
               </Box>
             )}
             {item.university && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "#f1f5f9", borderRadius: 2, px: 1.5, py: 0.5 }}>
-                <SchoolIcon sx={{ fontSize: 14, color: "#64748b" }} />
-                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#475569" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "background.subtle", borderRadius: 2, px: 1.5, py: 0.5 }}>
+                <SchoolIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "text.secondary" }}>
                   {item.university}
                 </Typography>
               </Box>
             )}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "#f1f5f9", borderRadius: 2, px: 1.5, py: 0.5 }}>
-              <CalendarTodayIcon sx={{ fontSize: 14, color: "#64748b" }} />
-              <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#475569" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "background.subtle", borderRadius: 2, px: 1.5, py: 0.5 }}>
+              <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+              <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "text.secondary" }}>
                 {date}
               </Typography>
             </Box>
@@ -213,10 +229,10 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
           {/* Description */}
           {item.description && (
             <>
-              <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", mb: 0.8 }}>
+              <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.08em", mb: 0.8, opacity: 0.7 }}>
                 Description
               </Typography>
-              <Typography sx={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.7, mb: 2.5 }}>
+              <Typography sx={{ fontSize: "0.9rem", color: "text.primary", lineHeight: 1.7, mb: 2.5 }}>
                 {item.description}
               </Typography>
             </>
@@ -229,15 +245,15 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Avatar
                 src={item.sellerPhoto}
-                sx={{ width: 38, height: 38, bgcolor: "#2563eb", fontSize: "0.9rem", fontWeight: 700 }}
+                sx={{ width: 38, height: 38, bgcolor: "primary.main", fontSize: "0.9rem", fontWeight: 700 }}
               >
                 {item.sellerName?.charAt(0)?.toUpperCase() ?? "?"}
               </Avatar>
               <Box>
-                <Typography sx={{ fontWeight: 700, fontSize: "0.9rem", color: "#0f172a" }}>
+                <Typography sx={{ fontWeight: 700, fontSize: "0.9rem", color: "text.primary" }}>
                   {item.sellerName ?? "Unknown Seller"}
                 </Typography>
-                <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8" }}>Seller</Typography>
+                <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Seller</Typography>
               </Box>
             </Box>
 
@@ -252,15 +268,15 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
                   display: "flex",
                   alignItems: "center",
                   gap: 0.8,
-                  bgcolor: "#ecfdf5",
-                  color: "#10b981",
+                  bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5",
+                  color: isDark ? "#34d399" : "#10b981",
                   px: 1.5,
                   py: 0.8,
                   borderRadius: 2,
                   textDecoration: "none",
                   fontWeight: 700,
                   fontSize: "0.82rem",
-                  "&:hover": { bgcolor: "#dcfce7" },
+                  "&:hover": { bgcolor: isDark ? "rgba(16, 185, 129, 0.25)" : "#dcfce7" },
                   transition: "background 0.15s",
                 }}
               >

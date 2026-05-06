@@ -17,6 +17,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../../services/auth";
+import { useTheme } from "@mui/material/styles";
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
@@ -29,6 +30,8 @@ const COLLAPSED_WIDTH = 72;
 
 export default function AdminSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse }) {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   const handleLogout = async () => {
     try {
@@ -53,16 +56,16 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
           px: collapsed ? 1.5 : 2,
           justifyContent: collapsed ? "center" : "flex-start",
           "&.Mui-selected": {
-            bgcolor: "#eff6ff",
-            "&:hover": { bgcolor: "#dbeafe" },
+            bgcolor: isDark ? "rgba(37, 99, 235, 0.12)" : "#eff6ff",
+            "&:hover": { bgcolor: isDark ? "rgba(37, 99, 235, 0.18)" : "#dbeafe" },
           },
-          "&:hover": { bgcolor: "#f8fafc" },
+          "&:hover": { bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f8fafc" },
         }}
       >
         <ListItemIcon
           sx={{
             minWidth: collapsed ? 0 : 36,
-            color: isActive ? "#2563eb" : "#64748b",
+            color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
           }}
         >
           <Icon fontSize="small" />
@@ -74,7 +77,7 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
             primaryTypographyProps={{
               fontWeight: isActive ? 700 : 500,
               fontSize: "0.9rem",
-              color: isActive ? "#2563eb" : "#0f172a",
+              color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
             }}
           />
         )}
@@ -87,7 +90,11 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   };
 
   /* ── helper: bottom action button ── */
-  const ActionBtn = ({ label, Icon, onClick, color = "#64748b", hoverBg = "#f8fafc" }) => {
+  const ActionBtn = ({ label, Icon, onClick, color, hoverBg }) => {
+    const defaultColor = theme.palette.text.secondary;
+    const btnColor = color || defaultColor;
+    const btnHoverBg = hoverBg || (isDark ? "rgba(255, 255, 255, 0.05)" : "#f8fafc");
+
     const btn = (
       <ListItemButton
         onClick={onClick}
@@ -96,8 +103,8 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
           minHeight: 44,
           px: collapsed ? 1.5 : 2,
           justifyContent: collapsed ? "center" : "flex-start",
-          color,
-          "&:hover": { bgcolor: hoverBg },
+          color: btnColor,
+          "&:hover": { bgcolor: btnHoverBg },
         }}
       >
         <ListItemIcon sx={{ minWidth: collapsed ? 0 : 36, color: "inherit" }}>
@@ -122,8 +129,9 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
       sx={{
         width,
         minHeight: "100vh",
-        bgcolor: "white",
-        borderRight: "1px solid #e2e8f0",
+        bgcolor: "background.paper",
+        borderRight: "1px solid",
+        borderColor: "divider",
         display: "flex",
         flexDirection: "column",
         transition: "width 0.25s ease",
@@ -139,7 +147,8 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
           alignItems: "center",
           px: collapsed ? 1.5 : 3,
           gap: 1.5,
-          borderBottom: "1px solid #e2e8f0",
+          borderBottom: "1px solid",
+          borderColor: "divider",
           overflow: "hidden",
           flexShrink: 0,
         }}
@@ -150,7 +159,7 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
             sx={{
               fontWeight: 800,
               fontSize: "1.1rem",
-              color: "#0f172a",
+              color: "text.primary",
               whiteSpace: "nowrap",
               letterSpacing: "-0.02em",
             }}
@@ -179,7 +188,8 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
       {/* ── Bottom: Collapse + Logout ── */}
       <Box
         sx={{
-          borderTop: "1px solid #e2e8f0",
+          borderTop: "1px solid",
+          borderColor: "divider",
           py: 1.5,
           px: collapsed ? 1 : 1.5,
           display: "flex",
@@ -196,8 +206,8 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
           label="Logout"
           Icon={LogoutIcon}
           onClick={handleLogout}
-          color="#ef4444"
-          hoverBg="#fef2f2"
+          color={theme.palette.error.main}
+          hoverBg={isDark ? "rgba(239, 68, 68, 0.1)" : "#fef2f2"}
         />
       </Box>
     </Box>

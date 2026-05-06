@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
@@ -15,6 +15,9 @@ import SellerProfile from "./pages/SellerProfile";
 import AIChatbot from "./components/AIChatbot";
 
 export default function App() {
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith("/admindashboard");
+
   return (
     <>
     <Routes>
@@ -98,7 +101,7 @@ export default function App() {
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
-    <AIChatbot />
+    {!isAdminPath && <AIChatbot />}
     </>
   );
 }

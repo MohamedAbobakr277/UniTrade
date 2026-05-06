@@ -8,15 +8,26 @@ import {
   Avatar,
   Chip,
   Divider,
+  useTheme,
 } from "@mui/material";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
 export default function DeleteConfirmModal({ item, onClose, onConfirm }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   if (!item) return null;
 
   const statusChip = item.status === "sold"
-    ? { label: "Sold",      bgcolor: "#fef2f2", color: "#ef4444" }
-    : { label: "Available", bgcolor: "#ecfdf5", color: "#10b981" };
+    ? { 
+        label: "Sold",      
+        bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2", 
+        color: isDark ? "#f87171" : "#ef4444" 
+      }
+    : { 
+        label: "Available", 
+        bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", 
+        color: isDark ? "#34d399" : "#10b981" 
+      };
 
   return (
     <Dialog
@@ -24,28 +35,29 @@ export default function DeleteConfirmModal({ item, onClose, onConfirm }) {
       onClose={onClose}
       maxWidth="xs"
       fullWidth
-      PaperProps={{ sx: { borderRadius: 4, overflow: "hidden" } }}
+      PaperProps={{ sx: { borderRadius: 4, overflow: "hidden", bgcolor: "background.paper", backgroundImage: "none" } }}
     >
       <DialogContent sx={{ p: 0 }}>
 
         {/* Red warning header */}
         <Box
           sx={{
-            bgcolor: "#fef2f2",
+            bgcolor: isDark ? "rgba(239, 68, 68, 0.1)" : "#fef2f2",
             px: 3,
             py: 2.5,
             display: "flex",
             alignItems: "center",
             gap: 1.5,
-            borderBottom: "1px solid #fecaca",
+            borderBottom: "1px solid",
+            borderColor: isDark ? "rgba(239, 68, 68, 0.2)" : "#fecaca",
           }}
         >
           <WarningAmberRoundedIcon sx={{ color: "#ef4444", fontSize: 26 }} />
           <Box>
-            <Typography sx={{ fontWeight: 800, color: "#b91c1c", fontSize: "1rem" }}>
+            <Typography sx={{ fontWeight: 800, color: isDark ? "#f87171" : "#b91c1c", fontSize: "1rem" }}>
               Delete Listing
             </Typography>
-            <Typography sx={{ fontSize: "0.78rem", color: "#ef4444" }}>
+            <Typography sx={{ fontSize: "0.78rem", color: isDark ? "rgba(248, 113, 113, 0.8)" : "#ef4444" }}>
               This action cannot be undone
             </Typography>
           </Box>
@@ -60,22 +72,23 @@ export default function DeleteConfirmModal({ item, onClose, onConfirm }) {
               gap: 2,
               p: 1.5,
               borderRadius: 2,
-              border: "1px solid #e2e8f0",
-              bgcolor: "#f8fafc",
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc",
               mb: 2.5,
             }}
           >
             <Avatar
               src={item.images?.[0]}
               variant="rounded"
-              sx={{ width: 52, height: 52, bgcolor: "#e2e8f0", flexShrink: 0 }}
+              sx={{ width: 52, height: 52, bgcolor: "background.subtle", flexShrink: 0 }}
             />
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.92rem",
-                  color: "#0f172a",
+                  color: "text.primary",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -83,10 +96,10 @@ export default function DeleteConfirmModal({ item, onClose, onConfirm }) {
               >
                 {item.title}
               </Typography>
-              <Typography sx={{ fontSize: "0.78rem", color: "#64748b", mt: 0.25 }}>
+              <Typography sx={{ fontSize: "0.78rem", color: "text.secondary", mt: 0.25 }}>
                 {item.sellerName ?? "Unknown Seller"} · {item.category ?? "—"}
               </Typography>
-              <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: "#2563eb", mt: 0.5 }}>
+              <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: "primary.main", mt: 0.5 }}>
                 {Number(item.price ?? 0).toLocaleString()} EGP
               </Typography>
             </Box>
@@ -103,9 +116,9 @@ export default function DeleteConfirmModal({ item, onClose, onConfirm }) {
             />
           </Box>
 
-          <Typography sx={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.6 }}>
+          <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.6 }}>
             Are you sure you want to permanently delete{" "}
-            <strong style={{ color: "#0f172a" }}>{item.title}</strong>?
+            <strong style={{ color: theme.palette.text.primary }}>{item.title}</strong>?
             All images and data will be removed from the platform.
           </Typography>
         </Box>
@@ -116,7 +129,7 @@ export default function DeleteConfirmModal({ item, onClose, onConfirm }) {
       <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
         <Button
           onClick={onClose}
-          sx={{ fontWeight: 600, color: "#64748b", textTransform: "none" }}
+          sx={{ fontWeight: 600, color: "text.secondary", textTransform: "none" }}
         >
           Cancel
         </Button>
