@@ -19,7 +19,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where,
-  getDocs, addDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot,
+  getDocs, updateDoc, arrayUnion, arrayRemove, onSnapshot,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
@@ -58,6 +58,108 @@ const CONDITION_COLOR: Record<string, { bg: string; text: string }> = {
   Fair: { bg: "#fee2e2", text: "#991b1b" },
 };
 
+/* ─────────────────────────────────────────────
+   🤖  AI SIMILAR ITEMS — Claude Ranking Helper
+───────────────────────────────────────────── */
+async function getAISimilarItems(
+  currentProduct: Product,
+  candidates: Product[]
+): Promise<Product[]> {
+  if (candidates.length === 0) return [];
+
+  const catalogue = candidates.map((p) => ({
+    id: p.id,
+    title: p.title,
+    description: p.description?.slice(0, 120) || "",
+    category: p.category || "",
+    condition: p.condition || "",
+    price: p.price,
+  }));
+
+  const prompt = `You are a product recommendation engine for a university marketplace.
+
+Current product:
+Title: "${currentProduct.title}"
+Description: "${currentProduct.description?.slice(0, 200) || ""}"
+Category: "${currentProduct.category || ""}"
+
+Candidate products (JSON array):
+${JSON.stringify(catalogue, null, 2)}
+
+Task: Return ONLY a JSON array of up to 4 product IDs (strings) from the candidates list that are STRONGLY similar or highly relevant to the current product. Base similarity on semantic meaning of title + description + category. If none are truly similar, return an empty array []. Respond with ONLY the JSON array, no explanation. Example: ["id1","id2"]`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+        // ضع الـ API Key الخاص بك هنا لتفعيل Claude
+        // "x-api-key": "YOUR_ANTHROPIC_API_KEY", 
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("API Request Failed");
+    }
+
+    const data = await response.json();
+    const raw = data.content?.find((b: any) => b.type === "text")?.text || "[]";
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const rankedIds: string[] = JSON.parse(clean);
+
+    const productMap = new Map(candidates.map((p) => [p.id, p]));
+    const ranked = rankedIds
+      .map((id) => productMap.get(id))
+      .filter(Boolean) as Product[];
+
+    if (ranked.length === 0) throw new Error("AI found no matches");
+
+    return ranked.slice(0, 4);
+    
+  } catch (e) {
+    console.log("AI error, falling back to local category match...");
+    
+    // البديل المحلي الذكي: إرجاع المنتجات التي في نفس القسم
+    const strictCategoryMatches = candidates.filter(
+      (p) => p.category === currentProduct.category
+    );
+
+    if (strictCategoryMatches.length > 0) {
+      return strictCategoryMatches.slice(0, 4);
+    }
+    
+    return [];
+  }
+}
+
+/* ─────────────────────────────────────────────
+   🔍  PREDICTIVE SEARCH HIGHLIGHT UTILITY
+───────────────────────────────────────────── */
+export function highlightSearchTerms(
+  text: string,
+  query: string
+): { text: string; matched: boolean }[] {
+  if (!query.trim()) return [{ text, matched: false }];
+
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const splitRegex = new RegExp(`(${escapedQuery})`, "i");
+  const parts = text.split(splitRegex);
+  const lowerQuery = query.toLowerCase();
+
+  return parts
+    .filter((part) => part !== "")
+    .map((part) => ({
+      text: part,
+      matched: part.toLowerCase() === lowerQuery,
+    }));
+}
+
 export default function ProductDetails() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams();
@@ -71,10 +173,11 @@ export default function ProductDetails() {
   const [zoom, setZoom] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recommended, setRecommended] = useState<Product[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
 
   /* ─── Fetch product ─── */
   useEffect(() => {
-    const fetch = async () => {
+    const fetchProduct = async () => {
       try {
         if (!id) return;
         const docId = Array.isArray(id) ? id[0] : id;
@@ -101,42 +204,51 @@ export default function ProductDetails() {
         setLoading(false);
       }
     };
-    fetch();
+    fetchProduct();
   }, [id]);
 
-  /* ─── Fetch recommended ─── */
+  /* ─── AI-Powered Similar Items ─── */
   useEffect(() => {
     if (!product) return;
-    const fetchRecommended = async () => {
+
+    const fetchAIRecommended = async () => {
+      setAiLoading(true);
       try {
-        // query by category only — filter sold client-side to avoid composite index
-        const snap = await getDocs(
+        let candidates: Product[] = [];
+
+        const sameCategorySnap = await getDocs(
           query(
             collection(db, "products"),
             where("category", "==", product.category ?? "")
           )
         );
-        const results = snap.docs
-          .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
-          .filter((p) => p.id !== product.id && p.status !== "sold")
-          .slice(0, 6);
 
-        // fallback: if same category has < 2 results, fetch recent products instead
-        if (results.length < 2) {
-          const fallback = await getDocs(query(collection(db, "products")));
-          const fallbackResults = fallback.docs
+        candidates = sameCategorySnap.docs
+          .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
+          .filter((p) => p.id !== product.id && p.status !== "sold");
+
+        if (candidates.length < 6) {
+          const globalSnap = await getDocs(query(collection(db, "products")));
+          const globalPool = globalSnap.docs
             .map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
-            .filter((p) => p.id !== product.id && p.status !== "sold")
-            .slice(0, 6);
-          setRecommended(fallbackResults);
-        } else {
-          setRecommended(results);
+            .filter((p) => p.id !== product.id && p.status !== "sold");
+          const seen = new Set(candidates.map((p) => p.id));
+          for (const p of globalPool) {
+            if (!seen.has(p.id)) candidates.push(p);
+          }
         }
+
+        const cappedCandidates = candidates.slice(0, 30);
+        const aiRanked = await getAISimilarItems(product, cappedCandidates);
+        setRecommended(aiRanked);
       } catch (e) {
-        console.log("recommended error:", e);
+        console.log("AI recommended error:", e);
+      } finally {
+        setAiLoading(false);
       }
     };
-    fetchRecommended();
+
+    fetchAIRecommended();
   }, [product]);
 
   /* ─── Check favourite ─── */
@@ -171,32 +283,26 @@ export default function ProductDetails() {
     product && Share.share({ message: `${product.title} — EGP ${Number(product.price).toLocaleString()}` });
 
   const phone = sellerPhone || product?.phone || "";
+
   const openWhatsApp = () => {
     if (!product) return;
-
-    // make a phone number
     let cleaned = phone.replace(/\D/g, "");
     if (cleaned.startsWith("0")) {
       cleaned = "2" + cleaned;
     } else if (cleaned.startsWith("1") && cleaned.length < 12) {
       cleaned = "20" + cleaned;
     }
-
-    // make a message
     const message = `Hi! 👋\n\nI'm interested in your listing on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
-
-    // make it encoded
     const encodedMessage = encodeURIComponent(message);
-
-    // make a link
     const url = `https://wa.me/${cleaned}?text=${encodedMessage}`;
-
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
-        Linking.openURL(url);
+        return Linking.openURL(url);
       } else {
         Alert.alert("Error", "WhatsApp is not installed on this device");
       }
+    }).catch(() => {
+      Alert.alert("Error", "Could not open WhatsApp");
     });
   };
 
@@ -248,7 +354,6 @@ export default function ProductDetails() {
             ))}
           </ScrollView>
 
-          {/* Dots */}
           {images.length > 1 && (
             <View style={s.dots}>
               {images.map((_, i) => (
@@ -311,10 +416,8 @@ export default function ProductDetails() {
             <Text style={s.timeText}>{timeAgo(product.createdAt)}</Text>
           </View>
 
-          {/* Divider */}
           <View style={[s.divider, { backgroundColor: theme.card }]} />
 
-          {/* Description */}
           {product.description ? (
             <>
               <Text style={[s.sectionLabel, { color: theme.text }]}>Description</Text>
@@ -324,7 +427,6 @@ export default function ProductDetails() {
             </>
           ) : null}
 
-          {/* Divider */}
           <View style={[s.divider, { backgroundColor: theme.card }]} />
 
           {/* Seller card */}
@@ -348,45 +450,72 @@ export default function ProductDetails() {
             <Feather name="chevron-right" size={18} color="#94a3b8" />
           </TouchableOpacity>
 
-          {/* Recommended */}
-          {recommended.length > 0 && (
+          {/* ── AI "You May Also Like" ── */}
+          {(aiLoading || recommended.length > 0) && (
             <>
               <View style={[s.divider, { backgroundColor: theme.card }]} />
-              <Text style={[s.sectionLabel, { color: theme.text }]}>You May Also Like</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
-              >
-                {recommended.map((item) => {
-                  const img =
-                    Array.isArray(item.images) && item.images.length > 0
-                      ? item.images[0]
-                      : "https://via.placeholder.com/150";
-                  const condS = CONDITION_COLOR[item.condition || ""] || CONDITION_COLOR["Used"];
-                  return (
-                    <TouchableOpacity
-                      key={item.id}
-                      style={[s.recCard, { backgroundColor: theme.card }]}
-                      onPress={() => router.push({ pathname: "/product/[id]", params: { id: item.id } })}
-                      activeOpacity={0.85}
-                    >
-                      <Image source={{ uri: img }} style={s.recImage} />
-                      {item.condition && (
-                        <View style={[s.recBadge, { backgroundColor: condS.bg }]}>
-                          <Text style={[s.recBadgeText, { color: condS.text }]}>{item.condition}</Text>
-                        </View>
-                      )}
+              <View style={s.aiSectionHeader}>
+                <Text style={[s.sectionLabel, { color: theme.text }]}>You May Also Like</Text>
+                <View style={s.aiBadge}>
+                  <Feather name="cpu" size={11} color="#7c3aed" />
+                  <Text style={s.aiBadgeText}>AI Picks</Text>
+                </View>
+              </View>
+
+              {aiLoading ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
+                  style={{ paddingVertical: 4 }}
+                >
+                  {[1, 2, 3, 4].map((i) => (
+                    <View key={i} style={[s.recCard, s.skeleton, { backgroundColor: theme.card }]}>
+                      <View style={[s.skeletonImage, { backgroundColor: theme.background }]} />
                       <View style={s.recBody}>
-                        <Text style={[s.recTitle, { color: theme.text }]} numberOfLines={1}>
-                          {item.title}
-                        </Text>
-                        <Text style={s.recPrice}>EGP {Number(item.price).toLocaleString()}</Text>
+                        <View style={[s.skeletonLine, { width: "80%", backgroundColor: theme.background }]} />
+                        <View style={[s.skeletonLine, { width: "50%", marginTop: 6, backgroundColor: theme.background }]} />
                       </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
+                    </View>
+                  ))}
+                </ScrollView>
+              ) : (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
+                  style={{ paddingVertical: 4 }}
+                >
+                  {recommended.map((item) => {
+                    const img =
+                      Array.isArray(item.images) && item.images.length > 0
+                        ? item.images[0]
+                        : "https://via.placeholder.com/150";
+                    const condS = CONDITION_COLOR[item.condition || ""] || CONDITION_COLOR["Used"];
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={[s.recCard, { backgroundColor: theme.card }]}
+                        onPress={() => router.push({ pathname: "/product/[id]", params: { id: item.id } })}
+                        activeOpacity={0.85}
+                      >
+                        <Image source={{ uri: img }} style={s.recImage} />
+                        {item.condition && (
+                          <View style={[s.recBadge, { backgroundColor: condS.bg }]}>
+                            <Text style={[s.recBadgeText, { color: condS.text }]}>{item.condition}</Text>
+                          </View>
+                        )}
+                        <View style={s.recBody}>
+                          <Text style={[s.recTitle, { color: theme.text }]} numberOfLines={1}>
+                            {item.title}
+                          </Text>
+                          <Text style={s.recPrice}>EGP {Number(item.price).toLocaleString()}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              )}
             </>
           )}
 
@@ -424,7 +553,6 @@ const s = StyleSheet.create({
   screen: { flex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  /* Image */
   imageWrap: { width, height: 400, backgroundColor: "#000" },
   mainImage: { width, height: 400, resizeMode: "contain" },
   dots: {
@@ -436,18 +564,9 @@ const s = StyleSheet.create({
     justifyContent: "center",
     gap: 6,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "rgba(255,255,255,0.45)",
-  },
-  dotActive: {
-    backgroundColor: "#fff",
-    width: 18,
-  },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.45)" },
+  dotActive: { backgroundColor: "#fff", width: 18 },
 
-  /* Nav */
   floatingNav: {
     position: "absolute",
     top: 50,
@@ -466,7 +585,6 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
 
-  /* Content */
   content: { padding: 20 },
   topRow: {
     flexDirection: "row",
@@ -475,11 +593,7 @@ const s = StyleSheet.create({
     marginBottom: 6,
   },
   price: { fontSize: 26, fontWeight: "800" },
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
+  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   badgeText: { fontSize: 12, fontWeight: "700" },
   title: { fontSize: 18, fontWeight: "600", marginBottom: 12, lineHeight: 26 },
 
@@ -514,7 +628,28 @@ const s = StyleSheet.create({
   },
   description: { fontSize: 15, lineHeight: 24, color: "#475569" },
 
-  /* Seller */
+  aiSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+  },
+  aiBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#f5f3ff",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+    marginBottom: 10,
+  },
+  aiBadgeText: { fontSize: 11, color: "#7c3aed", fontWeight: "700" },
+
+  skeleton: { opacity: 0.6 },
+  skeletonImage: { width: 150, height: 130 },
+  skeletonLine: { height: 10, borderRadius: 5 },
+
   sellerCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -536,7 +671,6 @@ const s = StyleSheet.create({
   },
   sellerBadgeText: { fontSize: 11, color: "#16a34a", fontWeight: "600" },
 
-  /* Contact bar */
   contactBar: {
     position: "absolute",
     bottom: 0,
@@ -562,7 +696,6 @@ const s = StyleSheet.create({
   callBtn: { backgroundColor: "#2563eb" },
   contactText: { color: "#fff", fontWeight: "700", fontSize: 13 },
 
-  /* Recommended */
   recCard: {
     width: 150,
     borderRadius: 14,
@@ -587,12 +720,7 @@ const s = StyleSheet.create({
   recTitle: { fontSize: 13, fontWeight: "600", marginBottom: 3 },
   recPrice: { fontSize: 13, fontWeight: "700", color: "#2563eb" },
 
-  /* Zoom */
-  zoomModal: {
-    flex: 1,
-    backgroundColor: "#000",
-    justifyContent: "center",
-  },
+  zoomModal: { flex: 1, backgroundColor: "#000", justifyContent: "center" },
   zoomImage: { width: "100%", height: "100%", resizeMode: "contain" },
   zoomClose: {
     position: "absolute",
