@@ -117,80 +117,6 @@ export default function Footer() {
   };
 
   return (
-<<<<<<< Updated upstream
-    <Box
-      component="footer"
-      sx={{
-        bgcolor: "background.paper",
-        borderTop: "1px solid",
-        borderColor: "divider",
-        pt: 8,
-        pb: 4,
-        mt: "auto",
-      }}
-    >
-      <Container maxWidth="xl">
-        <Grid container spacing={6}>
-          {/* Logo & Social Section */}
-          <Grid item xs={12} md={4}>
-            <Box
-              onClick={() => navigate("/home")}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                mb: 3,
-                cursor: "pointer",
-                width: "fit-content",
-              }}
-            >
-              <img src={logo} alt="UniTrade Logo" style={{ height: 45 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: "text.primary", lineHeight: 1 }}>
-                  UniTrade
-                </Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
-                  Campus Marketplace
-                </Typography>
-              </Box>
-            </Box>
-            <Typography sx={{ color: "text.secondary", mb: 4, maxWidth: 300, lineHeight: 1.7 }}>
-              The most trusted marketplace for university students across Egypt. Buy, sell, and trade with your peers safely and easily.
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1.5 }}>
-              {[
-                { icon: <FacebookIcon />, label: "Facebook" },
-                { icon: <TwitterIcon />, label: "Twitter" },
-                { icon: <LinkedInIcon />, label: "LinkedIn" },
-                { icon: <InstagramIcon />, label: "Instagram" },
-              ].map((social) => (
-                <IconButton
-                  key={social.label}
-                  size="small"
-                  sx={{
-                    bgcolor: "background.subtle",
-                    color: "text.secondary",
-                    "&:hover": {
-                      bgcolor: "primary.main",
-                      color: "#ffffff",
-                      transform: "translateY(-2px)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  {social.icon}
-                </IconButton>
-              ))}
-            </Box>
-          </Grid>
-
-          {/* Links Sections */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <Grid item xs={6} sm={4} md={2.66} key={category}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 800, color: "text.primary", mb: 3 }}
-=======
     <>
       <Box
         component="footer"
@@ -243,7 +169,6 @@ export default function Footer() {
                   transition: "opacity 0.3s",
                   "&:hover": { opacity: 0.85 },
                 }}
->>>>>>> Stashed changes
               >
                 <Box
                   component="img"
@@ -296,12 +221,6 @@ export default function Footer() {
                     aria-label={s.label}
                     size="small"
                     sx={{
-<<<<<<< Updated upstream
-                      color: "text.secondary",
-                      fontWeight: 500,
-                      transition: "color 0.2s",
-                      "&:hover": { color: "primary.main" },
-=======
                       color: TEXT_MUTED,
                       border: `1px solid ${DIVIDER_COLOR}`,
                       backgroundColor: "rgba(255,255,255,0.04)",
@@ -315,7 +234,6 @@ export default function Footer() {
                         transform: "translateY(-3px)",
                         boxShadow: `0 6px 20px ${s.color}40`,
                       },
->>>>>>> Stashed changes
                     }}
                   >
                     {s.icon}
@@ -344,9 +262,6 @@ export default function Footer() {
               </Box>
             </Grid>
 
-<<<<<<< Updated upstream
-        <Divider sx={{ my: 6, borderColor: "divider" }} />
-=======
             {/* ════════════════════ CONTACT ════════════════════ */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Typography sx={sectionTitleSx}>Contact Us</Typography>
@@ -377,7 +292,6 @@ export default function Footer() {
               </Box>
             </Grid>
           </Grid>
->>>>>>> Stashed changes
 
           {/* ════════════════════ DIVIDER ════════════════════ */}
           <Divider sx={{ borderColor: DIVIDER_COLOR, mt: { xs: 5, md: 6 }, mb: 0 }} />
@@ -449,30 +363,10 @@ export default function Footer() {
             zIndex: 1100,
           }}
         >
-<<<<<<< Updated upstream
-          <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500 }}>
-            © {currentYear} UniTrade Egypt. All rights reserved. Built with ❤️ for Students.
-          </Typography>
-          <Box sx={{ display: "flex", gap: 4 }}>
-            <Link href="#" underline="none" sx={{ color: "text.secondary", fontSize: "0.875rem", "&:hover": { color: "text.primary" } }}>
-              Privacy
-            </Link>
-            <Link href="#" underline="none" sx={{ color: "text.secondary", fontSize: "0.875rem", "&:hover": { color: "text.primary" } }}>
-              Terms
-            </Link>
-            <Link href="#" underline="none" sx={{ color: "text.secondary", fontSize: "0.875rem", "&:hover": { color: "text.primary" } }}>
-              Cookies
-            </Link>
-          </Box>
-        </Box>
-      </Container>
-    </Box>
-=======
           <KeyboardArrowUpIcon sx={{ fontSize: 28 }} />
 
         </Fab>
       </Zoom>
     </>
->>>>>>> Stashed changes
   );
 }
