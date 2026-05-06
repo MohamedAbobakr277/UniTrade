@@ -107,10 +107,16 @@ export default function AIChatbot() {
             }
 
             const backendUrl = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, '');
-
+            
+            // Get user token for authentication
+            const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+            
             const response = await fetch(`${backendUrl}/chat`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                },
                 body: JSON.stringify({ chatHistory: validHistory })
             });
 

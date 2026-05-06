@@ -1,7 +1,4 @@
-/**
- * AI Image Analyzer Service
- * Handles Cloudinary uploads and Backend AI requests
- */
+import { auth } from "../firebase";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -45,9 +42,16 @@ export const uploadToCloudinary = async (file) => {
  * @returns {Promise<Object>} AI Response
  */
 export const analyzeWithAI = async (prompt, imageUrl = null) => {
+    // Get current user's ID token for authentication
+    const user = auth.currentUser;
+    const token = user ? await user.getIdToken() : null;
+
     const res = await fetch(`${API_URL}/generate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify({ prompt, imageUrl })
     });
 
