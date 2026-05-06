@@ -107,13 +107,13 @@ export default function AIChatbot() {
             }
 
             const backendUrl = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, '');
-            
+
             // Get user token for authentication
             const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
-            
+
             const response = await fetch(`${backendUrl}/chat`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': token ? `Bearer ${token}` : ''
                 },
@@ -136,7 +136,11 @@ export default function AIChatbot() {
 
             // Check if it's a Google Rate Limit / Quota Error
             let errorMessage = error.message || "Make sure your backend server is running on port 5000!";
-            if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('429')) {
+            if (errorMessage.toLowerCase().includes('api quota exceeded')) {
+                errorMessage = "The AI service has reached its usage limit. Please try again later.";
+            } else if (errorMessage.toLowerCase().includes('too many messages')) {
+                errorMessage = "You're sending messages too quickly. Please wait a moment and try again.";
+            } else if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('429')) {
                 errorMessage = "I'm receiving too many messages right now! Please wait 60 seconds and ask me again.";
             } else {
                 errorMessage = `Error connecting: ${errorMessage}`;
