@@ -45,7 +45,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
             >
                 {/* Header */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                    <StorefrontOutlinedIcon sx={{ color: "#2563eb" }} />
+                    <StorefrontOutlinedIcon sx={{ color: 'primary.main' }} />
                     <Typography
                         variant="h6"
                         sx={{
@@ -84,10 +84,14 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         fontWeight: 800,
                         fontSize: "0.95rem",
                         letterSpacing: "0.2px",
-                        background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
+                        background: (theme) => theme.palette.mode === 'light' 
+                            ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
+                            : "linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)",
                         boxShadow: "0 10px 20px rgba(37,99,235,0.25)",
                         "&:hover": {
-                            background: "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)",
+                            background: (theme) => theme.palette.mode === 'light' 
+                                ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
+                                : "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
                             boxShadow: "0 12px 24px rgba(37,99,235,0.32)",
                             transform: "translateY(-1px)",
                         },
@@ -110,7 +114,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
-                        <SchoolOutlinedIcon sx={{ color: "#16a34a", fontSize: 20 }} />
+                        <SchoolOutlinedIcon sx={{ color: "success.main", fontSize: 20 }} />
                         <Typography
                             sx={{
                                 fontWeight: 700,
@@ -142,7 +146,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-                        <PaidOutlinedIcon sx={{ color: "#f59e0b", fontSize: 20 }} />
+                        <PaidOutlinedIcon sx={{ color: "warning.main", fontSize: 20 }} />
                         <Typography
                             sx={{
                                 fontWeight: 700,
@@ -171,7 +175,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                             min={0}
                             max={100000}
                             sx={{
-                                color: "#2563eb",
+                                color: "primary.main",
                                 "& .MuiSlider-thumb": {
                                     width: 18,
                                     height: 18,
@@ -212,7 +216,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                 </Typography>
                             </Box>
 
-                            <Typography sx={{ color: "#94a3b8", fontSize: "0.8rem", fontWeight: 700 }}>—</Typography>
+                            <Typography sx={{ color: "text.secondary", fontSize: "0.8rem", fontWeight: 700 }}>—</Typography>
 
                             <Box
                                 sx={{
@@ -248,7 +252,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
-                        <VerifiedOutlinedIcon sx={{ color: "#7c3aed", fontSize: 20 }} />
+                        <VerifiedOutlinedIcon sx={{ color: "secondary.main", fontSize: 20 }} />
                         <Typography
                             sx={{
                                 fontWeight: 700,
@@ -283,9 +287,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                             }
                                         }}
                                         sx={{
-                                            color: "#94a3b8",
+                                            color: "text.secondary",
                                             "&.Mui-checked": {
-                                                color: "#2563eb",
+                                                color: "primary.main",
                                             },
                                         }}
                                     />
@@ -412,7 +416,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.8 }}>
-                        <TuneRoundedIcon sx={{ fontSize: 18, color: "#2563eb" }} />
+                        <TuneRoundedIcon sx={{ fontSize: 18, color: "primary.main" }} />
                         <Typography
                             sx={{
                                 fontWeight: 800,

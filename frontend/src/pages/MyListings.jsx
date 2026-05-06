@@ -198,9 +198,9 @@ export default function MyListings() {
                                     <Box sx={{ position: "relative", overflow: "hidden" }}>
                                         <Box sx={{
                                             position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
-                                            fontSize: 12, fontWeight: 700, color: 'white', zIndex: 2,
-                                            bgcolor: item.status === "sold" ? '#ef4444' : '#10b981',
-                                            boxShadow: "0 6px 18px rgba(0,0,0,0.15)"
+                                            fontSize: 12, fontWeight: 800, color: 'white', zIndex: 2,
+                                            bgcolor: item.status === "sold" ? 'error.main' : 'success.main',
+                                            boxShadow: "0 6px 18px rgba(0,0,0,0.2)"
                                         }}>
                                             {item.status === "sold" ? "SOLD" : "AVAILABLE"}
                                         </Box>
@@ -255,11 +255,14 @@ export default function MyListings() {
                                                 label={item.condition || "Condition not specified"}
                                                 size="small"
                                                 sx={{
-                                                    backgroundColor: `${item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b"}12`,
-                                                    color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b",
-                                                    fontWeight: 700,
+                                                    backgroundColor: (theme) => 
+                                                        item.condition === "New" ? "rgba(16, 185, 129, 0.1)" : 
+                                                        item.condition === "Like New" ? "rgba(37, 99, 235, 0.1)" : 
+                                                        "rgba(245, 158, 11, 0.1)",
+                                                    color: item.condition === "New" ? "success.main" : item.condition === "Like New" ? "primary.main" : "warning.main",
+                                                    fontWeight: 800,
                                                     borderRadius: "10px",
-                                                    "& .MuiChip-icon": { color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b" },
+                                                    "& .MuiChip-icon": { color: 'inherit' },
                                                 }}
                                             />
                                         </Box>
@@ -271,31 +274,63 @@ export default function MyListings() {
                                         <Box sx={{ flexGrow: 1 }} />
                                         <Divider sx={{ my: 2 }} />
 
-                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: "58px", width: "100%" }}>
+                                        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', height: "58px", width: "100%" }}>
                                             {item.status !== "sold" && (
                                                 <Button
                                                     fullWidth
                                                     variant="contained"
                                                     size="small"
-                                                    sx={{ borderRadius: "10px", textTransform: 'none', bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' }, height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, boxShadow: 'none' }}
+                                                    sx={{ 
+                                                        borderRadius: "12px", 
+                                                        textTransform: 'none', 
+                                                        bgcolor: 'success.main', 
+                                                        '&:hover': { bgcolor: 'success.dark' }, 
+                                                        height: '40px', 
+                                                        whiteSpace: 'nowrap', 
+                                                        minWidth: 0, 
+                                                        px: 2, 
+                                                        fontSize: '0.9rem', 
+                                                        fontWeight: 700, 
+                                                        boxShadow: 'none' 
+                                                    }}
                                                     onClick={() => handleMarkAsSold(item.id)}
                                                 >
-                                                    Sold
+                                                    Mark Sold
                                                 </Button>
                                             )}
                                             <Button
                                                 fullWidth
                                                 variant="outlined"
                                                 size="small"
-                                                startIcon={<EditIcon sx={{ fontSize: '1.1rem !important', mr: -0.5 }} />}
-                                                sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } }}
+                                                startIcon={<EditIcon sx={{ fontSize: '1.1rem !important' }} />}
+                                                sx={{ 
+                                                    borderRadius: "12px", 
+                                                    textTransform: 'none', 
+                                                    height: '40px', 
+                                                    whiteSpace: 'nowrap', 
+                                                    minWidth: 0, 
+                                                    px: 2, 
+                                                    fontSize: '0.9rem', 
+                                                    fontWeight: 700, 
+                                                    borderColor: 'divider', 
+                                                    color: 'text.primary', 
+                                                    '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } 
+                                                }}
                                                 onClick={() => handleOpenEditListing(item)}
                                             >
                                                 Edit
                                             </Button>
                                             <IconButton
                                                 size="small"
-                                                sx={{ bgcolor: 'background.subtle', borderRadius: "10px", color: 'text.secondary', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }}
+                                                sx={{ 
+                                                    bgcolor: 'background.subtle', 
+                                                    borderRadius: "12px", 
+                                                    color: 'text.secondary', 
+                                                    '&:hover': { bgcolor: 'error.light', color: 'error.main' }, 
+                                                    height: '40px', 
+                                                    width: '40px', 
+                                                    flexShrink: 0 
+                                                }}
                                                 onClick={() => handleOpenDeleteConfirm(item.id)}
                                             >
                                                 <DeleteIcon fontSize="small" />
@@ -356,8 +391,8 @@ export default function MyListings() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveListing} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Save Changes</Button>
+                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveListing} sx={{ bgcolor: 'primary.main', borderRadius: 2, px: 4, fontWeight: 800, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: 'primary.dark' } }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
 

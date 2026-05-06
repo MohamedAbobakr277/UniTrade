@@ -136,7 +136,7 @@ export default function Footer() {
             gap: 2,
           }}
         >
-          <Typography variant="body2" sx={{ color: "#94a3b8", fontWeight: 500 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500 }}>
             © {currentYear} UniTrade Egypt. All rights reserved. Built with ❤️ for Students.
           </Typography>
           <Box sx={{ display: "flex", gap: 4 }}>

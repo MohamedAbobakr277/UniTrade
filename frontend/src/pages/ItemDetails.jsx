@@ -195,9 +195,15 @@ export default function ItemDetails() {
                             px: 4,
                             py: 1.5,
                             textTransform: "none",
-                            fontWeight: 700,
-                            bgcolor: "#2563eb",
+                            fontWeight: 800,
+                            background: (theme) => theme.palette.mode === 'light' 
+                                ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
+                                : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
                             boxShadow: "0 8px 20px rgba(37,99,235,0.2)",
+                            "&:hover": {
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 12px 25px rgba(37,99,235,0.3)",
+                            }
                         }}
                     >
                         Back to Home
@@ -309,12 +315,12 @@ export default function ItemDetails() {
                                             <Chip
                                                 label="Sold Out"
                                                 sx={{
-                                                    bgcolor: "#ef4444",
+                                                    bgcolor: 'error.main',
                                                     color: "white",
-                                                    fontWeight: 800,
+                                                    fontWeight: 900,
                                                     borderRadius: "12px",
                                                     px: 1,
-                                                    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+                                                    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.4)",
                                                 }}
                                             />
                                         )}
@@ -399,7 +405,8 @@ export default function ItemDetails() {
                                                     borderRadius: "12px",
                                                     overflow: "hidden",
                                                     cursor: "pointer",
-                                                    border: currentImageIndex === idx ? "3px solid #3b82f6" : "2px solid transparent",
+                                                    border: '3px solid',
+                                                    borderColor: currentImageIndex === idx ? 'primary.main' : 'transparent',
                                                     opacity: currentImageIndex === idx ? 1 : 0.6,
                                                     transition: "all 0.2s ease",
                                                     flexShrink: 0,
@@ -436,7 +443,7 @@ export default function ItemDetails() {
                                         sx={{
                                             fontSize: { xs: 20, sm: 26, md: 36 },
                                             fontWeight: 900,
-                                            color: "#2563eb",
+                                            color: "primary.main",
                                             letterSpacing: "-1px",
                                             mb: 1.5,
                                         }}
@@ -468,7 +475,7 @@ export default function ItemDetails() {
                                     />
                                 </Box>
 
-                                <Divider sx={{ borderColor: "#e2e8f0" }} />
+                                <Divider sx={{ borderColor: 'divider' }} />
 
                                 {/* Description */}
                                 <Box sx={{ maxHeight: "150px", overflowY: "auto", pr: 1, "::-webkit-scrollbar": { width: "6px" }, "::-webkit-scrollbar-thumb": { background: (theme) => theme.palette.divider, borderRadius: "10px" } }}>
@@ -480,7 +487,7 @@ export default function ItemDetails() {
                                     </Typography>
                                 </Box>
 
-                                <Divider sx={{ borderColor: "#e2e8f0" }} />
+                                <Divider sx={{ borderColor: 'divider' }} />
 
                                 {/* Stock Status & Quantity Selector */}
                                 <Box>
@@ -495,32 +502,38 @@ export default function ItemDetails() {
                                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
                                                     <Chip
-                                                        icon={<InventoryIcon sx={{ fontSize: "18px !important", color: isOutOfStock ? "#ef4444 !important" : isLowStock ? "#f59e0b !important" : "#10b981 !important" }} />}
+                                                        icon={<InventoryIcon sx={{ fontSize: "18px !important", color: 'inherit' }} />}
                                                         label={isOutOfStock ? "Out of stock" : `In stock: ${stock} item${stock !== 1 ? 's' : ''}`}
                                                         sx={{
-                                                            bgcolor: isOutOfStock ? (theme => theme.palette.mode === 'light' ? "#fef2f2" : "rgba(239, 68, 68, 0.1)") : isLowStock ? (theme => theme.palette.mode === 'light' ? "#fffbeb" : "rgba(245, 158, 11, 0.1)") : (theme => theme.palette.mode === 'light' ? "#f0fdf4" : "rgba(16, 185, 129, 0.1)"),
-                                                            color: isOutOfStock ? "#ef4444" : isLowStock ? (theme => theme.palette.mode === 'light' ? "#d97706" : "#f59e0b") : "#10b981",
-                                                            fontWeight: 700,
+                                                            bgcolor: isOutOfStock 
+                                                                ? (theme => theme.palette.mode === 'light' ? "rgba(239, 68, 68, 0.08)" : "rgba(239, 68, 68, 0.15)") 
+                                                                : isLowStock 
+                                                                    ? (theme => theme.palette.mode === 'light' ? "rgba(245, 158, 11, 0.08)" : "rgba(245, 158, 11, 0.15)") 
+                                                                    : (theme => theme.palette.mode === 'light' ? "rgba(16, 185, 129, 0.08)" : "rgba(16, 185, 129, 0.15)"),
+                                                            color: isOutOfStock ? "error.main" : isLowStock ? "warning.main" : "success.main",
+                                                            fontWeight: 800,
                                                             borderRadius: "12px",
                                                             py: 2.2,
                                                             px: 0.5,
                                                             border: '1px solid',
-                                                            borderColor: isOutOfStock ? "error.main" : isLowStock ? "warning.main" : "success.main",
+                                                            borderColor: 'inherit',
                                                             fontSize: "0.9rem",
+                                                            "& .MuiChip-icon": { color: 'inherit' }
                                                         }}
                                                     />
                                                     {isLowStock && (
                                                         <Chip
-                                                            icon={<WarningAmberIcon sx={{ fontSize: "16px !important", color: "#f59e0b !important" }} />}
+                                                            icon={<WarningAmberIcon sx={{ fontSize: "16px !important", color: 'inherit' }} />}
                                                             label="Low stock"
                                                             size="small"
                                                             sx={{
-                                                                bgcolor: (theme) => theme.palette.mode === 'light' ? "#fffbeb" : "rgba(245, 158, 11, 0.1)",
-                                                                color: (theme) => theme.palette.mode === 'light' ? "#d97706" : "#f59e0b",
-                                                                fontWeight: 700,
+                                                                bgcolor: (theme) => theme.palette.mode === 'light' ? "rgba(245, 158, 11, 0.08)" : "rgba(245, 158, 11, 0.15)",
+                                                                color: "warning.main",
+                                                                fontWeight: 800,
                                                                 borderRadius: "10px",
                                                                 border: "1px solid",
                                                                 borderColor: "warning.main",
+                                                                "& .MuiChip-icon": { color: 'inherit' }
                                                             }}
                                                         />
                                                     )}
@@ -621,8 +634,10 @@ export default function ItemDetails() {
                                         fontWeight: 900,
                                         fontSize: 19,
                                         background: item.status === "sold" || item.quantityAvailable === 0 
-                                            ? "#94a3b8" 
-                                            : "linear-gradient(135deg, #2563eb, #3b82f6)",
+                                            ? "text.disabled" 
+                                            : (theme) => theme.palette.mode === 'light' 
+                                                ? "linear-gradient(135deg, #2563eb, #3b82f6)"
+                                                : "linear-gradient(135deg, #3b82f6, #60a5fa)",
                                         boxShadow: item.status === "sold" || item.quantityAvailable === 0 
                                             ? "none" 
                                             : "0 10px 30px rgba(37,99,235,0.25)",
@@ -633,8 +648,10 @@ export default function ItemDetails() {
                                                 ? "none" 
                                                 : "0 15px 40px rgba(37,99,235,0.35)",
                                             background: item.status === "sold" || item.quantityAvailable === 0 
-                                                ? "#94a3b8" 
-                                                : "linear-gradient(135deg, #1d4ed8, #2563eb)",
+                                                ? "text.disabled" 
+                                                : (theme) => theme.palette.mode === 'light' 
+                                                    ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
+                                                    : "linear-gradient(135deg, #2563eb, #3b82f6)",
                                         },
                                         "&.Mui-disabled": {
                                             bgcolor: "divider",
@@ -697,7 +714,7 @@ export default function ItemDetails() {
                                 <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "text.primary" }}>
                                     {sellerName}
                                 </Typography>
-                                {(sellerData?.isVerified || sellerData?.major) && <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: "1.1rem" }} />}
+                                {(sellerData?.isVerified || sellerData?.major) && <VerifiedUserIcon sx={{ color: "primary.main", fontSize: "1.1rem" }} />}
                             </Box>
                             <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", fontWeight: 500 }}>
                                 Verified User

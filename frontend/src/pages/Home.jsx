@@ -239,10 +239,10 @@ export default function Home() {
                     <Chip
                       label={`${filteredItems.length} item${filteredItems.length !== 1 ? "s" : ""} found`}
                       sx={{
-                        fontWeight: 700,
+                        fontWeight: 800,
                         borderRadius: "10px",
-                        backgroundColor: (theme) => theme.palette.mode === 'light' ? "#e0ecff" : "rgba(37, 99, 235, 0.15)",
-                        color: (theme) => theme.palette.mode === 'light' ? "#1d4ed8" : "#60a5fa",
+                        backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(37, 99, 235, 0.1)" : "rgba(96, 165, 250, 0.1)",
+                        color: (theme) => theme.palette.mode === 'light' ? "primary.main" : "#60a5fa",
                         display: { xs: "none", sm: "flex" },
                       }}
                     />
@@ -326,7 +326,9 @@ export default function Home() {
           position: "fixed",
           bottom: 32,
           right: 32,
-          background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+          background: (theme) => theme.palette.mode === 'light' 
+            ? "linear-gradient(135deg, #2563eb, #3b82f6)"
+            : "linear-gradient(135deg, #3b82f6, #60a5fa)",
           color: "#fff",
           boxShadow: "0 8px 24px rgba(37, 99, 235, 0.35)",
           opacity: showScrollTop ? 1 : 0,
@@ -334,7 +336,9 @@ export default function Home() {
           transition: "opacity 0.3s ease, transform 0.3s ease",
           pointerEvents: showScrollTop ? "auto" : "none",
           "&:hover": {
-            background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
+            background: (theme) => theme.palette.mode === 'light' 
+                ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
+                : "linear-gradient(135deg, #2563eb, #3b82f6)",
             boxShadow: "0 10px 30px rgba(37, 99, 235, 0.45)",
           },
           zIndex: 1000,

@@ -345,9 +345,19 @@ export default function Profile() {
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>{user.firstName} {user.lastName}</Typography>
                         <List sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             <ListItem disablePadding>
-                                <ListItemButton selected sx={{ borderRadius: 2, '&.Mui-selected': { bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } } }}>
+                                <ListItemButton 
+                                    selected 
+                                    sx={{ 
+                                        borderRadius: 2, 
+                                        '&.Mui-selected': { 
+                                            bgcolor: 'primary.main', 
+                                            color: 'white', 
+                                            '&:hover': { bgcolor: 'primary.dark' } 
+                                        } 
+                                    }}
+                                >
                                     <ListItemIcon><PersonIcon sx={{ color: 'inherit' }} /></ListItemIcon>
-                                    <ListItemText primary="My Profile" primaryTypographyProps={{ fontWeight: 600 }} />
+                                    <ListItemText primary="My Profile" primaryTypographyProps={{ fontWeight: 700 }} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>
@@ -361,18 +371,22 @@ export default function Profile() {
                         <List>
                             <ListItem disablePadding>
                                 <ListItemButton
-                                    sx={{ borderRadius: 2, color: '#ef4444' }}
+                                    sx={{ 
+                                        borderRadius: 2, 
+                                        color: 'error.main',
+                                        '&:hover': { bgcolor: (theme) => theme.palette.mode === 'light' ? '#fff1f2' : 'rgba(239, 68, 68, 0.1)' }
+                                    }}
                                     onClick={async () => {
                                         try {
-                                            await auth.signOut(); // يسجل خروج المستخدم
-                                            navigate('/login');   // يرجعك لصفحة login
+                                            await auth.signOut();
+                                            navigate('/login');
                                         } catch (error) {
                                             console.error("Logout failed:", error);
                                         }
                                     }}
                                 >
                                     <ListItemIcon><LogoutIcon sx={{ color: 'inherit' }} /></ListItemIcon>
-                                    <ListItemText primary="Logout" />
+                                    <ListItemText primary="Logout" primaryTypographyProps={{ fontWeight: 600 }} />
                                 </ListItemButton>
                             </ListItem>
                         </List>
@@ -407,51 +421,86 @@ export default function Profile() {
                         </Button>
                         <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', m: 0 }}>My Profile</Typography>
                     </Box>
-                    <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', overflow: 'visible' }}>
-                        <CardContent sx={{ p: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Card sx={{ 
+                        borderRadius: 4, 
+                        boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 30px rgba(15,23,42,0.04)' : 'none',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        overflow: 'visible' 
+                    }}>
+                        <CardContent sx={{ p: 4, display: 'flex', alignItems: 'center', gap: 4, flexDirection: { xs: 'column', md: 'row' }, textAlign: { xs: 'center', md: 'left' } }}>
                             <Box sx={{ position: 'relative' }}>
-                                <Avatar src={user.profilePhoto} sx={{ width: 120, height: 120, border: '4px solid', borderColor: 'background.paper', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                                <Avatar src={user.profilePhoto} sx={{ width: 120, height: 120, border: '4px solid', borderColor: 'background.paper', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }} />
                             </Box>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="h4" sx={{ fontWeight: 700 }}>{user.firstName} {user.lastName}</Typography>
-                                <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 600 }}>{user.major}</Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, color: 'text.secondary' }}>
+                                <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary' }}>{user.firstName} {user.lastName}</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.main', mb: 0.5 }}>{user.major}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 1, color: 'text.secondary' }}>
                                     <BusinessIcon fontSize="small" />
-                                    <Typography variant="body2">{user.university}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{user.university}</Typography>
                                 </Box>
                                 
-                                <Box sx={{ mt: 1.5 }}>
+                                <Box sx={{ mt: 1.5, display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' } }}>
                                     <StarRatingDisplay averageRating={user.averageRating} ratingsCount={user.ratingsCount} size="medium" />
                                 </Box>
 
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 4, mt: 2 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: { xs: "center", md: "flex-start" }, gap: 4, mt: 2 }}>
                                     <Box>
-                                        <Typography sx={{ fontSize: 20, fontWeight: 800, color: "#2563eb", lineHeight: 1 }}>
+                                        <Typography sx={{ fontSize: 22, fontWeight: 900, color: "primary.main", lineHeight: 1 }}>
                                             {userItems.filter(i => i.status !== "sold").length}
                                         </Typography>
-                                        <Typography sx={{ fontSize: 11, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Available</Typography>
+                                        <Typography sx={{ fontSize: 11, color: "text.secondary", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Available</Typography>
                                     </Box>
                                     <Box sx={{ width: "1.5px", height: "25px", bgcolor: "divider" }} />
                                     <Box>
-                                        <Typography sx={{ fontSize: 20, fontWeight: 800, color: "#ef4444", lineHeight: 1 }}>
+                                        <Typography sx={{ fontSize: 22, fontWeight: 900, color: "error.main", lineHeight: 1 }}>
                                             {userItems.filter(i => i.status === "sold").length}
                                         </Typography>
-                                        <Typography sx={{ fontSize: 11, color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Sold</Typography>
+                                        <Typography sx={{ fontSize: 11, color: "text.secondary", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Sold</Typography>
                                     </Box>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Button variant="outlined" startIcon={<EditIcon />} sx={{ borderRadius: 3, textTransform: 'none', px: 3 }} onClick={handleOpenEditModal}>Edit Profile</Button>
-                                <Button variant="contained" startIcon={<LockResetIcon />} sx={{ borderRadius: 3, textTransform: 'none', px: 3, bgcolor: '#2563eb' }} onClick={() => setIsResetModalOpen(true)}>Reset Password</Button>
+                            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
+                                <Button 
+                                    variant="outlined" 
+                                    startIcon={<EditIcon />} 
+                                    sx={{ borderRadius: "14px", textTransform: 'none', px: 3, fontWeight: 700, py: 1.2 }} 
+                                    onClick={handleOpenEditModal}
+                                >
+                                    Edit Profile
+                                </Button>
+                                <Button 
+                                    variant="contained" 
+                                    startIcon={<LockResetIcon />} 
+                                    sx={{ 
+                                        borderRadius: "14px", 
+                                        textTransform: 'none', 
+                                        px: 3, 
+                                        fontWeight: 800, 
+                                        py: 1.2,
+                                        background: (theme) => theme.palette.mode === 'light' 
+                                            ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
+                                            : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
+                                    }} 
+                                    onClick={() => setIsResetModalOpen(true)}
+                                >
+                                    Reset Password
+                                </Button>
                             </Box>
                         </CardContent>
                     </Card>
 
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'stretch' }}>
                         <Box sx={{ width: { xs: '100%', md: '350px' }, flexShrink: 0 }}>
-                            <Card sx={{ borderRadius: 4, height: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                            <Card sx={{ 
+                                borderRadius: 4, 
+                                height: '100%', 
+                                boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 30px rgba(15,23,42,0.04)' : 'none',
+                                border: '1px solid',
+                                borderColor: 'divider'
+                            }}>
                                 <CardContent sx={{ p: 4 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Personal Information</Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, mb: 3 }}>Personal Information</Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                                         <InfoItem icon={<EmailIcon />} label="Email Address" value={user.email} />
                                         <InfoItem icon={<PhoneIcon />} label="Phone Number" value={user.phoneNumber} />
@@ -459,11 +508,11 @@ export default function Profile() {
                                         <InfoItem icon={<BusinessIcon />} label="University" value={user.university} />
                                     </Box>
                                     <Box sx={{ mt: 4, p: 3, borderRadius: 3, bgcolor: "background.subtle", border: '1px solid', borderColor: 'divider' }}>
-                                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, mb: 1 }}>Student Verification</Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Your account is verified as a current student.</Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#2563eb' }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5, color: 'primary.main' }}>Student Verification</Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>Your account is verified as a current student.</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main' }}>
                                             <CheckCircleIcon fontSize="small" />
-                                            <Typography variant="caption" sx={{ fontWeight: 700 }}>Status: Active</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: 800 }}>Status: Active</Typography>
                                         </Box>
                                     </Box>
                                 </CardContent>
@@ -508,107 +557,142 @@ export default function Profile() {
                                                     position: 'relative'
                                                 }}
                                             >
-                                                <Box sx={{ position: "relative", overflow: "hidden" }}>
-                                                    <Box sx={{
-                                                        position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
-                                                        fontSize: 12, fontWeight: 700, color: 'white', zIndex: 2,
-                                                        bgcolor: item.status === "sold" ? '#ef4444' : '#10b981',
-                                                        boxShadow: "0 6px 18px rgba(0,0,0,0.15)"
-                                                    }}>
-                                                        {item.status === "sold" ? "SOLD" : "AVAILABLE"}
-                                                    </Box>
-                                                    <CardMedia
-                                                        component="img"
-                                                        height="220"
-                                                        image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
-                                                        sx={{
-                                                            width: "100%",
-                                                            objectFit: "cover",
-                                                            display: "block",
-                                                            transition: "transform 0.35s ease",
-                                                            "&:hover": {
-                                                                transform: "scale(1.04)",
-                                                            },
-                                                        }}
-                                                    />
-                                                </Box>
-
-                                                <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                                                    <Typography
-                                                        variant="h6"
-                                                        sx={{
-                                                            fontWeight: 800,
-                                                            fontSize: "1.05rem",
-                                                            color: "text.primary",
-                                                            lineHeight: 1.4,
-                                                            height: "54px",
-                                                            display: "-webkit-box",
-                                                            WebkitLineClamp: 2,
-                                                            WebkitBoxOrient: "vertical",
-                                                            overflow: "hidden"
-                                                        }}
-                                                    >
-                                                        {item.title || "Untitled Item"}
-                                                    </Typography>
-
-                                                    <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 800, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
-                                                        {item.price ? `${item.price} EGP` : "Price not available"}
-                                                    </Typography>
-
-                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
-                                                        <LocationOnIcon sx={{ fontSize: 17, color: "text.secondary" }} />
-                                                        <Typography component="span" sx={{ fontSize: "0.92rem", color: "text.secondary", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                                                            {item.university || "University not specified"}
-                                                        </Typography>
-                                                    </Box>
-
-                                                    <Box sx={{ mt: 1.2, height: "32px" }}>
-                                                        <Chip
-                                                            icon={<VerifiedOutlinedIcon />}
-                                                            label={item.condition || "Condition not specified"}
-                                                            size="small"
+                                                    <Box sx={{ position: "relative", overflow: "hidden" }}>
+                                                        <Box sx={{
+                                                            position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
+                                                            fontSize: 12, fontWeight: 800, color: 'white', zIndex: 2,
+                                                            bgcolor: item.status === "sold" ? 'error.main' : 'success.main',
+                                                            boxShadow: "0 6px 18px rgba(0,0,0,0.2)"
+                                                        }}>
+                                                            {item.status === "sold" ? "SOLD" : "AVAILABLE"}
+                                                        </Box>
+                                                        <CardMedia
+                                                            component="img"
+                                                            height="220"
+                                                            image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
                                                             sx={{
-                                                                backgroundColor: `${item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b"}12`,
-                                                                color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b",
-                                                                fontWeight: 700,
-                                                                borderRadius: "10px",
-                                                                "& .MuiChip-icon": { color: item.condition === "New" ? "#16a34a" : item.condition === "Like New" ? "#2563eb" : "#f59e0b" },
+                                                                width: "100%",
+                                                                objectFit: "cover",
+                                                                display: "block",
+                                                                transition: "transform 0.4s ease",
+                                                                "&:hover": {
+                                                                    transform: "scale(1.05)",
+                                                                },
                                                             }}
                                                         />
                                                     </Box>
 
-                                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
-                                                        {item.description || "No description available"}
-                                                    </Typography>
+                                                    <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                                                        <Typography
+                                                            variant="h6"
+                                                            sx={{
+                                                                fontWeight: 800,
+                                                                fontSize: "1.05rem",
+                                                                color: "text.primary",
+                                                                lineHeight: 1.4,
+                                                                height: "54px",
+                                                                display: "-webkit-box",
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: "vertical",
+                                                                overflow: "hidden"
+                                                            }}
+                                                        >
+                                                            {item.title || "Untitled Item"}
+                                                        </Typography>
+
+                                                        <Typography variant="h6" sx={{ color: "primary.main", fontWeight: 900, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
+                                                            {item.price ? `${item.price} EGP` : "Price not available"}
+                                                        </Typography>
+
+                                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
+                                                            <LocationOnIcon sx={{ fontSize: 17, color: "text.secondary" }} />
+                                                            <Typography component="span" sx={{ fontSize: "0.92rem", color: "text.secondary", fontWeight: 600, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                                                {item.university || "University not specified"}
+                                                            </Typography>
+                                                        </Box>
+
+                                                        <Box sx={{ mt: 1.2, height: "32px" }}>
+                                                            <Chip
+                                                                icon={<VerifiedOutlinedIcon />}
+                                                                label={item.condition || "Condition not specified"}
+                                                                size="small"
+                                                                sx={{
+                                                                    backgroundColor: (theme) => 
+                                                                        item.condition === "New" ? "rgba(16, 185, 129, 0.1)" : 
+                                                                        item.condition === "Like New" ? "rgba(37, 99, 235, 0.1)" : 
+                                                                        "rgba(245, 158, 11, 0.1)",
+                                                                    color: item.condition === "New" ? "success.main" : item.condition === "Like New" ? "primary.main" : "warning.main",
+                                                                    fontWeight: 800,
+                                                                    borderRadius: "10px",
+                                                                    "& .MuiChip-icon": { color: 'inherit' },
+                                                                }}
+                                                            />
+                                                        </Box>
+
+                                                        <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px", fontWeight: 500 }}>
+                                                            {item.description || "No description available"}
+                                                        </Typography>
 
                                                     <Box sx={{ flexGrow: 1 }} />
                                                     <Divider sx={{ my: 2 }} />
 
-                                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: "58px", width: "100%" }}>
+                                                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', height: "58px", width: "100%" }}>
                                                         {item.status !== "sold" && (
                                                             <Button
                                                                 fullWidth
                                                                 variant="contained"
                                                                 size="small"
-                                                                sx={{ borderRadius: "10px", textTransform: 'none', bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' }, height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, boxShadow: 'none' }}
+                                                                sx={{ 
+                                                                    borderRadius: "12px", 
+                                                                    textTransform: 'none', 
+                                                                    bgcolor: 'success.main', 
+                                                                    '&:hover': { bgcolor: 'success.dark' }, 
+                                                                    height: '40px', 
+                                                                    whiteSpace: 'nowrap', 
+                                                                    minWidth: 0, 
+                                                                    px: 2, 
+                                                                    fontSize: '0.9rem', 
+                                                                    fontWeight: 700, 
+                                                                    boxShadow: 'none' 
+                                                                }}
                                                                 onClick={() => handleMarkAsSold(item.id)}
                                                             >
-                                                                Sold
+                                                                Mark Sold
                                                             </Button>
                                                         )}
                                                         <Button
                                                             fullWidth
                                                             variant="outlined"
                                                             size="small"
-                                                            startIcon={<EditIcon sx={{ fontSize: '1.1rem !important', mr: -0.5 }} />}
-                                                            sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } }}
+                                                            startIcon={<EditIcon sx={{ fontSize: '1.1rem !important' }} />}
+                                                            sx={{ 
+                                                                borderRadius: "12px", 
+                                                                textTransform: 'none', 
+                                                                height: '40px', 
+                                                                whiteSpace: 'nowrap', 
+                                                                minWidth: 0, 
+                                                                px: 2, 
+                                                                fontSize: '0.9rem', 
+                                                                fontWeight: 700, 
+                                                                borderColor: 'divider', 
+                                                                color: 'text.primary', 
+                                                                '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } 
+                                                            }}
                                                             onClick={() => handleOpenEditListing(item)}
                                                         >
                                                             Edit
                                                         </Button>
                                                         <IconButton
                                                             size="small"
-                                                            sx={{ bgcolor: 'background.subtle', borderRadius: "10px", color: 'text.secondary', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }}
+                                                            sx={{ 
+                                                                bgcolor: 'background.subtle', 
+                                                                borderRadius: "12px", 
+                                                                color: 'text.secondary', 
+                                                                '&:hover': { bgcolor: 'error.light', color: 'error.main' }, 
+                                                                height: '40px', 
+                                                                width: '40px', 
+                                                                flexShrink: 0 
+                                                            }}
                                                             onClick={() => handleOpenDeleteConfirm(item.id)}
                                                         >
                                                             <DeleteIcon fontSize="small" />
@@ -634,8 +718,8 @@ export default function Profile() {
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3, position: 'relative' }}>
-                        <Avatar src={editData.profilePhoto} sx={{ width: 100, height: 100, mb: 1 }} />
-                        <IconButton sx={{ position: 'absolute', bottom: 35, right: 'calc(50% - 50px)', bgcolor: '#2563eb', color: 'white', '&:hover': { bgcolor: '#1d4ed8' } }} size="small" onClick={() => fileInputRef.current.click()}>
+                        <Avatar src={editData.profilePhoto} sx={{ width: 100, height: 100, mb: 1, border: '4px solid', borderColor: 'background.paper', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                        <IconButton sx={{ position: 'absolute', bottom: 35, right: 'calc(50% - 50px)', bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }} size="small" onClick={() => fileInputRef.current.click()}>
                             <PhotoCameraIcon fontSize="small" />
                         </IconButton>
                         <input type="file" hidden ref={fileInputRef} onChange={handlePhotoChange} accept="image/*" />
@@ -662,8 +746,8 @@ export default function Profile() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveProfile} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Save Changes</Button>
+                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveProfile} sx={{ bgcolor: 'primary.main', borderRadius: 2, px: 4, fontWeight: 800, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: 'primary.dark' } }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
             {/* Edit Listing Modal */}
@@ -729,8 +813,8 @@ export default function Profile() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveListing} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Save Changes</Button>
+                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveListing} sx={{ bgcolor: 'primary.main', borderRadius: 2, px: 4, fontWeight: 800, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: 'primary.dark' } }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
 
@@ -775,8 +859,8 @@ export default function Profile() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsResetModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleResetPassword} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Update Password</Button>
+                    <Button onClick={() => setIsResetModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'none' }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleResetPassword} sx={{ bgcolor: 'primary.main', borderRadius: 2, px: 4, fontWeight: 800, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: 'primary.dark' } }}>Update Password</Button>
                 </DialogActions>
             </Dialog>
 

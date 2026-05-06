@@ -8,15 +8,16 @@ export default function EmptyState({ title, description, iconType, ctaText, ctaL
   const navigate = useNavigate();
 
   const getIcon = () => {
+    const iconStyle = { fontSize: 80, color: "text.secondary", mb: 2, opacity: 0.5 };
     switch (iconType) {
       case "shopping":
-        return <ShoppingBagOutlinedIcon sx={{ fontSize: 80, color: "#94a3b8", mb: 2 }} />;
+        return <ShoppingBagOutlinedIcon sx={iconStyle} />;
       case "favorite":
-        return <FavoriteBorderOutlinedIcon sx={{ fontSize: 80, color: "#94a3b8", mb: 2 }} />;
+        return <FavoriteBorderOutlinedIcon sx={iconStyle} />;
       case "inventory":
-        return <Inventory2OutlinedIcon sx={{ fontSize: 80, color: "#94a3b8", mb: 2 }} />;
+        return <Inventory2OutlinedIcon sx={iconStyle} />;
       default:
-        return <ShoppingBagOutlinedIcon sx={{ fontSize: 80, color: "#94a3b8", mb: 2 }} />;
+        return <ShoppingBagOutlinedIcon sx={iconStyle} />;
     }
   };
 
@@ -30,17 +31,18 @@ export default function EmptyState({ title, description, iconType, ctaText, ctaL
         py: 12,
         px: 4,
         textAlign: "center",
-        backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.03)",
-        borderRadius: "24px",
-        border: "1px dashed",
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(0, 0, 0, 0.02)" : "rgba(255, 255, 255, 0.02)",
+        borderRadius: "32px",
+        border: "2px dashed",
         borderColor: "divider",
+        width: '100%'
       }}
     >
       {getIcon()}
-      <Typography variant="h5" sx={{ fontWeight: 800, color: "text.primary", mb: 1.5 }}>
+      <Typography variant="h5" sx={{ fontWeight: 900, color: "text.primary", mb: 1.5, letterSpacing: '-0.5px' }}>
         {title}
       </Typography>
-      <Typography sx={{ color: "text.secondary", fontSize: "1.05rem", maxWidth: "450px", mb: 4, lineHeight: 1.6 }}>
+      <Typography sx={{ color: "text.secondary", fontSize: "1.05rem", maxWidth: "450px", mb: 4, lineHeight: 1.6, fontWeight: 500 }}>
         {description}
       </Typography>
       {ctaText && ctaLink && (
@@ -48,7 +50,9 @@ export default function EmptyState({ title, description, iconType, ctaText, ctaL
           variant="contained"
           onClick={() => onCtaClick ? onCtaClick() : navigate(ctaLink)}
           sx={{
-            bgcolor: "#2563eb",
+            background: (theme) => theme.palette.mode === 'light' 
+                ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
+                : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
             borderRadius: "14px",
             px: 4,
             py: 1.5,
@@ -56,9 +60,10 @@ export default function EmptyState({ title, description, iconType, ctaText, ctaL
             fontWeight: 800,
             fontSize: "1rem",
             boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
+            transition: "all 0.3s ease",
             "&:hover": {
-              bgcolor: "#1d4ed8",
-              transform: "translateY(-1px)",
+              transform: "translateY(-2px)",
+              boxShadow: "0 12px 25px rgba(37, 99, 235, 0.3)",
             },
           }}
         >

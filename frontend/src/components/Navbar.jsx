@@ -58,7 +58,7 @@ function HighlightMatch({ text, query }) {
     return (
         <span>
             {text.slice(0, idx)}
-            <strong style={{ color: "#2563eb" }}>{text.slice(idx, idx + query.length)}</strong>
+            <strong style={{ color: theme.palette.primary.main }}>{text.slice(idx, idx + query.length)}</strong>
             {text.slice(idx + query.length)}
         </span>
     );
@@ -286,20 +286,20 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             display: "flex",
                             alignItems: "center",
                             borderRadius: open ? "14px 14px 0 0" : "14px",
-                            border: open ? "1.5px solid #3b82f6" : `1.5px solid ${isDark ? "#334155" : "#dbe6fb"}`,
-                            borderBottom: open ? `1.5px solid ${isDark ? "#334155" : "#e8eef8"}` : `1.5px solid ${isDark ? "#334155" : "#dbe6fb"}`,
-                            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                            border: open ? `1.5px solid ${theme.palette.primary.main}` : `1.5px solid ${theme.palette.divider}`,
+                            borderBottom: open ? `1.5px solid ${theme.palette.divider}` : `1.5px solid ${theme.palette.divider}`,
+                            backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "#ffffff",
                             boxShadow: open
-                                ? "0 4px 0 rgba(59,130,246,0.10)"
+                                ? `0 4px 0 ${isDark ? 'rgba(59,130,246,0.2)' : 'rgba(59,130,246,0.1)'}`
                                 : "0 2px 12px rgba(37,99,235,0.06)",
                             overflow: "hidden",
-                            transition: "border-radius 0.15s ease, border 0.2s ease, box-shadow 0.2s ease",
+                            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                         }}
                     >
 
                         {/* Left search icon — decorative only */}
                         <Box sx={{ pl: 2.5, pr: 1, display: "flex", alignItems: "center", pointerEvents: "none", flexShrink: 0 }}>
-                            <SearchIcon sx={{ color: open ? "#3b82f6" : "#94a3b8", fontSize: "1.6rem", transition: "color 0.25s" }} />
+                            <SearchIcon sx={{ color: open ? "primary.main" : "text.secondary", fontSize: "1.6rem", transition: "color 0.25s" }} />
                         </Box>
 
                         <InputBase
@@ -342,7 +342,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             <Box sx={{ pr: 2, display: "flex", alignItems: "center" }}>
                                 <ClearIcon
                                     onClick={handleClear}
-                                    sx={{ color: "#94a3b8", fontSize: "1.1rem", cursor: "pointer", "&:hover": { color: "#475569" } }}
+                                    sx={{ color: "text.secondary", fontSize: "1.1rem", cursor: "pointer", "&:hover": { color: "text.primary" } }}
                                 />
                             </Box>
                         )}
@@ -361,10 +361,10 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 right: 0,
                                 zIndex: 1300,
                                 borderRadius: "0 0 16px 16px",
-                                border: "1.5px solid #3b82f6",
+                                border: `1.5px solid ${theme.palette.primary.main}`,
                                 borderTop: "none",
                                 backgroundColor: "background.paper",
-                                boxShadow: isDark ? "0 16px 40px rgba(0,0,0,0.4)" : "0 16px 40px rgba(15,23,42,0.12)",
+                                boxShadow: isDark ? "0 20px 50px rgba(0,0,0,0.5)" : "0 16px 40px rgba(15,23,42,0.12)",
                                 overflow: "hidden",
                                 maxHeight: "420px",
                                 overflowY: "auto",
@@ -392,18 +392,22 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                     px: 2.5,
                                                     py: 1.4,
                                                     cursor: "pointer",
-                                                    backgroundColor: activeIndex === idx ? (isDark ? "rgba(255,255,255,0.05)" : "#f0f6ff") : "transparent",
+                                                    backgroundColor: activeIndex === idx 
+                                                        ? (isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)") 
+                                                        : "transparent",
                                                     transition: "background 0.15s",
-                                                    "&:hover": { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#f0f6ff" },
+                                                    "&:hover": { 
+                                                        backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)" 
+                                                    },
                                                 }}
                                             >
-                                                <SearchIcon sx={{ color: "#94a3b8", fontSize: "1.1rem", flexShrink: 0 }} />
+                                                <SearchIcon sx={{ color: "text.secondary", fontSize: "1.1rem", flexShrink: 0 }} />
                                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                                     <Typography sx={{ fontSize: "0.92rem", color: "text.primary", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                         <HighlightMatch text={item.title} query={inputValue} />
                                                     </Typography>
                                                     {item.category && (
-                                                        <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mt: 0.1 }}>
+                                                        <Typography sx={{ fontSize: "0.78rem", color: "text.secondary", mt: 0.1 }}>
                                                             in {item.category}
                                                         </Typography>
                                                     )}
@@ -431,7 +435,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                 </Typography>
                                                 <Typography
                                                     onClick={() => { localStorage.removeItem(RECENT_KEY); setRecentSearches([]); }}
-                                                    sx={{ fontSize: "0.78rem", color: "#3b82f6", fontWeight: 700, cursor: "pointer", "&:hover": { color: "#1d4ed8" } }}
+                                                    sx={{ fontSize: "0.78rem", color: "primary.main", fontWeight: 800, cursor: "pointer", "&:hover": { textDecoration: 'underline' } }}
                                                 >
                                                     Clear all
                                                 </Typography>
@@ -447,29 +451,31 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                         px: 2.5,
                                                         py: 1.2,
                                                         cursor: "pointer",
-                                                        "&:hover": { backgroundColor: "#f0f6ff" },
+                                                        "&:hover": { 
+                                                            backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)" 
+                                                        },
                                                         transition: "background 0.15s",
                                                     }}
                                                 >
-                                                    <AccessTimeIcon sx={{ color: "#94a3b8", fontSize: "1.05rem", flexShrink: 0 }} />
+                                                    <AccessTimeIcon sx={{ color: "text.secondary", fontSize: "1.05rem", flexShrink: 0 }} />
                                                     <Typography sx={{ flex: 1, fontSize: "0.92rem", color: "text.primary", fontWeight: 500 }}>
                                                         {term}
                                                     </Typography>
                                                     <ClearIcon
                                                         onClick={(e) => handleRemoveRecent(e, term)}
-                                                        sx={{ color: "#cbd5e1", fontSize: "0.95rem", cursor: "pointer", "&:hover": { color: "#64748b" }, transition: "color 0.15s" }}
+                                                        sx={{ color: "text.disabled", fontSize: "0.95rem", cursor: "pointer", "&:hover": { color: "error.main" }, transition: "color 0.15s" }}
                                                     />
                                                 </Box>
                                             ))}
-                                            <Divider sx={{ mx: 2, my: 1, borderColor: "#f1f5f9" }} />
+                                            <Divider sx={{ mx: 2, my: 1, borderColor: "divider" }} />
                                         </Box>
                                     )}
 
                                     {/* Trending */}
                                     <Box sx={{ px: 2.5, pt: 1, pb: 2 }}>
                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-                                            <TrendingUpIcon sx={{ color: "#f59e0b", fontSize: "1.05rem" }} />
-                                            <Typography sx={{ fontSize: "0.78rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.6px" }}>
+                                            <TrendingUpIcon sx={{ color: "warning.main", fontSize: "1.05rem" }} />
+                                            <Typography sx={{ fontSize: "0.78rem", fontWeight: 800, color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.6px" }}>
                                                 Popular on UniTrade
                                             </Typography>
                                         </Box>
@@ -491,9 +497,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                         cursor: "pointer",
                                                         transition: "all 0.18s ease",
                                                         "&:hover": {
-                                                            backgroundColor: "#eef4ff",
-                                                            borderColor: "#3b82f6",
-                                                            color: "#2563eb",
+                                                            backgroundColor: (theme) => theme.palette.mode === 'light' 
+                                                                ? "rgba(37,99,235,0.08)" 
+                                                                : "rgba(255,255,255,0.1)",
+                                                            borderColor: "primary.main",
+                                                            color: "primary.main",
                                                             transform: "translateY(-1px)",
                                                         },
                                                     }}
@@ -516,17 +524,25 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         startIcon={<AddIcon />}
                         onClick={() => navigate("/sell")}
                         sx={{
-                            bgcolor: "#2563eb",
+                            background: (theme) => theme.palette.mode === 'light' 
+                                ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
+                                : "linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)",
                             color: "white",
                             borderRadius: "12px",
                             px: { xs: 2, md: 2.5 },
                             py: 1.1,
                             textTransform: "none",
-                            fontWeight: 700,
+                            fontWeight: 800,
                             fontSize: "0.9rem",
                             boxShadow: "0 4px 14px rgba(37,99,235,0.2)",
                             display: { xs: "none", sm: "flex" },
-                            "&:hover": { bgcolor: "#1d4ed8", transform: "translateY(-1px)", boxShadow: "0 6px 20px rgba(37,99,235,0.3)" },
+                            "&:hover": { 
+                                background: (theme) => theme.palette.mode === 'light' 
+                                    ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
+                                    : "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
+                                transform: "translateY(-1px)", 
+                                boxShadow: "0 6px 20px rgba(37,99,235,0.3)" 
+                            },
                         }}
                     >
                         Sell
@@ -538,9 +554,9 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             display: { xs: "flex", sm: "none" },
                             width: 42, height: 42,
                             borderRadius: "12px",
-                            backgroundColor: "#2563eb",
+                            backgroundColor: (theme) => theme.palette.mode === 'light' ? "primary.main" : "primary.light",
                             color: "white",
-                            "&:hover": { backgroundColor: "#1d4ed8" },
+                            "&:hover": { backgroundColor: (theme) => theme.palette.mode === 'light' ? "primary.dark" : "primary.main" },
                         }}
                     >
                         <AddIcon />
@@ -558,7 +574,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             "&:hover": { backgroundColor: isDark ? "#334155" : "#eef4ff", borderColor: isDark ? "#475569" : "#bfdbfe", transform: "translateY(-1px)" },
                         }}
                     >
-                        {isDark ? <LightModeIcon sx={{ color: "#f59e0b" }} /> : <DarkModeIcon sx={{ color: "#334155" }} />}
+                        {isDark ? <LightModeIcon sx={{ color: "warning.main" }} /> : <DarkModeIcon sx={{ color: "text.primary" }} />}
                     </IconButton>
 
                     <IconButton
@@ -574,7 +590,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         }}
                     >
                         <Badge badgeContent={unreadCount} color="error" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-                            <NotificationsNoneIcon sx={{ color: "#334155" }} />
+                            <NotificationsNoneIcon sx={{ color: "text.primary" }} />
                         </Badge>
                     </IconButton>
 

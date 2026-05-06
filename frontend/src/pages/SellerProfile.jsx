@@ -98,7 +98,7 @@ export default function SellerProfile() {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
+            <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
                 <Navbar />
                 <Box sx={{ p: { xs: 2.5, md: 5 }, maxWidth: "1250px", mx: "auto" }}>
                     <Skeleton variant="rectangular" width={100} height={36} sx={{ borderRadius: 2, mb: 3 }} />
@@ -116,20 +116,31 @@ export default function SellerProfile() {
 
     if (!seller) {
         return (
-            <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
+            <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
                 <Navbar />
                 <Box sx={{ p: 5, display: "flex", flexDirection: "column", alignItems: "center", mt: 10 }}>
                     <Typography sx={{ fontSize: 28, fontWeight: 800, color: "text.primary" }}>
                         Seller not found
                     </Typography>
-                    <Button
-                        variant="contained"
-                        startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate(-1)}
-                        sx={{ mt: 3, borderRadius: "14px", px: 4, py: 1.5, textTransform: "none", fontWeight: 700, bgcolor: "#2563eb" }}
-                    >
-                        Go Back
-                    </Button>
+                        <Button
+                            variant="contained"
+                            startIcon={<ArrowBackIcon />}
+                            onClick={() => navigate(-1)}
+                            sx={{ 
+                                mt: 3, 
+                                borderRadius: "14px", 
+                                px: 4, 
+                                py: 1.5, 
+                                textTransform: "none", 
+                                fontWeight: 800, 
+                                background: (theme) => theme.palette.mode === 'light' 
+                                    ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
+                                    : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
+                                boxShadow: "0 8px 20px rgba(37,99,235,0.2)"
+                            }}
+                        >
+                            Go Back
+                        </Button>
                 </Box>
             </Box>
         );
@@ -204,7 +215,7 @@ export default function SellerProfile() {
                                 <Typography sx={{ fontSize: { xs: 26, md: 32 }, fontWeight: 800, color: "text.primary" }}>
                                     {sellerName}
                                 </Typography>
-                                <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: 24 }} />
+                                <VerifiedUserIcon sx={{ color: "primary.main", fontSize: 24 }} />
                             </Box>
                             
                             <Box sx={{ display: "flex", justifyContent: { xs: "center", sm: "flex-start" }, mb: 1.5 }}>
@@ -240,13 +251,17 @@ export default function SellerProfile() {
                                 textTransform: "none",
                                 fontWeight: 800,
                                 fontSize: 16,
-                                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                                background: (theme) => theme.palette.mode === 'light' 
+                                    ? "linear-gradient(135deg, #2563eb, #3b82f6)"
+                                    : "linear-gradient(135deg, #3b82f6, #60a5fa)",
                                 boxShadow: "0 8px 20px rgba(37,99,235,0.2)",
-                                transition: "all 0.3s ease",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                 "&:hover": {
                                     transform: "translateY(-3px)",
                                     boxShadow: "0 14px 30px rgba(37,99,235,0.35)",
-                                    background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
+                                    background: (theme) => theme.palette.mode === 'light' 
+                                        ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
+                                        : "linear-gradient(135deg, #2563eb, #3b82f6)",
                                 },
                             }}
                         >
@@ -343,7 +358,7 @@ export default function SellerProfile() {
                                 <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "text.primary" }}>
                                     {sellerName}
                                 </Typography>
-                                <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: "1.1rem" }} />
+                                <VerifiedUserIcon sx={{ color: "primary.main", fontSize: "1.1rem" }} />
                             </Box>
                             <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", fontWeight: 500 }}>
                                 {seller?.major || "Verified Student"}
@@ -437,7 +452,7 @@ export default function SellerProfile() {
                                                             setSnackbarOpen(true);
                                                         }
                                                     }}
-                                                    sx={{ color: "#3b82f6", bgcolor: "rgba(59,130,246,0.1)", "&:hover": { bgcolor: "rgba(59,130,246,0.2)" } }}
+                                                    sx={{ color: "primary.main", bgcolor: (theme) => theme.palette.mode === 'light' ? "rgba(37,99,235,0.1)" : "rgba(96,165,250,0.1)", "&:hover": { bgcolor: (theme) => theme.palette.mode === 'light' ? "rgba(37,99,235,0.2)" : "rgba(96,165,250,0.2)" } }}
                                                 >
                                                     <ContentCopyIcon fontSize="small" />
                                                 </IconButton>
@@ -452,7 +467,7 @@ export default function SellerProfile() {
                                                 variant="text"
                                                 size="small"
                                                 onClick={() => setShowPhone(true)}
-                                                sx={{ textTransform: "none", fontWeight: 800, color: "#3b82f6" }}
+                                                sx={{ textTransform: "none", fontWeight: 800, color: "primary.main" }}
                                             >
                                                 Show Number
                                             </Button>

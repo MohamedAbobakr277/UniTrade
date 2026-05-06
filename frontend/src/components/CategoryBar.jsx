@@ -15,50 +15,15 @@ export default function CategoryBar({
     setSelectedCategories,
 }) {
     const categories = [
-        {
-            label: "All",
-            icon: <HomeIcon />,
-            iconColor: "#2563eb",
-        },
-        {
-            label: "Books & Notes",
-            icon: <MenuBookIcon />,
-            iconColor: "#f59e0b",
-        },
-        {
-            label: "Calculators",
-            icon: <CalculateIcon />,
-            iconColor: "#10b981",
-        },
-        {
-            label: "Electronics",
-            icon: <LaptopMacIcon />,
-            iconColor: "#8b5cf6",
-        },
-        {
-            label: "Engineering Tools",
-            icon: <BuildIcon />,
-            iconColor: "#3b82f6",
-        },
-        {
-            label: "Medical Tools",
-            icon: <MedicalServicesIcon />,
-            iconColor: "#2563eb",
-        },
-        {
-            label: "Lab Equipment",
-            icon: <ScienceIcon />,
-            iconColor: "#10b981",
-        },
-        {
-            label: "Stationery",
-            icon: <EditNoteIcon />,
-            iconColor: "#f59e0b",
-        }, {
-            label: "Bags & Accessories",
-            icon: <BackpackIcon />,
-            iconColor: "#8b5cf6",
-        },
+        { label: "All", icon: <HomeIcon />, iconColor: "primary.main" },
+        { label: "Books & Notes", icon: <MenuBookIcon />, iconColor: "warning.main" },
+        { label: "Calculators", icon: <CalculateIcon />, iconColor: "success.main" },
+        { label: "Electronics", icon: <LaptopMacIcon />, iconColor: "secondary.main" },
+        { label: "Engineering Tools", icon: <BuildIcon />, iconColor: "primary.light" },
+        { label: "Medical Tools", icon: <MedicalServicesIcon />, iconColor: "error.main" },
+        { label: "Lab Equipment", icon: <ScienceIcon />, iconColor: "success.dark" },
+        { label: "Stationery", icon: <EditNoteIcon />, iconColor: "warning.dark" }, 
+        { label: "Bags & Accessories", icon: <BackpackIcon />, iconColor: "secondary.dark" },
     ];
 
     return (
@@ -140,48 +105,40 @@ export default function CategoryBar({
                             sx={{
                                 px: 1.8,
                                 py: 2.7,
-                                fontWeight: 700,
+                                fontWeight: 800,
                                 fontSize: "0.95rem",
                                 borderRadius: "14px",
-                                border:
-                                    isSelected
-                                        ? "1px solid #2563eb"
-                                        : (theme) => `1px solid ${theme.palette.divider}`,
-                                background:
-                                    isSelected
+                                border: '1px solid',
+                                borderColor: isSelected ? 'primary.main' : 'divider',
+                                background: isSelected
+                                    ? (theme) => theme.palette.mode === 'light' 
                                         ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
-                                        : (theme) => theme.palette.mode === 'light' ? "#f8fafc" : "#1e293b",
-                                color:
-                                    isSelected ? "#ffffff" : "text.primary",
-                                boxShadow:
-                                    isSelected
-                                        ? "0 8px 18px rgba(37,99,235,0.22)"
-                                        : "0 2px 8px rgba(15,23,42,0.03)",
-                                transition: "all 0.25s ease",
+                                        : "linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)"
+                                    : (theme) => theme.palette.mode === 'light' ? "#f8fafc" : "rgba(255,255,255,0.03)",
+                                color: isSelected ? "#ffffff" : "text.primary",
+                                boxShadow: isSelected
+                                    ? "0 8px 18px rgba(37,99,235,0.22)"
+                                    : "0 2px 8px rgba(15,23,42,0.03)",
+                                transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                                 cursor: "pointer",
-                                "& .MuiChip-label": {
-                                    px: 0.5,
-                                },
+                                "& .MuiChip-label": { px: 0.5 },
                                 "& .MuiChip-icon": {
-                                    color:
-                                        isSelected
-                                            ? "#ffffff"
-                                            : cat.iconColor,
+                                    color: isSelected ? "#ffffff" : cat.iconColor,
                                     marginLeft: "6px",
                                     marginRight: "6px",
                                     fontSize: "1.1rem",
                                 },
                                 "&:hover": {
                                     transform: "translateY(-2px)",
-                                    background:
-                                        isSelected
+                                    background: isSelected
+                                        ? (theme) => theme.palette.mode === 'light' 
                                             ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
-                                            : (theme) => theme.palette.mode === 'light' ? "#eef4ff" : "#334155",
-                                    borderColor: "#2563eb",
-                                    boxShadow:
-                                        isSelected
-                                            ? "0 10px 22px rgba(37,99,235,0.28)"
-                                            : "0 6px 14px rgba(37,99,235,0.08)",
+                                            : "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
+                                        : (theme) => theme.palette.mode === 'light' ? "#eef4ff" : "rgba(255,255,255,0.08)",
+                                    borderColor: 'primary.main',
+                                    boxShadow: isSelected
+                                        ? "0 10px 22px rgba(37,99,235,0.28)"
+                                        : "0 6px 14px rgba(37,99,235,0.08)",
                                 },
                             }}
                         />
