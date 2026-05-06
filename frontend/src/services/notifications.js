@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, updateDoc, doc, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Create a notification for a specific user
@@ -42,3 +42,57 @@ export const markNotificationAsRead = async (userId, notificationId) => {
         console.error("Error marking notification as read:", error);
     }
 };
+
+// Notify users who favorited an item about a price drop
+export const notifyPriceDrop = async (productId, productTitle, oldPrice, newPrice) => {
+    try {
+        if (!productId) return;
+        
+        // Find all users who have this product in their favourites
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("favourites", "array-contains", productId));
+        const querySnapshot = await getDocs(q);
+        
+        const notifications = querySnapshot.docs.map(userDoc => {
+            const userId = userDoc.id;
+            return createNotification(userId, {
+                type: "price_drop",
+                message: `Price drop! 💸 The item "${productTitle}" is now EGP ${newPrice} (was EGP ${oldPrice})`,
+                productId: productId,
+                link: `/item/${productId}`
+            });
+        });
+
+        await Promise.all(notifications);
+    } catch (error) {
+        console.error("Error sending price drop notifications:", error);
+    }
+};
+
+// Notify users who favorited an item that it has been sold
+export const notifyItemSold = async (productId, productTitle) => {
+    try {
+        if (!productId) return;
+        
+        // Find all users who have this product in their favourites
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("favourites", "array-contains", productId));
+        const querySnapshot = await getDocs(q);
+        
+        const notifications = querySnapshot.docs.map(userDoc => {
+            const userId = userDoc.id;
+            return createNotification(userId, {
+                type: "item_sold",
+                message: `Update: The item "${productTitle}" you favorited has been sold. 🛍️`,
+                productId: productId,
+                link: `/item/${productId}`
+            });
+        });
+
+        await Promise.all(notifications);
+    } catch (error) {
+        console.error("Error sending item sold notifications:", error);
+    }
+};
+
+

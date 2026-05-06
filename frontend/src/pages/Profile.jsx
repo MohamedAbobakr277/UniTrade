@@ -55,6 +55,7 @@ import StarRatingDisplay from '../components/StarRatingDisplay';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
+import { notifyPriceDrop, notifyItemSold } from '../services/notifications';
 import { useNavigate } from 'react-router-dom';
 
 const universities = [
@@ -216,8 +217,20 @@ export default function Profile() {
             const updatedItem = { ...currentEditItem, quantityAvailable: qty, status: newStatus };
             
             const itemRef = doc(db, "products", currentEditItem.id);
+            
+            // Check for price drop to notify favorited users
+            const originalItem = userItems.find(i => i.id === currentEditItem.id);
+            const oldPrice = originalItem?.price || 0;
+            const newPrice = updatedItem.price || 0;
 
             await setDoc(itemRef, updatedItem, { merge: true });
+
+            if (newPrice < oldPrice) {
+                notifyPriceDrop(currentEditItem.id, updatedItem.title, oldPrice, newPrice);
+            }
+            if (qty === 0) {
+                notifyItemSold(currentEditItem.id, updatedItem.title);
+            }
 
             setUserItems(prev =>
                 prev.map(item =>
@@ -225,9 +238,11 @@ export default function Profile() {
                 )
             );
 
+
             setIsEditListingModalOpen(false);
 
             let msg = "Listing updated successfully";
+            if (newPrice < oldPrice) msg = "Listing updated & Price drop notification sent! 💸";
             if (qty === 0) msg = "Item marked as SOLD (0 quantity)";
 
             setSnackbar({
@@ -286,12 +301,18 @@ export default function Profile() {
             const itemRef = doc(db, "products", itemId);
 
             await updateDoc(itemRef, {
-                status: "sold"
+                status: "sold",
+                quantityAvailable: 0
             });
+
+            const item = userItems.find(i => i.id === itemId);
+            if (item) {
+                notifyItemSold(itemId, item.title);
+            }
 
             setUserItems(prev =>
                 prev.map(item =>
-                    item.id === itemId ? { ...item, status: "sold" } : item
+                    item.id === itemId ? { ...item, status: "sold", quantityAvailable: 0 } : item
                 )
             );
 

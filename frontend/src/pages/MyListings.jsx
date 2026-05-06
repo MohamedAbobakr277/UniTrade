@@ -17,6 +17,7 @@ import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { auth, db } from '../firebase';
 import { doc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { notifyPriceDrop, notifyItemSold } from '../services/notifications';
 import { useNavigate } from 'react-router-dom';
 
 export default function MyListings() {
@@ -71,12 +72,27 @@ export default function MyListings() {
             const updatedItem = { ...currentEditItem, quantityAvailable: qty, status: newStatus };
             
             const itemRef = doc(db, "products", currentEditItem.id);
+            
+            // Check for price drop to notify favorited users
+            const originalItem = userItems.find(i => i.id === currentEditItem.id);
+            const oldPrice = originalItem?.price || 0;
+            const newPrice = updatedItem.price || 0;
+            
             await setDoc(itemRef, updatedItem, { merge: true });
             
+            if (newPrice < oldPrice) {
+                notifyPriceDrop(currentEditItem.id, updatedItem.title, oldPrice, newPrice);
+            }
+            if (qty === 0) {
+                notifyItemSold(currentEditItem.id, updatedItem.title);
+            }
+            
             setUserItems(prev => prev.map(item => item.id === currentEditItem.id ? updatedItem : item));
+
             setIsEditListingModalOpen(false);
             
             let msg = "Listing updated successfully";
+            if (newPrice < oldPrice) msg = "Listing updated & Price drop notification sent! 💸";
             if (qty === 0) msg = "Item marked as SOLD (0 quantity)";
             
             setSnackbar({ open: true, message: msg, severity: "success" });
@@ -109,8 +125,14 @@ export default function MyListings() {
     const handleMarkAsSold = async (itemId) => {
         try {
             const itemRef = doc(db, "products", itemId);
-            await updateDoc(itemRef, { status: "sold" });
-            setUserItems(prev => prev.map(item => item.id === itemId ? { ...item, status: "sold" } : item));
+            await updateDoc(itemRef, { status: "sold", quantityAvailable: 0 });
+            
+            const item = userItems.find(i => i.id === itemId);
+            if (item) {
+                notifyItemSold(itemId, item.title);
+            }
+
+            setUserItems(prev => prev.map(item => item.id === itemId ? { ...item, status: "sold", quantityAvailable: 0 } : item));
             setSnackbar({ open: true, message: "Marked as sold", severity: "success" });
 
             // Show confetti

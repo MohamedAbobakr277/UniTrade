@@ -47,6 +47,7 @@ export default function SellTool() {
     const [aiLoading, setAiLoading] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+    const [qualityFeedback, setQualityFeedback] = useState(null);
     const { width, height } = useWindowSize();
     const navigate = useNavigate();
 
@@ -90,7 +91,9 @@ export default function SellTool() {
                 {
                   "title": "Clear concise product name",
                   "category": "One of: Books & Notes, Calculators, Electronics, Engineering Tools, Medical Tools, Lab Equipment, Stationery, Bags & Accessories",
-                  "description": "Short student-friendly description"
+                  "description": "Short student-friendly description",
+                  "qualityScore": 0-100,
+                  "qualityFeedback": "One sentence feedback on photo quality (lighting, clarity, etc.)"
                 }
                 Output ONLY JSON.
             `;
@@ -104,7 +107,13 @@ export default function SellTool() {
                     description: data.description || prev.description,
                     category: data.category || prev.category
                 }));
-                setSnackbar({ open: true, message: "AI generated product details! ✨" });
+                if (data.qualityScore !== undefined) {
+                    setQualityFeedback({
+                        score: data.qualityScore,
+                        message: data.qualityFeedback
+                    });
+                }
+                setSnackbar({ open: true, message: "AI generated product details & analyzed quality! ✨" });
             }
         } catch (err) {
             console.error("AI Error:", err);
@@ -200,6 +209,30 @@ export default function SellTool() {
                         )}
 
                         {aiLoading && <LinearProgress sx={{ mb: 3 }} />}
+
+                        {qualityFeedback && !aiLoading && (
+                            <Box sx={{ 
+                                mb: 4, 
+                                p: 2, 
+                                borderRadius: 3, 
+                                bgcolor: qualityFeedback.score >= 70 ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)",
+                                border: "1px solid",
+                                borderColor: qualityFeedback.score >= 70 ? "success.main" : "warning.main"
+                            }}>
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                                    <Typography sx={{ fontWeight: 800, fontSize: "0.9rem", color: qualityFeedback.score >= 70 ? "success.main" : "warning.main" }}>
+                                        AI Photo Quality Score
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 900, fontSize: "1.1rem", color: qualityFeedback.score >= 70 ? "success.main" : "warning.main" }}>
+                                        {qualityFeedback.score}/100
+                                    </Typography>
+                                </Box>
+                                <Typography sx={{ fontSize: "0.85rem", color: "text.secondary", fontWeight: 500 }}>
+                                    {qualityFeedback.message}
+                                </Typography>
+                            </Box>
+                        )}
+
 
                         {aiLoading ? (
                             <>

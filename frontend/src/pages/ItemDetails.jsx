@@ -34,15 +34,18 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
-import { useEffect, useState, forwardRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
+import { useEffect, useState, forwardRef } from "react";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, query, where, collection, getDocs, limit } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ItemCard from "../components/ItemCard";
 import StarRatingDisplay from "../components/StarRatingDisplay";
 import { createNotification } from "../services/notifications";
+import { analyzeWithAI } from "../services/aiImageAnalyzer";
+import SparklesIcon from "@mui/icons-material/AutoAwesome";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -64,6 +67,9 @@ export default function ItemDetails() {
 
     const [isFavorite, setIsFavorite] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [similarItems, setSimilarItems] = useState([]);
+    const [similarLoading, setSimilarLoading] = useState(false);
+
 
     useEffect(() => {
         let unsubUser;
@@ -139,6 +145,71 @@ export default function ItemDetails() {
 
         fetchItem();
     }, [id]);
+
+    useEffect(() => {
+        // Only fetch similar items once we have the current item and its category
+        if (item && item.category) {
+            const fetchSimilar = async () => {
+                setSimilarLoading(true);
+                try {
+                    // console.log("Fetching similar items for category:", item.category);
+                    const q = query(
+                        collection(db, "products"),
+                        where("category", "==", item.category),
+                        where("status", "==", "available"),
+                        limit(15) // Fetch a bit more to allow AI to filter/rank
+                    );
+                    const snap = await getDocs(q);
+                    const products = snap.docs
+                        .map(doc => ({ id: doc.id, ...doc.data() }))
+                        .filter(p => p.id !== id);
+                    
+                    if (products.length > 0) {
+                        if (products.length > 4) {
+                            const titles = products.map(p => p.title);
+                            const prompt = `Which of these product titles are most similar to "${item.title}"? Return ONLY the top 4 titles as a JSON array of strings. IMPORTANT: The titles must be exactly as provided. Titles: ${JSON.stringify(titles)}`;
+                            try {
+                                const aiResult = await analyzeWithAI(prompt);
+                                if (Array.isArray(aiResult)) {
+                                    // Map back from titles to product objects
+                                    const ranked = aiResult
+                                        .map(title => products.find(p => p.title === title))
+                                        .filter(Boolean); // Remove nulls if AI hallucinated a title
+                                    
+                                    if (ranked.length > 0) {
+                                        // Fill up to 4 if AI returned fewer
+                                        const finalItems = [...ranked];
+                                        products.forEach(p => {
+                                            if (finalItems.length < 4 && !finalItems.find(f => f.id === p.id)) {
+                                                finalItems.push(p);
+                                            }
+                                        });
+                                        setSimilarItems(finalItems.slice(0, 4));
+                                        return;
+                                    }
+                                }
+                            } catch (aiErr) {
+                                console.warn("AI recommendation failed, falling back to basic sorting:", aiErr);
+                            }
+                        }
+                        setSimilarItems(products.slice(0, 4));
+                    } else {
+                        setSimilarItems([]);
+                    }
+                } catch (err) {
+                    console.error("Error fetching similar items:", err);
+                } finally {
+                    setSimilarLoading(false);
+                }
+            };
+            fetchSimilar();
+        } else if (item) {
+            // If item exists but has no category (fallback)
+            setSimilarItems([]);
+            setSimilarLoading(false);
+        }
+    }, [item, id]);
+
 
     if (loading) {
         return (
@@ -668,6 +739,57 @@ export default function ItemDetails() {
                     </Grid>
                 </Box>
             </Box>
+
+            {/* Similar Items Section */}
+            {(similarLoading || similarItems.length > 0) && (
+                <Box sx={{ py: 6, display: "flex", justifyContent: "center", bgcolor: "background.paper", mt: 4 }}>
+                    <Box sx={{ width: "100%", maxWidth: "1250px", px: { xs: 2.5, md: 4 } }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4 }}>
+                            <Box>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                                    <SparklesIcon sx={{ color: "primary.main", fontSize: 20 }} />
+                                    <Typography sx={{ fontSize: "0.85rem", fontWeight: 800, color: "primary.main", textTransform: "uppercase", letterSpacing: "1px" }}>
+                                        AI Recommended
+                                    </Typography>
+                                </Box>
+                                <Typography sx={{ fontSize: { xs: 24, md: 28 }, fontWeight: 900, color: "text.primary" }}>
+                                    You Might Also Like
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: {
+                                    xs: "repeat(2, 1fr)", // Force 2 side-by-side on mobile
+                                    sm: "repeat(auto-fill, minmax(250px, 1fr))",
+                                    md: "repeat(4, 1fr)"
+                                },
+                                gap: { xs: 2, md: 3 },
+                                width: "100%",
+                                alignItems: "stretch"
+                            }}
+                        >
+                            {similarLoading ? (
+                                [1, 2, 3, 4].map((i) => (
+                                    <Box key={i} sx={{ display: "flex" }}>
+                                        <Skeleton variant="rectangular" height={350} width="100%" sx={{ borderRadius: 4 }} />
+                                    </Box>
+                                ))
+                            ) : (
+                                similarItems.map((similarItem) => (
+                                    <Box key={similarItem.id} sx={{ display: "flex" }}>
+                                        <ItemCard item={similarItem} />
+                                    </Box>
+                                ))
+                            )}
+                        </Box>
+                    </Box>
+                </Box>
+            )}
+            <Footer />
+
 
             {/* Contact Seller Dialog */}
             <Dialog
