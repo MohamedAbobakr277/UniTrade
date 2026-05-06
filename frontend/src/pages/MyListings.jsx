@@ -66,12 +66,20 @@ export default function MyListings() {
             return;
         }
         try {
-            const updatedItem = { ...currentEditItem, quantityAvailable: qty };
+            // Auto-update status based on quantity
+            const newStatus = qty === 0 ? "sold" : "available";
+            const updatedItem = { ...currentEditItem, quantityAvailable: qty, status: newStatus };
+            
             const itemRef = doc(db, "products", currentEditItem.id);
             await setDoc(itemRef, updatedItem, { merge: true });
+            
             setUserItems(prev => prev.map(item => item.id === currentEditItem.id ? updatedItem : item));
             setIsEditListingModalOpen(false);
-            setSnackbar({ open: true, message: "Listing updated successfully", severity: "success" });
+            
+            let msg = "Listing updated successfully";
+            if (qty === 0) msg = "Item marked as SOLD (0 quantity)";
+            
+            setSnackbar({ open: true, message: msg, severity: "success" });
         } catch (error) {
             console.error(error);
             setSnackbar({ open: true, message: "Failed to update listing", severity: "error" });

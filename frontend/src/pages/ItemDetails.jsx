@@ -599,7 +599,8 @@ export default function ItemDetails() {
                                 <Button
                                     fullWidth
                                     variant="contained"
-                                    startIcon={<ConnectWithoutContactIcon sx={{ fontSize: 22 }} />}
+                                    disabled={item.status === "sold" || item.quantityAvailable === 0}
+                                    startIcon={item.status === "sold" || item.quantityAvailable === 0 ? <InventoryIcon sx={{ fontSize: 22 }} /> : <ConnectWithoutContactIcon sx={{ fontSize: 22 }} />}
                                     sx={{
                                         mt: 1.5,
                                         py: 1.8,
@@ -607,18 +608,31 @@ export default function ItemDetails() {
                                         textTransform: "none",
                                         fontWeight: 900,
                                         fontSize: 19,
-                                        background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-                                        boxShadow: "0 10px 30px rgba(37,99,235,0.25)",
+                                        background: item.status === "sold" || item.quantityAvailable === 0 
+                                            ? "#94a3b8" 
+                                            : "linear-gradient(135deg, #2563eb, #3b82f6)",
+                                        boxShadow: item.status === "sold" || item.quantityAvailable === 0 
+                                            ? "none" 
+                                            : "0 10px 30px rgba(37,99,235,0.25)",
                                         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                         "&:hover": {
-                                            transform: "translateY(-4px)",
-                                            boxShadow: "0 15px 40px rgba(37,99,235,0.35)",
-                                            background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
+                                            transform: item.status === "sold" || item.quantityAvailable === 0 ? "none" : "translateY(-4px)",
+                                            boxShadow: item.status === "sold" || item.quantityAvailable === 0 
+                                                ? "none" 
+                                                : "0 15px 40px rgba(37,99,235,0.35)",
+                                            background: item.status === "sold" || item.quantityAvailable === 0 
+                                                ? "#94a3b8" 
+                                                : "linear-gradient(135deg, #1d4ed8, #2563eb)",
                                         },
+                                        "&.Mui-disabled": {
+                                            bgcolor: "#e2e8f0",
+                                            color: "#94a3b8",
+                                            boxShadow: "none"
+                                        }
                                     }}
                                     onClick={() => setIsContactOpen(true)}
                                 >
-                                    Contact Seller
+                                    {item.status === "sold" || item.quantityAvailable === 0 ? "Item Sold Out" : "Contact Seller"}
                                 </Button>
                             </Box>
                         </Grid>
