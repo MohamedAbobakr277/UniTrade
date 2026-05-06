@@ -59,21 +59,23 @@ export default function MultiSelectUniversitiesDropdown({ selectedUniversities, 
                     width: "100%",
                     justifyContent: "space-between",
                     borderRadius: "14px",
-                    backgroundColor: "#f8fafc",
-                    border: isOpen ? "1px solid #2563eb" : "1px solid #dbe3ee",
-                    color: "#334155",
+                    backgroundColor: "background.paper",
+                    border: "1px solid",
+                    borderColor: isOpen ? "primary.main" : "divider",
+                    color: "text.primary",
                     fontWeight: 600,
                     textTransform: "none",
                     px: 2,
                     py: 1,
+                    transition: "all 0.2s ease",
                     "&:hover": {
-                        backgroundColor: "#f1f5f9",
-                        borderColor: "#2563eb",
+                        backgroundColor: "background.subtle",
+                        borderColor: "primary.main",
                     },
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                    <Typography sx={{ fontWeight: 600, fontSize: "0.95rem", color: "text.primary" }}>
                         {selectedUniversities.length === 0 ? "All Universities" : `${selectedUniversities.length} Selected`}
                     </Typography>
                     {selectedUniversities.length > 0 && (
@@ -81,13 +83,16 @@ export default function MultiSelectUniversitiesDropdown({ selectedUniversities, 
                             component="span"
                             onClick={handleClear}
                             sx={{
-                                fontSize: "0.75rem",
+                                fontSize: "0.72rem",
                                 color: "#ef4444",
-                                bgcolor: "#fee2e2",
+                                bgcolor: "rgba(239, 68, 68, 0.1)",
                                 px: 1,
-                                borderRadius: "8px",
+                                py: 0.2,
+                                border: "1px solid rgba(239, 68, 68, 0.2)",
+                                fontWeight: 700,
+                                borderRadius: "6px",
                                 ml: 1,
-                                "&:hover": { bgcolor: "#fecaca" }
+                                "&:hover": { bgcolor: "rgba(239, 68, 68, 0.2)" }
                             }}
                         >
                             Clear
@@ -101,13 +106,17 @@ export default function MultiSelectUniversitiesDropdown({ selectedUniversities, 
                     sx={{
                         p: 1.5,
                         borderRadius: "14px",
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #e2e8f0",
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                        backgroundColor: "background.paper",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        boxShadow: (theme) => theme.palette.mode === 'light' ? "0 10px 25px rgba(0,0,0,0.05)" : "0 10px 30px rgba(0,0,0,0.3)",
                         maxHeight: "250px",
                         overflowY: "auto",
                         "&::-webkit-scrollbar": { width: "6px" },
-                        "&::-webkit-scrollbar-thumb": { background: "#cbd5e1", borderRadius: "10px" },
+                        "&::-webkit-scrollbar-thumb": { 
+                            background: (theme) => theme.palette.mode === 'light' ? "#cbd5e1" : "#334155", 
+                            borderRadius: "10px" 
+                        },
                     }}
                 >
                     <FormGroup>
@@ -120,12 +129,12 @@ export default function MultiSelectUniversitiesDropdown({ selectedUniversities, 
                                         checked={selectedUniversities.includes(uni)}
                                         onChange={() => handleToggle(uni)}
                                         sx={{
-                                            color: "#cbd5e1",
-                                            "&.Mui-checked": { color: "#2563eb" },
+                                            color: "text.secondary",
+                                            "&.Mui-checked": { color: "primary.main" },
                                         }}
                                     />
                                 }
-                                label={<Typography sx={{ fontSize: "0.9rem", color: "#334155", fontWeight: 500 }}>{uni}</Typography>}
+                                label={<Typography sx={{ fontSize: "0.9rem", color: "text.primary", fontWeight: 500 }}>{uni}</Typography>}
                                 sx={{ mb: 0.5 }}
                             />
                         ))}
