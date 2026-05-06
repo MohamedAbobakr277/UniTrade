@@ -5,19 +5,28 @@ export default function StarRatingDisplay({ averageRating, ratingsCount, size = 
     const count = ratingsCount || 0;
 
     return (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Rating
-                value={avg}
-                precision={0.1}
-                readOnly
-                size={size}
-                sx={{
-                    color: "#faaf00", // Standard star color
-                }}
-            />
-            {showCount && (
-                <Typography sx={{ fontSize: size === "small" ? 13 : 15, color: "#64748b", fontWeight: 600, ml: 0.5 }}>
-                    {avg.toFixed(1)} ({count})
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {count > 0 ? (
+                <>
+                    <Rating
+                        value={avg}
+                        precision={0.1}
+                        readOnly
+                        size={size}
+                        sx={{ color: "#faaf00" }}
+                    />
+                    {showCount && (
+                        <Typography sx={{ fontSize: size === "small" ? 13 : 15, color: "#475569", fontWeight: 700 }}>
+                            {avg.toFixed(1)} / 5
+                            <Box component="span" sx={{ color: "#94a3b8", ml: 1, fontWeight: 500 }}>
+                                ({count} {count === 1 ? 'review' : 'reviews'})
+                            </Box>
+                        </Typography>
+                    )}
+                </>
+            ) : (
+                <Typography sx={{ fontSize: size === "small" ? 13 : 14, color: "#94a3b8", fontWeight: 600, fontStyle: "italic" }}>
+                    No ratings yet
                 </Typography>
             )}
         </Box>

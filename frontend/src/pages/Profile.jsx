@@ -51,6 +51,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import logo from '../assets/logo.png';
+import StarRatingDisplay from '../components/StarRatingDisplay';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
@@ -411,6 +412,10 @@ export default function Profile() {
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, color: 'text.secondary' }}>
                                     <BusinessIcon fontSize="small" />
                                     <Typography variant="body2">{user.university}</Typography>
+                                </Box>
+                                
+                                <Box sx={{ mt: 1.5 }}>
+                                    <StarRatingDisplay averageRating={user.averageRating} ratingsCount={user.ratingsCount} size="medium" />
                                 </Box>
 
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 4, mt: 2 }}>
