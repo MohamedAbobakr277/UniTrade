@@ -129,7 +129,7 @@ export default function MyListings() {
     });
 
     return (
-        <Box sx={{ backgroundColor: '#f8fbff', minHeight: '100vh' }}>
+        <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
             <Navbar items={userItems} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
 
             {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} />}
@@ -142,25 +142,25 @@ export default function MyListings() {
                         sx={{
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#64748b",
-                            bgcolor: "#ffffff",
+                            color: "text.secondary",
+                            bgcolor: "background.paper",
                             px: 2.5,
                             py: 0.8,
                             borderRadius: "12px",
-                            boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
-                            border: "1px solid #e2e8f0",
+                            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 14px rgba(0,0,0,0.03)" : "none",
+                            border: "1px solid",
+                            borderColor: "divider",
                             transition: "all 0.2s ease",
                             "&:hover": {
-                                bgcolor: "#f8fafc",
-                                color: "#0f172a",
+                                bgcolor: "background.subtle",
+                                color: "text.primary",
                                 transform: "translateX(-4px)",
-                                boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
                             },
                         }}
                     >
                         Back to Profile
                     </Button>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', m: 0 }}>My Listings</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', m: 0 }}>My Listings</Typography>
                 </Box>
 
                 {displayedItems.length > 0 ? (
@@ -179,9 +179,10 @@ export default function MyListings() {
                                     sx={{
                                         borderRadius: "24px",
                                         overflow: "hidden",
-                                        border: "1px solid #e2e8f0",
-                                        backgroundColor: "#ffffff",
-                                        boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                        backgroundColor: "background.paper",
+                                        boxShadow: (theme) => theme.palette.mode === 'light' ? "0 8px 24px rgba(15,23,42,0.06)" : "none",
                                         transition: "all 0.3s ease",
                                         width: "100%",
                                         height: "100%",
@@ -225,7 +226,7 @@ export default function MyListings() {
                                             sx={{
                                                 fontWeight: 800,
                                                 fontSize: "1.05rem",
-                                                color: "#0f172a",
+                                                color: "text.primary",
                                                 lineHeight: 1.4,
                                                 height: "54px",
                                                 display: "-webkit-box",
@@ -242,8 +243,8 @@ export default function MyListings() {
                                         </Typography>
 
                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
-                                            <LocationOnIcon sx={{ fontSize: 17, color: "#94a3b8" }} />
-                                            <Typography component="span" sx={{ fontSize: "0.92rem", color: "#64748b", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                            <LocationOnIcon sx={{ fontSize: 17, color: "text.secondary" }} />
+                                            <Typography component="span" sx={{ fontSize: "0.92rem", color: "text.secondary", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                                                 {item.university || "University not specified"}
                                             </Typography>
                                         </Box>
@@ -263,7 +264,7 @@ export default function MyListings() {
                                             />
                                         </Box>
 
-                                        <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "#64748b", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
+                                        <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px" }}>
                                             {item.description || "No description available"}
                                         </Typography>
 
@@ -287,14 +288,14 @@ export default function MyListings() {
                                                 variant="outlined"
                                                 size="small"
                                                 startIcon={<EditIcon sx={{ fontSize: '1.1rem !important', mr: -0.5 }} />}
-                                                sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: '#e2e8f0', color: '#334155', '&:hover': { borderColor: '#cbd5e1', bgcolor: '#f8fafc' } }}
+                                                sx={{ borderRadius: "10px", textTransform: 'none', height: '36px', whiteSpace: 'nowrap', minWidth: 0, px: 1, fontSize: '0.85rem', fontWeight: 600, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } }}
                                                 onClick={() => handleOpenEditListing(item)}
                                             >
                                                 Edit
                                             </Button>
                                             <IconButton
                                                 size="small"
-                                                sx={{ bgcolor: '#f1f5f9', borderRadius: "10px", color: '#64748b', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }}
+                                                sx={{ bgcolor: 'background.subtle', borderRadius: "10px", color: 'text.secondary', '&:hover': { bgcolor: '#fee2e2', color: '#ef4444' }, height: '36px', width: '36px', flexShrink: 0 }}
                                                 onClick={() => handleOpenDeleteConfirm(item.id)}
                                             >
                                                 <DeleteIcon fontSize="small" />
@@ -319,8 +320,8 @@ export default function MyListings() {
             <Footer />
 
             {/* Edit Listing Modal */}
-            <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
-                <DialogTitle sx={{ fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Dialog open={isEditListingModalOpen} onClose={() => setIsEditListingModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, p: 1, backgroundImage: 'none' } }}>
+                <DialogTitle sx={{ fontWeight: 700, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <EditIcon color="primary" /> Edit Listing
                 </DialogTitle>
                 <DialogContent>
@@ -355,21 +356,21 @@ export default function MyListings() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: '#64748b', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
+                    <Button onClick={() => setIsEditListingModalOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
                     <Button variant="contained" onClick={handleSaveListing} sx={{ bgcolor: '#2563eb', borderRadius: 2, px: 4, fontWeight: 700, textTransform: 'none', boxShadow: 'none', '&:hover': { bgcolor: '#1d4ed8' } }}>Save Changes</Button>
                 </DialogActions>
             </Dialog>
 
             {/* Delete Confirmation Modal */}
-            <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
-                <DialogTitle sx={{ fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1, backgroundImage: 'none' } }}>
+                <DialogTitle sx={{ fontWeight: 700, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <DeleteIcon color="error" /> Confirm Deletion
                 </DialogTitle>
                 <DialogContent>
                     <Typography color="text.secondary" sx={{ mt: 1 }}>Are you sure you want to delete this item? This action cannot be undone.</Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button onClick={() => setIsDeleteDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
+                    <Button onClick={() => setIsDeleteDialogOpen(false)} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}>Cancel</Button>
                     <Button variant="contained" color="error" onClick={confirmDeleteListing} sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none', px: 4, boxShadow: 'none' }}>Delete</Button>
                 </DialogActions>
             </Dialog>

@@ -145,7 +145,9 @@ export default function Home() {
       <Box
         sx={{
           minHeight: "100vh",
-          background: "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 35%, #eef4ff 100%)",
+          background: (theme) => theme.palette.mode === 'light' 
+            ? "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 35%, #eef4ff 100%)"
+            : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
         }}
       >
         <Navbar
@@ -186,9 +188,10 @@ export default function Home() {
                   mb: 4,
                   p: { xs: 2.5, md: 3 },
                   borderRadius: "24px",
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  boxShadow: "0 8px 30px rgba(15, 23, 42, 0.05)",
+                  backgroundColor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  boxShadow: (theme) => theme.palette.mode === 'light' ? "0 8px 30px rgba(15, 23, 42, 0.05)" : "none",
                 }}
               >
                 <Box
@@ -201,10 +204,10 @@ export default function Home() {
                   }}
                 >
                   <Box>
-                    <Typography sx={{ fontSize: { xs: 24, md: 28 }, fontWeight: 800, color: "#0f172a", mb: 0.5 }}>
+                    <Typography sx={{ fontSize: { xs: 24, md: 28 }, fontWeight: 800, color: "text.primary", mb: 0.5 }}>
                       All Listings
                     </Typography>
-                    <Typography sx={{ fontSize: "0.95rem", color: "#64748b", lineHeight: 1.7 }}>
+                    <Typography sx={{ fontSize: "0.95rem", color: "text.secondary", lineHeight: 1.7 }}>
                       Explore campus deals and discover useful student items in one place.
                     </Typography>
                   </Box>
@@ -218,13 +221,13 @@ export default function Home() {
                         IconComponent={SortIcon}
                         sx={{
                           borderRadius: "12px",
-                          backgroundColor: "#f8fafc",
+                          backgroundColor: "background.default",
                           fontWeight: 600,
                           fontSize: "0.88rem",
-                          color: "#334155",
-                          "& .MuiOutlinedInput-notchedOutline": { borderColor: "#e2e8f0" },
-                          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#cbd5e1" },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                          color: "text.primary",
+                          "& .MuiOutlinedInput-notchedOutline": { borderColor: "divider" },
+                          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "text.secondary" },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main" },
                         }}
                       >
                         <MenuItem value="newest">Newest First</MenuItem>
@@ -238,8 +241,8 @@ export default function Home() {
                       sx={{
                         fontWeight: 700,
                         borderRadius: "10px",
-                        backgroundColor: "#e0ecff",
-                        color: "#1d4ed8",
+                        backgroundColor: (theme) => theme.palette.mode === 'light' ? "#e0ecff" : "rgba(37, 99, 235, 0.15)",
+                        color: (theme) => theme.palette.mode === 'light' ? "#1d4ed8" : "#60a5fa",
                         display: { xs: "none", sm: "flex" },
                       }}
                     />
@@ -274,10 +277,11 @@ export default function Home() {
                           textTransform: "none",
                           fontWeight: 800,
                           fontSize: "1rem",
-                          border: "2px solid #2563eb",
-                          color: "#2563eb",
+                          border: "2px solid",
+                          borderColor: "primary.main",
+                          color: "primary.main",
                           "&:hover": {
-                            border: "2px solid #1d4ed8",
+                            borderColor: "primary.dark",
                             bgcolor: "rgba(37, 99, 235, 0.04)",
                             transform: "translateY(-2px)",
                           },

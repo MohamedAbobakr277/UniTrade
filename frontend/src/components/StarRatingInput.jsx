@@ -62,15 +62,16 @@ export default function StarRatingInput({ sellerId, currentUser }) {
         <Box sx={{ 
             p: 3, 
             borderRadius: "16px", 
-            border: "1px solid #e2e8f0", 
-            bgcolor: "#fff",
+            border: "1px solid",
+            borderColor: "divider", 
+            bgcolor: "background.paper",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: 1.5,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
+            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 12px rgba(0,0,0,0.02)" : "none"
         }}>
-            <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
+            <Typography sx={{ fontSize: 16, fontWeight: 700, color: "text.primary" }}>
                 {initialRating > 0 ? "Update your rating" : "Rate this seller"}
             </Typography>
             
@@ -102,8 +103,10 @@ export default function StarRatingInput({ sellerId, currentUser }) {
                         bgcolor: "#1d4ed8",
                     },
                     "&:disabled": {
-                        bgcolor: "#e2e8f0",
-                        color: "#94a3b8"
+                        bgcolor: "background.subtle",
+                        color: "text.disabled",
+                        border: "1px solid",
+                        borderColor: "divider"
                     }
                 }}
             >

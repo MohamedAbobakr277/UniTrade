@@ -35,9 +35,10 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                 sx={{
                     p: 2.5,
                     borderRadius: "24px",
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 8px 30px rgba(15, 23, 42, 0.05)",
+                    backgroundColor: "background.paper",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: (theme) => theme.palette.mode === 'light' ? "0 8px 30px rgba(15, 23, 42, 0.05)" : "none",
                     position: "sticky",
                     top: 20,
                 }}
@@ -49,7 +50,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         variant="h6"
                         sx={{
                             fontWeight: 800,
-                            color: "#0f172a",
+                            color: "text.primary",
                             fontSize: "1.1rem",
                         }}
                     >
@@ -59,7 +60,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
 
                 <Typography
                     sx={{
-                        color: "#64748b",
+                        color: "text.secondary",
                         fontSize: "0.92rem",
                         lineHeight: 1.7,
                         mb: 2.5,
@@ -103,8 +104,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         mb: 3,
                         p: 1.6,
                         borderRadius: "18px",
-                        backgroundColor: "#fcfdff",
-                        border: "1px solid #edf2f7",
+                        backgroundColor: "background.subtle",
+                        border: "1px solid",
+                        borderColor: "divider",
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
@@ -112,7 +114,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         <Typography
                             sx={{
                                 fontWeight: 700,
-                                color: "#0f172a",
+                                color: "text.primary",
                                 fontSize: "0.98rem",
                             }}
                         >
@@ -134,8 +136,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         mb: 3,
                         p: 1.6,
                         borderRadius: "18px",
-                        backgroundColor: "#fcfdff",
-                        border: "1px solid #edf2f7",
+                        backgroundColor: "background.subtle",
+                        border: "1px solid",
+                        borderColor: "divider",
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
@@ -143,7 +146,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         <Typography
                             sx={{
                                 fontWeight: 700,
-                                color: "#0f172a",
+                                color: "text.primary",
                                 fontSize: "0.98rem",
                             }}
                         >
@@ -156,8 +159,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                             px: 1,
                             py: 1.5,
                             borderRadius: "16px",
-                            backgroundColor: "#f8fafc",
-                            border: "1px solid #e2e8f0",
+                            backgroundColor: "background.default",
+                            border: "1px solid",
+                            borderColor: "divider",
                         }}
                     >
                         <Slider
@@ -196,13 +200,14 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     px: 1,
                                     py: 0.8,
                                     borderRadius: "10px",
-                                    backgroundColor: "#ffffff",
-                                    border: "1px solid #e2e8f0",
+                                    backgroundColor: "background.paper",
+                                    border: "1px solid",
+                                    borderColor: "divider",
                                     textAlign: "center"
                                 }}
                             >
-                                <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>From</Typography>
-                                <Typography sx={{ color: "#334155", fontWeight: 800, fontSize: "0.85rem" }}>
+                                <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>From</Typography>
+                                <Typography sx={{ color: "text.primary", fontWeight: 800, fontSize: "0.85rem" }}>
                                     EGP {priceRange[0]}
                                 </Typography>
                             </Box>
@@ -215,13 +220,14 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     px: 1,
                                     py: 0.8,
                                     borderRadius: "10px",
-                                    backgroundColor: "#ffffff",
-                                    border: "1px solid #e2e8f0",
+                                    backgroundColor: "background.paper",
+                                    border: "1px solid",
+                                    borderColor: "divider",
                                     textAlign: "center"
                                 }}
                             >
-                                <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>To</Typography>
-                                <Typography sx={{ color: "#334155", fontWeight: 800, fontSize: "0.85rem" }}>
+                                <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>To</Typography>
+                                <Typography sx={{ color: "text.primary", fontWeight: 800, fontSize: "0.85rem" }}>
                                     EGP {priceRange[1]}
                                 </Typography>
                             </Box>
@@ -236,8 +242,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                     sx={{
                         p: 1.6,
                         borderRadius: "18px",
-                        backgroundColor: "#fcfdff",
-                        border: "1px solid #edf2f7",
+                        backgroundColor: "background.subtle",
+                        border: "1px solid",
+                        borderColor: "divider",
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
@@ -245,7 +252,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         <Typography
                             sx={{
                                 fontWeight: 700,
-                                color: "#0f172a",
+                                color: "text.primary",
                                 fontSize: "0.98rem",
                             }}
                         >
@@ -259,8 +266,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                 gap: 0.5,
                                 p: 1.2,
                                 borderRadius: "16px",
-                                backgroundColor: "#f8fafc",
-                                border: "1px solid #e2e8f0",
+                                backgroundColor: "background.default",
+                                border: "1px solid",
+                                borderColor: "divider",
                             }}
                         >
                             <FormControlLabel
@@ -283,7 +291,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     />
                                 }
                                 label={
-                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                    <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
                                         New
                                     </Typography>
                                 }
@@ -308,7 +316,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     />
                                 }
                                 label={
-                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                    <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
                                         Like New
                                     </Typography>
                                 }
@@ -333,7 +341,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     />
                                 }
                                 label={
-                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                    <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
                                         Good
                                     </Typography>
                                 }
@@ -358,7 +366,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     />
                                 }
                                 label={
-                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                    <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
                                         Fair
                                     </Typography>
                                 }
@@ -383,7 +391,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                     />
                                 }
                                 label={
-                                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
+                                    <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
                                         Poor
                                     </Typography>
                                 }
@@ -398,8 +406,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         mt: 3,
                         p: 1.8,
                         borderRadius: "18px",
-                        background: "linear-gradient(135deg, #eef4ff 0%, #f8fbff 100%)",
-                        border: "1px solid #dbeafe",
+                        backgroundColor: "background.subtle",
+                        border: "1px solid",
+                        borderColor: "divider",
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.8 }}>
@@ -408,7 +417,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                             sx={{
                                 fontWeight: 800,
                                 fontSize: "0.92rem",
-                                color: "#0f172a",
+                                color: "text.primary",
                             }}
                         >
                             Quick Tip
@@ -418,7 +427,7 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                     <Typography
                         sx={{
                             fontSize: "0.85rem",
-                            color: "#64748b",
+                            color: "text.secondary",
                             lineHeight: 1.6,
                         }}
                     >

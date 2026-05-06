@@ -30,16 +30,17 @@ export default function EmptyState({ title, description, iconType, ctaText, ctaL
         py: 12,
         px: 4,
         textAlign: "center",
-        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.03)",
         borderRadius: "24px",
-        border: "1px dashed #cbd5e1",
+        border: "1px dashed",
+        borderColor: "divider",
       }}
     >
       {getIcon()}
-      <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a", mb: 1.5 }}>
+      <Typography variant="h5" sx={{ fontWeight: 800, color: "text.primary", mb: 1.5 }}>
         {title}
       </Typography>
-      <Typography sx={{ color: "#64748b", fontSize: "1.05rem", maxWidth: "450px", mb: 4, lineHeight: 1.6 }}>
+      <Typography sx={{ color: "text.secondary", fontSize: "1.05rem", maxWidth: "450px", mb: 4, lineHeight: 1.6 }}>
         {description}
       </Typography>
       {ctaText && ctaLink && (

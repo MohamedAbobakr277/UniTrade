@@ -179,18 +179,19 @@ export default function AIChatbot() {
                     slotProps={{
                         tooltip: {
                             sx: {
-                                bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)',
                                 backdropFilter: 'blur(10px)',
                                 boxShadow: '0 8px 30px rgba(37,99,235,0.15)',
-                                border: '1px solid rgba(0,0,0,0.05)',
+                                border: '1px solid',
+                                borderColor: 'divider',
                                 borderRadius: '12px',
                                 p: 1,
                                 ml: 2,
-                                color: '#0f172a'
+                                color: 'text.primary'
                             }
                         },
                         arrow: {
-                            sx: { color: 'rgba(255, 255, 255, 0.95)' }
+                            sx: { color: (theme) => theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)' }
                         }
                     }}
                 >
@@ -230,10 +231,11 @@ export default function AIChatbot() {
                         maxWidth: 260,
                         p: 2,
                         borderRadius: '20px 20px 20px 4px',
-                        background: 'rgba(255, 255, 255, 0.95)',
+                        background: (theme) => theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)',
                         backdropFilter: 'blur(12px)',
-                        border: '1px solid rgba(0,0,0,0.05)',
-                        boxShadow: '0 12px 40px -10px rgba(37,99,235,0.25)',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 40px -10px rgba(37,99,235,0.25)' : '0 12px 40px -10px rgba(0,0,0,0.5)',
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: 1.5,
@@ -243,7 +245,7 @@ export default function AIChatbot() {
                     <IconButton
                         size="small"
                         onClick={(e) => { e.stopPropagation(); setShowWelcome(false); }}
-                        sx={{ position: 'absolute', top: 4, right: 4, color: '#94a3b8', width: 20, height: 20, '&:hover': { color: '#0f172a', bgcolor: '#f1f5f9' } }}
+                        sx={{ position: 'absolute', top: 4, right: 4, color: 'text.secondary', width: 20, height: 20, '&:hover': { color: 'text.primary', bgcolor: 'background.subtle' } }}
                     >
                         <CloseIcon sx={{ fontSize: 14 }} />
                     </IconButton>
@@ -251,10 +253,10 @@ export default function AIChatbot() {
                         <AutoAwesomeIcon sx={{ fontSize: 18, color: '#fff' }} />
                     </Avatar>
                     <Box sx={{ mt: 0.5, cursor: 'pointer', pr: 1 }} onClick={() => { setIsOpen(true); setShowWelcome(false); }}>
-                        <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.95rem', fontWeight: 800, color: '#0f172a', mb: 0.5, lineHeight: 1.2 }}>
+                        <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.95rem', fontWeight: 800, color: 'text.primary', mb: 0.5, lineHeight: 1.2 }}>
                             Hi {userName}! 👋
                         </Typography>
-                        <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.8rem', color: '#64748b', lineHeight: 1.4 }}>
+                        <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.8rem', color: 'text.secondary', lineHeight: 1.4 }}>
                             Looking for a specific item? Just ask and I'll help you find it fast.
                         </Typography>
                     </Box>
@@ -276,17 +278,20 @@ export default function AIChatbot() {
                         flexDirection: 'column',
                         borderRadius: '28px',
                         overflow: 'hidden',
-                        boxShadow: '0 24px 60px -12px rgba(15,23,42,0.2), 0 0 1px rgba(0,0,0,0.1)',
-                        backgroundColor: '#ffffff'
+                        boxShadow: (theme) => theme.palette.mode === 'light' ? '0 24px 60px -12px rgba(15,23,42,0.2), 0 0 1px rgba(0,0,0,0.1)' : '0 24px 60px -12px rgba(0,0,0,0.5)',
+                        backgroundColor: 'background.paper',
+                        border: '1px solid',
+                        borderColor: 'divider'
                     }}
                 >
                     {/* Header (Glassmorphic) */}
                     <Box sx={{
-                        background: 'rgba(255, 255, 255, 0.85)',
+                        background: (theme) => theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.85)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
-                        color: '#0f172a',
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        color: 'text.primary',
                         px: 3,
                         py: 2.5,
                         display: 'flex',
@@ -320,19 +325,19 @@ export default function AIChatbot() {
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <Tooltip title="Reset Conversation">
-                                <IconButton size="small" onClick={() => setMessages([{ id: 1, text: `Hi ${userName}! What can I help you with?`, sender: 'ai' }])} sx={{ color: '#94a3b8', '&:hover': { color: '#2563eb', bgcolor: '#eff6ff' } }}>
+                                <IconButton size="small" onClick={() => setMessages([{ id: 1, text: `Hi ${userName}! What can I help you with?`, sender: 'ai' }])} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'background.subtle' } }}>
                                     <RefreshIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <IconButton size="small" onClick={() => setIsOpen(false)} sx={{ color: '#94a3b8', '&:hover': { color: '#ef4444', bgcolor: '#fef2f2' } }}>
+                            <IconButton size="small" onClick={() => setIsOpen(false)} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main', bgcolor: 'background.subtle' } }}>
                                 <MinimizeIcon fontSize="small" sx={{ mb: 1 }} />
                             </IconButton>
                         </Box>
                     </Box>
 
                     {/* Chat Body */}
-                    <Box sx={{ flex: 1, overflowY: 'auto', p: 3, display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
-                        <Typography sx={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500, letterSpacing: '0.5px', textTransform: 'uppercase', mt: 1, mb: 4, px: 2 }}>
+                    <Box sx={{ flex: 1, overflowY: 'auto', p: 3, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+                        <Typography sx={{ textAlign: 'center', color: 'text.secondary', fontSize: '0.75rem', fontWeight: 500, letterSpacing: '0.5px', textTransform: 'uppercase', mt: 1, mb: 4, px: 2 }}>
                             Today
                         </Typography>
 
@@ -352,10 +357,11 @@ export default function AIChatbot() {
                                     py: 1.5,
                                     px: 2.5,
                                     borderRadius: msg.sender === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
-                                    background: msg.sender === 'user' ? 'linear-gradient(135deg, #1e3a8a, #2563eb)' : '#ffffff',
-                                    color: msg.sender === 'user' ? '#ffffff' : '#0f172a',
-                                    boxShadow: msg.sender === 'user' ? '0 10px 25px -5px rgba(37,99,235,0.4)' : '0 4px 15px rgba(0,0,0,0.03)',
-                                    border: msg.sender === 'ai' ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                                    background: msg.sender === 'user' ? 'linear-gradient(135deg, #1e3a8a, #2563eb)' : 'background.paper',
+                                    color: msg.sender === 'user' ? '#ffffff' : 'text.primary',
+                                    boxShadow: msg.sender === 'user' ? '0 10px 25px -5px rgba(37,99,235,0.4)' : (theme) => theme.palette.mode === 'light' ? '0 4px 15px rgba(0,0,0,0.03)' : 'none',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
                                 }}>
                                     <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.95rem', lineHeight: 1.6, fontWeight: 400, wordBreak: 'break-word' }}>
                                         {msg.text}
@@ -370,15 +376,16 @@ export default function AIChatbot() {
                                     py: 2,
                                     px: 2.5,
                                     borderRadius: '20px 20px 20px 4px',
-                                    backgroundColor: '#ffffff',
-                                    boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-                                    border: '1px solid rgba(0,0,0,0.04)',
+                                    backgroundColor: 'background.paper',
+                                    boxShadow: (theme) => theme.palette.mode === 'light' ? '0 4px 15px rgba(0,0,0,0.03)' : 'none',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
                                     display: 'flex',
                                     gap: 0.5
                                 }}>
-                                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#3b82f6', animation: 'bounce 1.4s infinite ease-in-out both' }} />
-                                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#3b82f6', animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0.2s' }} />
-                                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#3b82f6', animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0.4s' }} />
+                                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'primary.main', animation: 'bounce 1.4s infinite ease-in-out both' }} />
+                                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'primary.main', animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0.2s' }} />
+                                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'primary.main', animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0.4s' }} />
                                 </Box>
                             </Box>
                         )}
@@ -386,20 +393,21 @@ export default function AIChatbot() {
                     </Box>
 
                     {/* Input Area (Floating Style) */}
-                    <Box sx={{ p: 2.5, pt: 1, position: 'relative', bgcolor: '#f8fafc', borderTop: '1px solid rgba(0,0,0,0.03)' }}>
+                    <Box sx={{ p: 2.5, pt: 1, position: 'relative', bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', position: 'absolute', top: -16, left: 0, right: 0 }}>
                             <IconButton
                                 onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
                                 sx={{
-                                    bgcolor: '#ffffff',
+                                    bgcolor: 'background.paper',
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                    border: '1px solid rgba(0,0,0,0.05)',
-                                    '&:hover': { bgcolor: '#f8fafc', transform: 'translateY(2px)' },
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    '&:hover': { bgcolor: 'background.subtle', transform: 'translateY(2px)' },
                                     width: 32, height: 32,
                                     transition: 'all 0.2s ease'
                                 }}
                             >
-                                <KeyboardArrowDownIcon fontSize="small" sx={{ color: '#64748b' }} />
+                                <KeyboardArrowDownIcon fontSize="small" sx={{ color: 'text.secondary' }} />
                             </IconButton>
                         </Box>
 
@@ -414,18 +422,19 @@ export default function AIChatbot() {
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: '30px',
-                                        backgroundColor: '#ffffff',
+                                        backgroundColor: 'background.subtle',
                                         pr: 1,
                                         boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                                        '& fieldset': { border: '1px solid rgba(0,0,0,0.08)' },
-                                        '&:hover fieldset': { borderColor: '#cbd5e1' },
-                                        '&.Mui-focused fieldset': { borderColor: '#2563eb', borderWidth: '2px' },
+                                        '& fieldset': { border: '1px solid', borderColor: 'divider' },
+                                        '&:hover fieldset': { borderColor: 'primary.main' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: '2px' },
                                     },
                                     '& .MuiOutlinedInput-input': {
                                         py: 1.8,
                                         px: 2.5,
                                         fontSize: '0.95rem',
-                                        fontFamily: 'Outfit, sans-serif'
+                                        fontFamily: 'Outfit, sans-serif',
+                                        color: 'text.primary'
                                     }
                                 }}
                                 InputProps={{
@@ -450,8 +459,8 @@ export default function AIChatbot() {
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mt: 1.5 }}>
-                            <AutoAwesomeIcon sx={{ fontSize: 14, color: '#3b82f6' }} />
-                            <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+                            <AutoAwesomeIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                            <Typography sx={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.8rem', color: 'text.secondary', fontWeight: 500 }}>
                                 Powered by UniTrade AI
                             </Typography>
                         </Box>

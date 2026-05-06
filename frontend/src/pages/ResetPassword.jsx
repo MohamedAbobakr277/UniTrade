@@ -15,52 +15,60 @@ import { forgotPassword } from "../services/auth"; // استدعاء الفان�
 
 /* ================= BACKGROUND ================= */
 
-const PageWrapper = styled(Box)({
+const PageWrapper = styled(Box)(({ theme }) => ({
     minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
     overflow: "hidden",
-    background:
-        "linear-gradient(135deg, #e0ecff 0%, #c8dcff 40%, #b7d1ff 100%)",
-});
+    background: theme.palette.mode === 'light'
+        ? "linear-gradient(135deg, #e0ecff 0%, #c8dcff 40%, #b7d1ff 100%)"
+        : "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+}));
 
-const BlurTop = styled(Box)({
+const BlurTop = styled(Box)(({ theme }) => ({
     position: "absolute",
     top: "-150px",
     right: "-150px",
     width: "400px",
     height: "400px",
-    background: "#9ec5ff",
+    background: theme.palette.mode === 'light' ? "#9ec5ff" : "#1e40af",
     borderRadius: "50%",
     filter: "blur(120px)",
-    opacity: 0.4,
-});
+    opacity: theme.palette.mode === 'light' ? 0.4 : 0.2,
+}));
 
-const BlurBottom = styled(Box)({
+const BlurBottom = styled(Box)(({ theme }) => ({
     position: "absolute",
     bottom: "-150px",
     left: "-150px",
     width: "400px",
     height: "400px",
-    background: "#b7d1ff",
+    background: theme.palette.mode === 'light' ? "#b7d1ff" : "#1e40af",
     borderRadius: "50%",
     filter: "blur(120px)",
-    opacity: 0.4,
-});
+    opacity: theme.palette.mode === 'light' ? 0.4 : 0.2,
+}));
 
-const GlassCard = styled(Box)({
+const GlassCard = styled(Box)(({ theme }) => ({
     width: "420px",
     padding: "45px 40px",
     borderRadius: "24px",
     backdropFilter: "blur(20px)",
-    background: "rgba(255,255,255,0.75)",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
-    border: "1px solid rgba(255,255,255,0.4)",
+    background: theme.palette.mode === 'light' 
+        ? "rgba(255, 255, 255, 0.75)" 
+        : "rgba(30, 41, 59, 0.7)",
+    boxShadow: theme.palette.mode === 'light'
+        ? "0 20px 60px rgba(0,0,0,0.08)"
+        : "0 20px 60px rgba(0,0,0,0.4)",
+    border: "1px solid",
+    borderColor: theme.palette.mode === 'light'
+        ? "rgba(255,255,255,0.4)"
+        : "rgba(255,255,255,0.05)",
     position: "relative",
     zIndex: 2,
-});
+}));
 
 const SoftButton = styled(Button)({
     background: "linear-gradient(90deg, #7db7ff, #5da9ff)",
@@ -117,6 +125,7 @@ export default function ResetPassword() {
                         textAlign="center"
                         fontWeight={600}
                         mb={3}
+                        color="text.primary"
                     >
                         Reset Password
                     </Typography>

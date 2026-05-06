@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   }, [users]);
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden", bgcolor: "#f5f7fb" }}>
+    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden", bgcolor: "background.default" }}>
       {/* ── Sidebar ── */}
       <AdminSidebar
         activeTab={activeTab}

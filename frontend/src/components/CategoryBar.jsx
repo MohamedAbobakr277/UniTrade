@@ -68,9 +68,10 @@ export default function CategoryBar({
                 mb: 1.5,
                 p: { xs: 2, md: 2.5 },
                 borderRadius: "22px",
-                backgroundColor: "#ffffff",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 8px 30px rgba(15, 23, 42, 0.04)",
+                backgroundColor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                boxShadow: (theme) => theme.palette.mode === 'light' ? "0 8px 30px rgba(15, 23, 42, 0.04)" : "none",
             }}
         >
             <Box
@@ -89,7 +90,7 @@ export default function CategoryBar({
                         sx={{
                             fontSize: "1.05rem",
                             fontWeight: 800,
-                            color: "#0f172a",
+                            color: "text.primary",
                         }}
                     >
                         Browse Categories
@@ -99,7 +100,7 @@ export default function CategoryBar({
                 <Typography
                     sx={{
                         fontSize: "0.9rem",
-                        color: "#64748b",
+                        color: "text.secondary",
                     }}
                 >
                     Choose a category to explore student listings faster
@@ -145,13 +146,13 @@ export default function CategoryBar({
                                 border:
                                     isSelected
                                         ? "1px solid #2563eb"
-                                        : "1px solid #e2e8f0",
+                                        : (theme) => `1px solid ${theme.palette.divider}`,
                                 background:
                                     isSelected
                                         ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
-                                        : "#f8fafc",
+                                        : (theme) => theme.palette.mode === 'light' ? "#f8fafc" : "#1e293b",
                                 color:
-                                    isSelected ? "#ffffff" : "#0f172a",
+                                    isSelected ? "#ffffff" : "text.primary",
                                 boxShadow:
                                     isSelected
                                         ? "0 8px 18px rgba(37,99,235,0.22)"
@@ -175,7 +176,7 @@ export default function CategoryBar({
                                     background:
                                         isSelected
                                             ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
-                                            : "#eef4ff",
+                                            : (theme) => theme.palette.mode === 'light' ? "#eef4ff" : "#334155",
                                     borderColor: "#2563eb",
                                     boxShadow:
                                         isSelected

@@ -108,9 +108,10 @@ export default function ItemCard({ item }) {
       sx={{
         borderRadius: "20px",
         overflow: "hidden",
-        border: "1px solid #f1f5f9",
-        backgroundColor: item.status === "sold" ? "#f8fafc" : "#ffffff",
-        boxShadow: "0 4px 12px rgba(15,23,42,0.03)",
+        border: "1px solid",
+        borderColor: "divider",
+        backgroundColor: item.status === "sold" ? "background.subtle" : "background.paper",
+        boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 12px rgba(15,23,42,0.03)" : "none",
         transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         width: "100%",
         height: "100%",
@@ -120,8 +121,8 @@ export default function ItemCard({ item }) {
         opacity: item.status === "sold" ? 0.8 : 1,
         "&:hover": {
           transform: item.status === "sold" ? "none" : "translateY(-10px)",
-          boxShadow: item.status === "sold" ? "none" : "0 22px 48px rgba(15,23,42,0.12)",
-          borderColor: "#e2e8f0",
+          boxShadow: item.status === "sold" ? "none" : (theme) => theme.palette.mode === 'light' ? "0 22px 48px rgba(15,23,42,0.12)" : "0 22px 48px rgba(0,0,0,0.5)",
+          borderColor: (theme) => theme.palette.mode === 'light' ? "#e2e8f0" : "primary.main",
         },
       }}
     >
@@ -156,7 +157,7 @@ export default function ItemCard({ item }) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "rgba(255,255,255,0.4)",
+                    backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
                     zIndex: 10,
                 }}
             >
@@ -204,11 +205,13 @@ export default function ItemCard({ item }) {
               position: "absolute",
               top: 14,
               right: 14,
-              backgroundColor: "#ffffff",
+              backgroundColor: "background.paper",
               color: conditionColor,
               fontWeight: 700,
               borderRadius: "10px",
-              boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+              boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.08)" : "none",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           />
         )}
@@ -219,10 +222,12 @@ export default function ItemCard({ item }) {
             position: "absolute",
             bottom: 14,
             right: 14,
-            backgroundColor: "#ffffff",
-            color: isFavorite ? "#ef4444" : "#94a3b8",
-            "&:hover": { backgroundColor: "#f8fafc" },
-            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+            backgroundColor: "background.paper",
+            color: isFavorite ? "#ef4444" : "text.secondary",
+            "&:hover": { backgroundColor: "background.subtle" },
+            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
+            border: "1px solid",
+            borderColor: "divider",
             zIndex: 20,
           }}
         >
@@ -244,7 +249,7 @@ export default function ItemCard({ item }) {
           sx={{
             fontWeight: 800,
             fontSize: "1.1rem",
-            color: "#0f172a",
+            color: "text.primary",
             lineHeight: 1.35,
             height: "58px",
             display: "-webkit-box",
@@ -279,7 +284,7 @@ export default function ItemCard({ item }) {
             <Typography
               sx={{
                 fontSize: "0.85rem",
-                color: "#64748b",
+                color: "text.secondary",
                 fontWeight: 600,
                 maxWidth: "110px",
                 overflow: "hidden",
@@ -312,7 +317,7 @@ export default function ItemCard({ item }) {
           sx={{
             mt: 1.4,
             fontSize: "0.9rem",
-            color: "#64748b",
+            color: "text.secondary",
             lineHeight: 1.6,
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -335,21 +340,22 @@ export default function ItemCard({ item }) {
             mt: 2.2,
             pt: 2.2,
             pb: 1,
-            borderTop: "1.5px solid rgba(15, 23, 42, 0.04)",
+            borderTop: "1.5px solid",
+            borderColor: "divider",
             gap: 2,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Avatar
               src={editData?.profilePhoto || "/default-avatar.png"}
-              sx={{ width: 42, height: 42, border: "2px solid #f1f5f9", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+              sx={{ width: 42, height: 42, border: "2px solid", borderColor: "divider", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
             />
             <Box sx={{ minWidth: 0 }}>
               <Typography 
                 sx={{ 
                   fontSize: 14.5, 
                   fontWeight: 800, 
-                  color: "#0f172a", 
+                  color: "text.primary", 
                   lineHeight: 1.2,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -359,7 +365,7 @@ export default function ItemCard({ item }) {
               >
                 {sellerName}
               </Typography>
-              <Typography sx={{ fontSize: 12, color: "#94a3b8", fontWeight: 500, mt: 0.2 }}>
+              <Typography sx={{ fontSize: 12, color: "text.secondary", fontWeight: 500, mt: 0.2 }}>
                 Student Seller
               </Typography>
             </Box>
@@ -370,8 +376,9 @@ export default function ItemCard({ item }) {
                 display: "flex", 
                 alignItems: "center", 
                 gap: 0.8,
-                bgcolor: "#f8fafc",
-                border: "1px solid #e2e8f0",
+                bgcolor: "background.subtle",
+                border: "1px solid",
+                borderColor: "divider",
                 borderRadius: "20px",
                 px: 1.5,
                 py: 0.8,

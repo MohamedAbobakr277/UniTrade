@@ -142,7 +142,7 @@ export default function ItemDetails() {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
+            <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
                 <Navbar />
                 <Box sx={{ py: { xs: 3, md: 4 }, display: "flex", justifyContent: "center" }}>
                     <Box sx={{ width: "100%", maxWidth: "1250px", px: { xs: 2.5, md: 4 } }}>
@@ -180,10 +180,10 @@ export default function ItemDetails() {
             <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
                 <Navbar />
                 <Box sx={{ p: 5, display: "flex", flexDirection: "column", alignItems: "center", mt: 10 }}>
-                    <Typography sx={{ fontSize: 28, fontWeight: 800, color: "#0f172a" }}>
+                    <Typography sx={{ fontSize: 28, fontWeight: 800, color: "text.primary" }}>
                         Item not found
                     </Typography>
-                    <Typography sx={{ fontSize: 16, color: "#64748b", mt: 1, mb: 4 }}>
+                    <Typography sx={{ fontSize: 16, color: "text.secondary", mt: 1, mb: 4 }}>
                         The item you are looking for might have been sold or deleted.
                     </Typography>
                     <Button
@@ -224,7 +224,13 @@ export default function ItemDetails() {
         : "Just now";
 
     return (
-        <Box sx={{ minHeight: "100vh", background: "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)", pb: 4 }}>
+        <Box sx={{ 
+            minHeight: "100vh", 
+            background: (theme) => theme.palette.mode === 'light' 
+                ? "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)"
+                : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)", 
+            pb: 4 
+        }}>
             <Navbar />
 
             <Box sx={{ py: { xs: 3, md: 4 }, display: "flex", justifyContent: "center" }}>
@@ -237,17 +243,18 @@ export default function ItemDetails() {
                             mb: 2.5,
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#64748b",
-                            bgcolor: "#ffffff",
+                            color: "text.secondary",
+                            bgcolor: "background.paper",
                             px: 2.5,
                             py: 0.8,
                             borderRadius: "12px",
-                            boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
-                            border: "1px solid #e2e8f0",
+                            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 14px rgba(0,0,0,0.03)" : "none",
+                            border: "1px solid",
+                            borderColor: "divider",
                             transition: "all 0.2s ease",
                             "&:hover": {
-                                bgcolor: "#f8fafc",
-                                color: "#0f172a",
+                                bgcolor: "background.subtle",
+                                color: "text.primary",
                                 transform: "translateX(-4px)",
                                 boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
                             },
@@ -267,9 +274,10 @@ export default function ItemDetails() {
                                         borderRadius: "20px",
                                         overflow: "hidden",
                                         position: "relative",
-                                        backgroundColor: "#fff",
-                                        border: "1px solid #e2e8f0",
-                                        boxShadow: "0 12px 30px rgba(15,23,42,0.04)",
+                                        backgroundColor: "background.paper",
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                        boxShadow: (theme) => theme.palette.mode === 'light' ? "0 12px 30px rgba(15,23,42,0.04)" : "none",
                                         height: { xs: "180px", sm: "300px", md: "350px", lg: "400px" },
                                         display: "flex",
                                         alignItems: "center",
@@ -331,12 +339,10 @@ export default function ItemDetails() {
                                             <IconButton
                                                 onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? item.images.length - 1 : prev - 1))}
                                                 sx={{
-                                                    position: "absolute",
-                                                    left: 16,
-                                                    bgcolor: "rgba(255,255,255,0.85)",
+                                                    bgcolor: (theme) => theme.palette.mode === 'light' ? "rgba(255,255,255,0.85)" : "rgba(15,23,42,0.85)",
                                                     backdropFilter: "blur(6px)",
-                                                    color: "#0f172a",
-                                                    "&:hover": { bgcolor: "#fff", transform: "scale(1.1)" },
+                                                    color: "text.primary",
+                                                    "&:hover": { bgcolor: "background.paper", transform: "scale(1.1)" },
                                                     transition: "all 0.2s",
                                                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                                                 }}
@@ -348,10 +354,10 @@ export default function ItemDetails() {
                                                 sx={{
                                                     position: "absolute",
                                                     right: 16,
-                                                    bgcolor: "rgba(255,255,255,0.85)",
+                                                    bgcolor: (theme) => theme.palette.mode === 'light' ? "rgba(255,255,255,0.85)" : "rgba(15,23,42,0.85)",
                                                     backdropFilter: "blur(6px)",
-                                                    color: "#0f172a",
-                                                    "&:hover": { bgcolor: "#fff", transform: "scale(1.1)" },
+                                                    color: "text.primary",
+                                                    "&:hover": { bgcolor: "background.paper", transform: "scale(1.1)" },
                                                     transition: "all 0.2s",
                                                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                                                 }}
@@ -367,9 +373,9 @@ export default function ItemDetails() {
                                             position: "absolute",
                                             bottom: 18,
                                             right: 18,
-                                            backgroundColor: "#ffffff",
-                                            color: isFavorite ? "#ef4444" : "#94a3b8",
-                                            "&:hover": { backgroundColor: "#f8fafc", transform: "scale(1.1)" },
+                                            backgroundColor: "background.paper",
+                                            color: isFavorite ? "#ef4444" : "text.secondary",
+                                            "&:hover": { backgroundColor: "background.subtle", transform: "scale(1.1)" },
                                             boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
                                             transition: "all 0.2s ease",
                                             width: 48,
@@ -417,7 +423,7 @@ export default function ItemDetails() {
                                         sx={{
                                             fontSize: { xs: 16, sm: 22, md: 32 },
                                             fontWeight: 900,
-                                            color: "#0f172a",
+                                            color: "text.primary",
                                             lineHeight: 1.2,
                                             mb: 0.5,
                                             wordBreak: "break-word",
@@ -443,33 +449,33 @@ export default function ItemDetails() {
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 0.5 }}>
                                     {item.category && (
                                         <Chip
-                                            icon={<CategoryIcon sx={{ fontSize: "16px !important", color: "#64748b !important" }} />}
+                                            icon={<CategoryIcon sx={{ fontSize: "16px !important", color: "text.secondary !important" }} />}
                                             label={item.category}
-                                            sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid #e2e8f0' }}
+                                            sx={{ bgcolor: "background.subtle", color: "text.primary", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid', borderColor: 'divider' }}
                                         />
                                     )}
                                     {item.university && (
                                         <Chip
-                                            icon={<LocationOnIcon sx={{ fontSize: "18px !important", color: "#64748b !important" }} />}
+                                            icon={<LocationOnIcon sx={{ fontSize: "18px !important", color: "text.secondary !important" }} />}
                                             label={item.university}
-                                            sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid #e2e8f0' }}
+                                            sx={{ bgcolor: "background.subtle", color: "text.primary", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid', borderColor: 'divider' }}
                                         />
                                     )}
                                     <Chip
-                                        icon={<AccessTimeIcon sx={{ fontSize: "18px !important", color: "#64748b !important" }} />}
+                                        icon={<AccessTimeIcon sx={{ fontSize: "18px !important", color: "text.secondary !important" }} />}
                                         label={`Posted ${formattedDate}`}
-                                        sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid #e2e8f0' }}
+                                        sx={{ bgcolor: "background.subtle", color: "text.primary", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid', borderColor: 'divider' }}
                                     />
                                 </Box>
 
                                 <Divider sx={{ borderColor: "#e2e8f0" }} />
 
                                 {/* Description */}
-                                <Box sx={{ maxHeight: "150px", overflowY: "auto", pr: 1, "::-webkit-scrollbar": { width: "6px" }, "::-webkit-scrollbar-thumb": { background: "#cbd5e1", borderRadius: "10px" } }}>
-                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#0f172a", mb: 1 }}>
+                                <Box sx={{ maxHeight: "150px", overflowY: "auto", pr: 1, "::-webkit-scrollbar": { width: "6px" }, "::-webkit-scrollbar-thumb": { background: (theme) => theme.palette.divider, borderRadius: "10px" } }}>
+                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "text.primary", mb: 1 }}>
                                         Description
                                     </Typography>
-                                    <Typography sx={{ fontSize: 14.5, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                                    <Typography sx={{ fontSize: 14.5, color: "text.secondary", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
                                         {item.description || "No description provided by the seller."}
                                     </Typography>
                                 </Box>
@@ -478,7 +484,7 @@ export default function ItemDetails() {
 
                                 {/* Stock Status & Quantity Selector */}
                                 <Box>
-                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#0f172a", mb: 1.5 }}>
+                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "text.primary", mb: 1.5 }}>
                                         Availability
                                     </Typography>
                                     {(() => {
@@ -492,13 +498,14 @@ export default function ItemDetails() {
                                                         icon={<InventoryIcon sx={{ fontSize: "18px !important", color: isOutOfStock ? "#ef4444 !important" : isLowStock ? "#f59e0b !important" : "#10b981 !important" }} />}
                                                         label={isOutOfStock ? "Out of stock" : `In stock: ${stock} item${stock !== 1 ? 's' : ''}`}
                                                         sx={{
-                                                            bgcolor: isOutOfStock ? "#fef2f2" : isLowStock ? "#fffbeb" : "#f0fdf4",
-                                                            color: isOutOfStock ? "#ef4444" : isLowStock ? "#d97706" : "#16a34a",
+                                                            bgcolor: isOutOfStock ? (theme => theme.palette.mode === 'light' ? "#fef2f2" : "rgba(239, 68, 68, 0.1)") : isLowStock ? (theme => theme.palette.mode === 'light' ? "#fffbeb" : "rgba(245, 158, 11, 0.1)") : (theme => theme.palette.mode === 'light' ? "#f0fdf4" : "rgba(16, 185, 129, 0.1)"),
+                                                            color: isOutOfStock ? "#ef4444" : isLowStock ? (theme => theme.palette.mode === 'light' ? "#d97706" : "#f59e0b") : "#10b981",
                                                             fontWeight: 700,
                                                             borderRadius: "12px",
                                                             py: 2.2,
                                                             px: 0.5,
-                                                            border: `1px solid ${isOutOfStock ? "#fecaca" : isLowStock ? "#fde68a" : "#bbf7d0"}`,
+                                                            border: '1px solid',
+                                                            borderColor: isOutOfStock ? "error.main" : isLowStock ? "warning.main" : "success.main",
                                                             fontSize: "0.9rem",
                                                         }}
                                                     />
@@ -508,11 +515,12 @@ export default function ItemDetails() {
                                                             label="Low stock"
                                                             size="small"
                                                             sx={{
-                                                                bgcolor: "#fffbeb",
-                                                                color: "#d97706",
+                                                                bgcolor: (theme) => theme.palette.mode === 'light' ? "#fffbeb" : "rgba(245, 158, 11, 0.1)",
+                                                                color: (theme) => theme.palette.mode === 'light' ? "#d97706" : "#f59e0b",
                                                                 fontWeight: 700,
                                                                 borderRadius: "10px",
-                                                                border: "1px solid #fde68a",
+                                                                border: "1px solid",
+                                                                borderColor: "warning.main",
                                                             }}
                                                         />
                                                     )}
@@ -539,7 +547,10 @@ export default function ItemDetails() {
                                                             '& .MuiOutlinedInput-root': {
                                                                 borderRadius: '12px',
                                                                 fontWeight: 700,
-                                                            }
+                                                                bgcolor: "background.paper",
+                                                            },
+                                                            '& .MuiInputLabel-root': { color: 'text.secondary' },
+                                                            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
                                                         }}
                                                         helperText={`Max: ${stock}`}
                                                     />
@@ -553,7 +564,7 @@ export default function ItemDetails() {
 
                                 {/* Seller Section */}
                                 <Box>
-                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#0f172a", mb: 1.5 }}>
+                                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: "text.primary", mb: 1.5 }}>
                                         About the Seller
                                     </Typography>
                                     <Paper
@@ -562,33 +573,34 @@ export default function ItemDetails() {
                                         sx={{
                                             p: 2.5,
                                             borderRadius: "20px",
-                                            bgcolor: "#ffffff",
-                                            border: "1px solid #e2e8f0",
+                                            bgcolor: "background.paper",
+                                            border: "1px solid",
+                                            borderColor: "divider",
                                             display: "flex",
                                             alignItems: "center",
                                             gap: 2.5,
                                             cursor: "pointer",
                                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                            boxShadow: "0 4px 12px rgba(15,23,42,0.02)",
+                                            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 12px rgba(15,23,42,0.02)" : "none",
                                             "&:hover": {
-                                                boxShadow: '0 12px 30px rgba(15,23,42,0.08)',
+                                                boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 30px rgba(15,23,42,0.08)' : 'none',
                                                 transform: 'translateY(-4px)',
-                                                borderColor: '#3b82f6'
+                                                borderColor: 'primary.main'
                                             }
                                         }}
                                     >
                                         <Avatar
                                             src={sellerData?.profilePhoto || "/default-avatar.png"}
-                                            sx={{ width: 60, height: 60, border: "2,5px solid #f1f5f9", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }}
+                                            sx={{ width: 60, height: 60, border: "2.5px solid", borderColor: "divider", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }}
                                         />
                                         <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>
+                                            <Typography sx={{ fontSize: 17, fontWeight: 800, color: "text.primary" }}>
                                                 {sellerName}
                                             </Typography>
                                             <Box sx={{ mt: 0.5, mb: 0.5 }}>
                                                 <StarRatingDisplay averageRating={sellerData?.averageRating} ratingsCount={sellerData?.ratingsCount} size="small" />
                                             </Box>
-                                            <Typography sx={{ fontSize: 14, color: "#64748b", fontWeight: 600, mt: 0.3 }}>
+                                            <Typography sx={{ fontSize: 14, color: "text.secondary", fontWeight: 600, mt: 0.3 }}>
                                                 {sellerData?.major || "Verified Student"}
                                             </Typography>
                                         </Box>
@@ -625,8 +637,8 @@ export default function ItemDetails() {
                                                 : "linear-gradient(135deg, #1d4ed8, #2563eb)",
                                         },
                                         "&.Mui-disabled": {
-                                            bgcolor: "#e2e8f0",
-                                            color: "#94a3b8",
+                                            bgcolor: "divider",
+                                            color: "text.disabled",
                                             boxShadow: "none"
                                         }
                                     }}
@@ -658,15 +670,17 @@ export default function ItemDetails() {
                         width: "100%",
                         p: { xs: 2.5, sm: 3.5 },
                         maxWidth: { xs: "100%", sm: "440px" },
-                        boxShadow: "0 -8px 40px rgba(0,0,0,0.1)",
-                        border: "1px solid rgba(255,255,255,0.8)",
+                        boxShadow: (theme) => theme.palette.mode === 'light' ? "0 -8px 40px rgba(0,0,0,0.1)" : "none",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        backgroundImage: "none",
                     }
                 }}
             >
                 {/* 1. Header */}
-                <DialogTitle sx={{ fontWeight: 900, color: "#0f172a", p: 0, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "1.3rem" }}>
+                <DialogTitle sx={{ fontWeight: 900, color: "text.primary", p: 0, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "1.3rem" }}>
                     Contact Seller
-                    <IconButton onClick={() => setIsContactOpen(false)} size="small" sx={{ color: "#64748b", bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
+                    <IconButton onClick={() => setIsContactOpen(false)} size="small" sx={{ color: "text.secondary", bgcolor: "background.subtle", "&:hover": { bgcolor: "divider" } }}>
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
@@ -676,21 +690,21 @@ export default function ItemDetails() {
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1.5 }}>
                         <Avatar
                             src={sellerData?.profilePhoto || "/default-avatar.png"}
-                            sx={{ width: 56, height: 56, border: "2px solid #f1f5f9" }}
+                            sx={{ width: 56, height: 56, border: "2px solid", borderColor: "divider" }}
                         />
                         <Box>
                             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>
+                                <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "text.primary" }}>
                                     {sellerName}
                                 </Typography>
                                 {(sellerData?.isVerified || sellerData?.major) && <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: "1.1rem" }} />}
                             </Box>
-                            <Typography sx={{ fontSize: "0.9rem", color: "#64748b", fontWeight: 500 }}>
+                            <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", fontWeight: 500 }}>
                                 Verified User
                             </Typography>
                         </Box>
                     </Box>
-                    <Typography sx={{ color: "#475569", mb: 3.5, fontSize: "0.95rem", fontWeight: 500 }}>
+                    <Typography sx={{ color: "text.secondary", mb: 3.5, fontSize: "0.95rem", fontWeight: 500 }}>
                         Choose how you want to contact the seller
                     </Typography>
 
@@ -756,12 +770,12 @@ Is it still available? 😊`;
                             >
                                 Chat on WhatsApp
                             </Button>
-                            <Typography sx={{ textAlign: "center", mt: 1.2, color: "#94a3b8", fontSize: "0.85rem", fontWeight: 500 }}>
+                            <Typography sx={{ textAlign: "center", mt: 1.2, color: "text.secondary", fontSize: "0.85rem", fontWeight: 500 }}>
                                 You will continue in WhatsApp
                             </Typography>
                         </Box>
 
-                        <Divider variant="middle" sx={{ borderColor: "#e2e8f0" }} />
+                        <Divider variant="middle" sx={{ borderColor: "divider" }} />
 
                         {/* 4. Phone Number Section */}
                         <Box
@@ -772,22 +786,23 @@ Is it still available? 😊`;
                                 flexDirection: "column",
                                 alignItems: "flex-start",
                                 gap: 1.5,
-                                border: "1px solid #e2e8f0",
-                                bgcolor: "#f8fafc",
+                                border: "1px solid",
+                                borderColor: "divider",
+                                bgcolor: "background.subtle",
                             }}
                         >
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: "100%" }}>
-                                <Avatar sx={{ bgcolor: "rgba(15, 23, 42, 0.06)", color: "#475569", width: 44, height: 44 }}>
+                                <Avatar sx={{ bgcolor: "background.default", color: "text.primary", width: 44, height: 44 }}>
                                     <PhoneIcon />
                                 </Avatar>
                                 <Box sx={{ flex: 1 }}>
-                                    <Typography sx={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.2 }}>
+                                    <Typography sx={{ fontSize: "0.8rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.2 }}>
                                         Phone Number
                                     </Typography>
 
                                     {showPhone ? (
                                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 0.5 }}>
-                                            <Typography sx={{ fontSize: "1.1rem", color: "#0f172a", fontWeight: 800, letterSpacing: "0.5px" }}>
+                                            <Typography sx={{ fontSize: "1.1rem", color: "text.primary", fontWeight: 800, letterSpacing: "0.5px" }}>
                                                 {(sellerData?.phoneNumber || sellerData?.phone) || "Unavailable"}
                                             </Typography>
                                             {(sellerData?.phoneNumber || sellerData?.phone) && (
@@ -808,7 +823,7 @@ Is it still available? 😊`;
                                         </Box>
                                     ) : (
                                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 0.5 }}>
-                                            <Typography sx={{ fontSize: "1.1rem", color: "#0f172a", fontWeight: 800, letterSpacing: "2px" }}>
+                                            <Typography sx={{ fontSize: "1.1rem", color: "text.primary", fontWeight: 800, letterSpacing: "2px" }}>
                                                 +20 1•• ••• ••••
                                             </Typography>
                                             <Button

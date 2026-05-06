@@ -59,7 +59,7 @@ export default function Favourites() {
   });
 
   return (
-    <Box sx={{ minHeight: "100vh", background: "#f8fbff" }}>
+    <Box sx={{ minHeight: "100vh", background: "background.default" }}>
       <Navbar items={items} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
       <Box sx={{ p: { xs: 2, md: 5 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
@@ -69,25 +69,25 @@ export default function Favourites() {
               sx={{
                   textTransform: "none",
                   fontWeight: 700,
-                  color: "#64748b",
-                  bgcolor: "#ffffff",
+                  color: "text.secondary",
+                  bgcolor: "background.paper",
                   px: 2.5,
                   py: 0.8,
                   borderRadius: "12px",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
-                  border: "1px solid #e2e8f0",
+                  boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 14px rgba(0,0,0,0.03)" : "none",
+                  border: "1px solid",
+                  borderColor: "divider",
                   transition: "all 0.2s ease",
                   "&:hover": {
-                      bgcolor: "#f8fafc",
-                      color: "#0f172a",
+                      bgcolor: "background.subtle",
+                      color: "text.primary",
                       transform: "translateX(-4px)",
-                      boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
                   },
               }}
           >
               Back to Profile
           </Button>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', m: 0 }}>My Favourites</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', m: 0 }}>My Favourites</Typography>
         </Box>
 
         {loading ? (

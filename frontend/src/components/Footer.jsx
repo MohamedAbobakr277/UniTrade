@@ -32,8 +32,9 @@ export default function Footer() {
     <Box
       component="footer"
       sx={{
-        bgcolor: "#ffffff",
-        borderTop: "1px solid #e2e8f0",
+        bgcolor: "background.paper",
+        borderTop: "1px solid",
+        borderColor: "divider",
         pt: 8,
         pb: 4,
         mt: "auto",
@@ -56,15 +57,15 @@ export default function Footer() {
             >
               <img src={logo} alt="UniTrade Logo" style={{ height: 45 }} />
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: "text.primary", lineHeight: 1 }}>
                   UniTrade
                 </Typography>
-                <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
+                <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
                   Campus Marketplace
                 </Typography>
               </Box>
             </Box>
-            <Typography sx={{ color: "#64748b", mb: 4, maxWidth: 300, lineHeight: 1.7 }}>
+            <Typography sx={{ color: "text.secondary", mb: 4, maxWidth: 300, lineHeight: 1.7 }}>
               The most trusted marketplace for university students across Egypt. Buy, sell, and trade with your peers safely and easily.
             </Typography>
             <Box sx={{ display: "flex", gap: 1.5 }}>
@@ -78,10 +79,10 @@ export default function Footer() {
                   key={social.label}
                   size="small"
                   sx={{
-                    bgcolor: "#f1f5f9",
-                    color: "#475569",
+                    bgcolor: "background.subtle",
+                    color: "text.secondary",
                     "&:hover": {
-                      bgcolor: "#2563eb",
+                      bgcolor: "primary.main",
                       color: "#ffffff",
                       transform: "translateY(-2px)",
                     },
@@ -99,7 +100,7 @@ export default function Footer() {
             <Grid item xs={6} sm={4} md={2.66} key={category}>
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 800, color: "#0f172a", mb: 3 }}
+                sx={{ fontWeight: 800, color: "text.primary", mb: 3 }}
               >
                 {category}
               </Typography>
@@ -110,10 +111,10 @@ export default function Footer() {
                     href="#"
                     underline="none"
                     sx={{
-                      color: "#64748b",
+                      color: "text.secondary",
                       fontWeight: 500,
                       transition: "color 0.2s",
-                      "&:hover": { color: "#2563eb" },
+                      "&:hover": { color: "primary.main" },
                     }}
                   >
                     {link.name}
@@ -124,7 +125,7 @@ export default function Footer() {
           ))}
         </Grid>
 
-        <Divider sx={{ my: 6, borderColor: "#f1f5f9" }} />
+        <Divider sx={{ my: 6, borderColor: "divider" }} />
 
         <Box
           sx={{
@@ -139,13 +140,13 @@ export default function Footer() {
             © {currentYear} UniTrade Egypt. All rights reserved. Built with ❤️ for Students.
           </Typography>
           <Box sx={{ display: "flex", gap: 4 }}>
-            <Link href="#" underline="none" sx={{ color: "#94a3b8", fontSize: "0.875rem", "&:hover": { color: "#64748b" } }}>
+            <Link href="#" underline="none" sx={{ color: "text.secondary", fontSize: "0.875rem", "&:hover": { color: "text.primary" } }}>
               Privacy
             </Link>
-            <Link href="#" underline="none" sx={{ color: "#94a3b8", fontSize: "0.875rem", "&:hover": { color: "#64748b" } }}>
+            <Link href="#" underline="none" sx={{ color: "text.secondary", fontSize: "0.875rem", "&:hover": { color: "text.primary" } }}>
               Terms
             </Link>
-            <Link href="#" underline="none" sx={{ color: "#94a3b8", fontSize: "0.875rem", "&:hover": { color: "#64748b" } }}>
+            <Link href="#" underline="none" sx={{ color: "text.secondary", fontSize: "0.875rem", "&:hover": { color: "text.primary" } }}>
               Cookies
             </Link>
           </Box>

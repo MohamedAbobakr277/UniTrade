@@ -154,81 +154,83 @@ export default function SellTool() {
     };
 
     return (
-        <Box sx={{ backgroundColor: "#f5f7fb", minHeight: "100vh" }}>
-            <Navbar />
-            {showConfetti && <Confetti width={width} height={height} recycle={false} />}
-            <Box sx={{ p: 5 }}>
-                <Box sx={{ maxWidth: 700, mx: "auto", backgroundColor: "white", p: 5, borderRadius: 4, boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-                    <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 3 }}>Back</Button>
-                    <Typography sx={{ fontSize: 26, fontWeight: 700, mb: 4 }}>Sell Your Item</Typography>
-                    
-                    {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+        <>
+            <Box sx={{ backgroundColor: "background.default", minHeight: "100vh" }}>
+                <Navbar />
+                {showConfetti && <Confetti width={width} height={height} recycle={false} />}
+                <Box sx={{ p: 5 }}>
+                    <Box sx={{ maxWidth: 700, mx: "auto", backgroundColor: "background.paper", p: 5, borderRadius: 4, boxShadow: (theme) => theme.palette.mode === 'light' ? "0 10px 30px rgba(0,0,0,0.05)" : "none", border: "1px solid", borderColor: "divider" }}>
+                        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 3 }}>Back</Button>
+                        <Typography sx={{ fontSize: 26, fontWeight: 700, mb: 4 }}>Sell Your Item</Typography>
+                        
+                        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-                    <Box 
-                        onClick={() => fileInputRef.current.click()}
-                        sx={{ border: "2px dashed #2563eb", borderRadius: 3, p: 4, textAlign: "center", cursor: "pointer", mb: 3, backgroundColor: "#f8fafc" }}
-                    >
-                        <CloudUploadIcon sx={{ fontSize: 40, color: "#2563eb" }} />
-                        <Typography sx={{ mt: 2, fontWeight: 500 }}>Upload Image</Typography>
-                        <input type="file" multiple hidden ref={fileInputRef} onChange={(e) => handleFiles(Array.from(e.target.files))} />
-                    </Box>
-
-                    {images.length > 0 && (
-                        <Box sx={{ display: "flex", gap: 2, mb: 3, overflowX: "auto" }}>
-                            {images.map((img, i) => (
-                                <Box key={i} sx={{ position: "relative", minWidth: 100 }}>
-                                    <img src={img.preview} alt="preview" style={{ width: 100, height: 100, borderRadius: 8, objectFit: "cover" }} />
-                                    <IconButton size="small" onClick={() => setImages(images.filter((_, idx) => idx !== i))} sx={{ position: "absolute", top: 0, right: 0, bgcolor: "white" }}><DeleteIcon fontSize="small" /></IconButton>
-                                </Box>
-                            ))}
-                        </Box>
-                    )}
-
-                    {images.length > 0 && (
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            startIcon={<AutoFixHighIcon />}
-                            onClick={handleGenerateAI}
-                            disabled={aiLoading}
-                            sx={{ mb: 4, py: 1.5, borderRadius: 3, fontWeight: 600 }}
+                        <Box 
+                            onClick={() => fileInputRef.current.click()}
+                            sx={{ border: "2px dashed", borderColor: "primary.main", borderRadius: 3, p: 4, textAlign: "center", cursor: "pointer", mb: 3, backgroundColor: "background.subtle" }}
                         >
-                            {aiLoading ? "Analyzing Image..." : "Generate Details from Image"}
-                        </Button>
-                    )}
+                            <CloudUploadIcon sx={{ fontSize: 40, color: "#2563eb" }} />
+                            <Typography sx={{ mt: 2, fontWeight: 500 }}>Upload Image</Typography>
+                            <input type="file" multiple hidden ref={fileInputRef} onChange={(e) => handleFiles(Array.from(e.target.files))} />
+                        </Box>
 
-                    {aiLoading && <LinearProgress sx={{ mb: 3 }} />}
+                        {images.length > 0 && (
+                            <Box sx={{ display: "flex", gap: 2, mb: 3, overflowX: "auto" }}>
+                                {images.map((img, i) => (
+                                    <Box key={i} sx={{ position: "relative", minWidth: 100 }}>
+                                        <img src={img.preview} alt="preview" style={{ width: 100, height: 100, borderRadius: 8, objectFit: "cover" }} />
+                                        <IconButton size="small" onClick={() => setImages(images.filter((_, idx) => idx !== i))} sx={{ position: "absolute", top: 0, right: 0, bgcolor: "background.paper" }}><DeleteIcon fontSize="small" /></IconButton>
+                                    </Box>
+                                ))}
+                            </Box>
+                        )}
 
-                    {aiLoading ? (
-                        <>
-                            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2, mb: 3 }} />
-                            <Skeleton variant="rectangular" height={120} sx={{ borderRadius: 2, mb: 3 }} />
-                            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2, mb: 3 }} />
-                        </>
-                    ) : (
-                        <>
-                            <TextField fullWidth label="Title" name="title" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} sx={{ mb: 3 }} />
-                            <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} sx={{ mb: 3 }} />
-                            
-                            <FormControl fullWidth sx={{ mb: 3 }}>
-                                <InputLabel>Category</InputLabel>
-                                <Select value={form.category} label="Category" onChange={(e) => setForm({...form, category: e.target.value})}>
-                                    {["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
-                                </Select>
-                            </FormControl>
-                        </>
-                    )}
+                        {images.length > 0 && (
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<AutoFixHighIcon />}
+                                onClick={handleGenerateAI}
+                                disabled={aiLoading}
+                                sx={{ mb: 4, py: 1.5, borderRadius: 3, fontWeight: 600 }}
+                            >
+                                {aiLoading ? "Analyzing Image..." : "Generate Details from Image"}
+                            </Button>
+                        )}
 
-                    <TextField fullWidth type="number" label="Price (EGP)" value={form.price} onChange={(e) => setForm({...form, price: e.target.value})} sx={{ mb: 3 }} />
-                    <TextField fullWidth type="number" label="Available Quantity" value={form.quantityAvailable} onChange={(e) => setForm({...form, quantityAvailable: e.target.value})} sx={{ mb: 3 }} />
+                        {aiLoading && <LinearProgress sx={{ mb: 3 }} />}
 
-                    <Button fullWidth variant="contained" onClick={handleSubmit} sx={{ py: 1.5, borderRadius: 3, bgcolor: "#2563eb" }}>Post Item</Button>
+                        {aiLoading ? (
+                            <>
+                                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2, mb: 3 }} />
+                                <Skeleton variant="rectangular" height={120} sx={{ borderRadius: 2, mb: 3 }} />
+                                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2, mb: 3 }} />
+                            </>
+                        ) : (
+                            <>
+                                <TextField fullWidth label="Title" name="title" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} sx={{ mb: 3 }} />
+                                <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} sx={{ mb: 3 }} />
+                                
+                                <FormControl fullWidth sx={{ mb: 3 }}>
+                                    <InputLabel>Category</InputLabel>
+                                    <Select value={form.category} label="Category" onChange={(e) => setForm({...form, category: e.target.value})}>
+                                        {["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                                    </Select>
+                                </FormControl>
+                            </>
+                        )}
+
+                        <TextField fullWidth type="number" label="Price (EGP)" value={form.price} onChange={(e) => setForm({...form, price: e.target.value})} sx={{ mb: 3 }} />
+                        <TextField fullWidth type="number" label="Available Quantity" value={form.quantityAvailable} onChange={(e) => setForm({...form, quantityAvailable: e.target.value})} sx={{ mb: 3 }} />
+
+                        <Button fullWidth variant="contained" onClick={handleSubmit} sx={{ py: 1.5, borderRadius: 3, bgcolor: "#2563eb" }}>Post Item</Button>
+                    </Box>
                 </Box>
+                <Footer />
+                <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({...snackbar, open: false})}>
+                    <Alert severity="success" variant="filled">{snackbar.message}</Alert>
+                </Snackbar>
             </Box>
-            <Footer />
-            <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({...snackbar, open: false})}>
-                <Alert severity="success" variant="filled">{snackbar.message}</Alert>
-            </Snackbar>
-        </Box>
+        </>
     );
 }

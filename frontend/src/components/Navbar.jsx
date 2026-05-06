@@ -1,18 +1,22 @@
 import {
     Box,
+    Typography,
+    Button,
     IconButton,
     Avatar,
-    Typography,
-    Badge,
-    Button,
-    InputBase,
     Paper,
+    InputBase,
+    Badge,
     Divider,
+    useTheme,
+    Tooltip,
 } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NorthWestIcon from "@mui/icons-material/NorthWest";
@@ -24,6 +28,7 @@ import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { subscribeToNotifications, markNotificationAsRead } from "../services/notifications";
 import Popover from "@mui/material/Popover";
+import { useColorMode } from "../context/ThemeContext";
 
 const RECENT_KEY = "unitrade_recent_searches";
 const MAX_RECENT = 6;
@@ -70,8 +75,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
     const [inputValue, setInputValue] = useState(search);
     const [notifications, setNotifications] = useState([]);
     const [notifAnchorEl, setNotifAnchorEl] = useState(null);
-    const inputRef = useRef(null);
+    const { toggleColorMode } = useColorMode();
+    const theme = useTheme();
+    const isDark = theme.palette.mode === "dark";
     const dropdownRef = useRef(null);
+    const inputRef = useRef(null);
 
     const unreadCount = notifications.filter(n => !n.read).length;
     const isNotifOpen = Boolean(notifAnchorEl);
@@ -232,10 +240,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                 position: "sticky",
                 top: 0,
                 zIndex: 1200,
-                backgroundColor: "rgba(248,250,252,0.97)",
+                backgroundColor: isDark ? "rgba(15,23,42,0.9)" : "rgba(248,250,252,0.97)",
                 backdropFilter: "blur(14px)",
-                borderBottom: "1px solid #e2e8f0",
-                boxShadow: "0 2px 16px rgba(15,23,42,0.05)",
+                borderBottom: "1px solid",
+                borderColor: isDark ? "rgba(255,255,255,0.08)" : "#e2e8f0",
+                boxShadow: isDark ? "0 4px 20px rgba(0,0,0,0.4)" : "0 2px 16px rgba(15,23,42,0.05)",
             }}
         >
             <Box
@@ -260,10 +269,10 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         sx={{ height: { xs: 44, md: 52 }, width: "auto", objectFit: "contain" }}
                     />
                     <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 800, color: "#0f172a", lineHeight: 1.1 }}>
+                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 800, color: theme.palette.text.primary, lineHeight: 1.1 }}>
                             UniTrade
                         </Typography>
-                        <Typography sx={{ fontSize: "0.78rem", color: "#64748b", fontWeight: 500, mt: 0.2 }}>
+                        <Typography sx={{ fontSize: "0.78rem", color: theme.palette.text.secondary, fontWeight: 500, mt: 0.2 }}>
                             Campus Marketplace
                         </Typography>
                     </Box>
@@ -277,9 +286,9 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             display: "flex",
                             alignItems: "center",
                             borderRadius: open ? "14px 14px 0 0" : "14px",
-                            border: open ? "1.5px solid #3b82f6" : "1.5px solid #dbe6fb",
-                            borderBottom: open ? "1.5px solid #e8eef8" : "1.5px solid #dbe6fb",
-                            backgroundColor: "#ffffff",
+                            border: open ? "1.5px solid #3b82f6" : `1.5px solid ${isDark ? "#334155" : "#dbe6fb"}`,
+                            borderBottom: open ? `1.5px solid ${isDark ? "#334155" : "#e8eef8"}` : `1.5px solid ${isDark ? "#334155" : "#dbe6fb"}`,
+                            backgroundColor: isDark ? "#1e293b" : "#ffffff",
                             boxShadow: open
                                 ? "0 4px 0 rgba(59,130,246,0.10)"
                                 : "0 2px 12px rgba(37,99,235,0.06)",
@@ -320,13 +329,13 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             placeholder="Search for books, electronics, tools and more..."
                             inputProps={{ "aria-label": "search items", autoComplete: "off" }}
                             sx={{
-                                pl: 0,
-                                py: 1.3,
-                                fontSize: "0.93rem",
-                                color: "#0f172a",
-                                fontWeight: 500,
-                                "& input::placeholder": { color: "#a0aec0", fontWeight: 400 },
-                            }}
+                            pl: 0,
+                            py: 1.3,
+                            fontSize: "0.93rem",
+                            color: theme.palette.text.primary,
+                            fontWeight: 500,
+                            "& input::placeholder": { color: isDark ? "#64748b" : "#a0aec0", fontWeight: 400 },
+                        }}
                         />
 
                         {inputValue && (
@@ -354,8 +363,8 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 borderRadius: "0 0 16px 16px",
                                 border: "1.5px solid #3b82f6",
                                 borderTop: "none",
-                                backgroundColor: "#ffffff",
-                                boxShadow: "0 16px 40px rgba(15,23,42,0.12)",
+                                backgroundColor: "background.paper",
+                                boxShadow: isDark ? "0 16px 40px rgba(0,0,0,0.4)" : "0 16px 40px rgba(15,23,42,0.12)",
                                 overflow: "hidden",
                                 maxHeight: "420px",
                                 overflowY: "auto",
@@ -383,14 +392,14 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                     px: 2.5,
                                                     py: 1.4,
                                                     cursor: "pointer",
-                                                    backgroundColor: activeIndex === idx ? "#f0f6ff" : "transparent",
+                                                    backgroundColor: activeIndex === idx ? (isDark ? "rgba(255,255,255,0.05)" : "#f0f6ff") : "transparent",
                                                     transition: "background 0.15s",
-                                                    "&:hover": { backgroundColor: "#f0f6ff" },
+                                                    "&:hover": { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#f0f6ff" },
                                                 }}
                                             >
                                                 <SearchIcon sx={{ color: "#94a3b8", fontSize: "1.1rem", flexShrink: 0 }} />
                                                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                    <Typography sx={{ fontSize: "0.92rem", color: "#0f172a", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                                    <Typography sx={{ fontSize: "0.92rem", color: "text.primary", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                         <HighlightMatch text={item.title} query={inputValue} />
                                                     </Typography>
                                                     {item.category && (
@@ -443,7 +452,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                     }}
                                                 >
                                                     <AccessTimeIcon sx={{ color: "#94a3b8", fontSize: "1.05rem", flexShrink: 0 }} />
-                                                    <Typography sx={{ flex: 1, fontSize: "0.92rem", color: "#334155", fontWeight: 500 }}>
+                                                    <Typography sx={{ flex: 1, fontSize: "0.92rem", color: "text.primary", fontWeight: 500 }}>
                                                         {term}
                                                     </Typography>
                                                     <ClearIcon
@@ -473,11 +482,12 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                         px: 1.8,
                                                         py: 0.6,
                                                         borderRadius: "20px",
-                                                        border: "1px solid #e2e8f0",
-                                                        backgroundColor: "#f8fafc",
+                                                        border: "1px solid",
+                                                        borderColor: "divider",
+                                                        backgroundColor: "background.subtle",
                                                         fontSize: "0.85rem",
                                                         fontWeight: 600,
-                                                        color: "#475569",
+                                                        color: "text.secondary",
                                                         cursor: "pointer",
                                                         transition: "all 0.18s ease",
                                                         "&:hover": {
@@ -537,14 +547,30 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     </IconButton>
 
                     <IconButton
+                        onClick={toggleColorMode}
+                        sx={{
+                            width: 42, height: 42,
+                            borderRadius: "12px",
+                            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                            border: "1px solid",
+                            borderColor: isDark ? "#334155" : "#e2e8f0",
+                            transition: "all 0.25s ease",
+                            "&:hover": { backgroundColor: isDark ? "#334155" : "#eef4ff", borderColor: isDark ? "#475569" : "#bfdbfe", transform: "translateY(-1px)" },
+                        }}
+                    >
+                        {isDark ? <LightModeIcon sx={{ color: "#f59e0b" }} /> : <DarkModeIcon sx={{ color: "#334155" }} />}
+                    </IconButton>
+
+                    <IconButton
                         onClick={handleNotifClick}
                         sx={{
                             width: 42, height: 42,
                             borderRadius: "12px",
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #e2e8f0",
+                            backgroundColor: "background.paper",
+                            border: "1px solid",
+                            borderColor: "divider",
                             transition: "all 0.25s ease",
-                            "&:hover": { backgroundColor: "#eef4ff", borderColor: "#bfdbfe", transform: "translateY(-1px)" },
+                            "&:hover": { backgroundColor: "background.subtle", borderColor: "primary.main", transform: "translateY(-1px)" },
                         }}
                     >
                         <Badge badgeContent={unreadCount} color="error" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
@@ -564,13 +590,15 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 width: 320,
                                 maxHeight: 400,
                                 borderRadius: "16px",
-                                boxShadow: "0 10px 40px rgba(15,23,42,0.12)",
-                                border: "1px solid #e2e8f0",
+                                backgroundColor: "background.paper",
+                                boxShadow: isDark ? "0 10px 40px rgba(0,0,0,0.4)" : "0 10px 40px rgba(15,23,42,0.12)",
+                                border: "1px solid",
+                                borderColor: "divider",
                             }
                         }}
                     >
-                        <Box sx={{ p: 2, borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: "#0f172a" }}>
+                        <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: "text.primary" }}>
                                 Notifications
                             </Typography>
                         </Box>
@@ -593,14 +621,15 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                             display: "flex",
                                             gap: 2,
                                             alignItems: "flex-start",
-                                            backgroundColor: notif.read ? "#ffffff" : "#f0f6ff",
-                                            borderBottom: "1px solid #f1f5f9",
-                                            "&:hover": { backgroundColor: "#f8fafc" },
+                                            backgroundColor: notif.read ? "transparent" : (isDark ? "rgba(37,99,235,0.1)" : "#f0f6ff"),
+                                            borderBottom: "1px solid",
+                                            borderColor: "divider",
+                                            "&:hover": { backgroundColor: "background.subtle" },
                                             transition: "background 0.2s"
                                         }}
                                     >
                                         <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ fontSize: "0.9rem", color: "#0f172a", fontWeight: notif.read ? 500 : 700 }}>
+                                            <Typography sx={{ fontSize: "0.9rem", color: "text.primary", fontWeight: notif.read ? 500 : 700 }}>
                                                 {notif.message}
                                             </Typography>
                                             <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", mt: 0.5 }}>
@@ -623,7 +652,8 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         sx={{
                             width: 42, height: 42,
                             cursor: "pointer",
-                            border: "2px solid #ffffff",
+                            border: "2px solid",
+                            borderColor: "background.paper",
                             boxShadow: "0 4px 14px rgba(15,23,42,0.10)",
                             transition: "all 0.25s ease",
                             "&:hover": { transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(37,99,235,0.20)" },

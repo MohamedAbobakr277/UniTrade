@@ -119,7 +119,7 @@ export default function SellerProfile() {
             <Box sx={{ minHeight: "100vh", bgcolor: "#f8fbff" }}>
                 <Navbar />
                 <Box sx={{ p: 5, display: "flex", flexDirection: "column", alignItems: "center", mt: 10 }}>
-                    <Typography sx={{ fontSize: 28, fontWeight: 800, color: "#0f172a" }}>
+                    <Typography sx={{ fontSize: 28, fontWeight: 800, color: "text.primary" }}>
                         Seller not found
                     </Typography>
                     <Button
@@ -140,7 +140,13 @@ export default function SellerProfile() {
     const soldItems = sellerItems.filter(item => item.status === "sold").length;
 
     return (
-        <Box sx={{ minHeight: "100vh", background: "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)", pb: 10 }}>
+        <Box sx={{ 
+            minHeight: "100vh", 
+            background: (theme) => theme.palette.mode === 'light' 
+                ? "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)"
+                : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)", 
+            pb: 10 
+        }}>
             <Navbar />
 
             <Box sx={{ py: { xs: 3, md: 5 }, display: "flex", justifyContent: "center" }}>
@@ -152,17 +158,18 @@ export default function SellerProfile() {
                             mb: 3,
                             textTransform: "none",
                             fontWeight: 700,
-                            color: "#64748b",
-                            bgcolor: "#ffffff",
+                            color: "text.secondary",
+                            bgcolor: "background.paper",
                             px: 2.5,
                             py: 0.8,
                             borderRadius: "12px",
-                            boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
-                            border: "1px solid #e2e8f0",
+                            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 4px 14px rgba(0,0,0,0.03)" : "none",
+                            border: "1px solid",
+                            borderColor: "divider",
                             transition: "all 0.2s ease",
                             "&:hover": {
-                                bgcolor: "#f8fafc",
-                                color: "#0f172a",
+                                bgcolor: "background.subtle",
+                                color: "text.primary",
                                 transform: "translateX(-4px)",
                                 boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
                             },
@@ -178,10 +185,11 @@ export default function SellerProfile() {
                             alignItems: "center",
                             gap: 3,
                             p: 4,
-                            bgcolor: "#fff",
+                            bgcolor: "background.paper",
                             borderRadius: "24px",
-                            boxShadow: "0 12px 30px rgba(15,23,42,0.03)",
-                            border: "1px solid #e2e8f0",
+                            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 12px 30px rgba(15,23,42,0.03)" : "none",
+                            border: "1px solid",
+                            borderColor: "divider",
                             mb: 5,
                             flexDirection: { xs: "column", sm: "row" },
                             textAlign: { xs: "center", sm: "left" }
@@ -189,11 +197,11 @@ export default function SellerProfile() {
                     >
                         <Avatar
                             src={seller.profilePhoto || "/default-avatar.png"}
-                            sx={{ width: 100, height: 100, border: "4px solid #f8fbff", boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}
+                            sx={{ width: 100, height: 100, border: "4px solid", borderColor: "background.paper", boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}
                         />
                         <Box sx={{ flex: 1 }}>
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: { xs: "center", sm: "flex-start" }, gap: 1, mb: 0.5 }}>
-                                <Typography sx={{ fontSize: { xs: 26, md: 32 }, fontWeight: 800, color: "#0f172a" }}>
+                                <Typography sx={{ fontSize: { xs: 26, md: 32 }, fontWeight: 800, color: "text.primary" }}>
                                     {sellerName}
                                 </Typography>
                                 <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: 24 }} />
@@ -203,19 +211,19 @@ export default function SellerProfile() {
                                 <StarRatingDisplay averageRating={seller.averageRating} ratingsCount={seller.ratingsCount} size="medium" />
                             </Box>
                             
-                            <Typography sx={{ fontSize: 16, color: "#64748b", fontWeight: 500, mb: 2 }}>
+                            <Typography sx={{ fontSize: 16, color: "text.secondary", fontWeight: 500, mb: 2 }}>
                                 {seller.major || "Student"} • {seller.university || "University not provided"}
                             </Typography>
 
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: { xs: "center", sm: "flex-start" }, gap: 4 }}>
                                 <Box>
-                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#2563eb", lineHeight: 1 }}>{availableItems}</Typography>
-                                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Available</Typography>
+                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "primary.main", lineHeight: 1 }}>{availableItems}</Typography>
+                                    <Typography sx={{ fontSize: 13, color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Available</Typography>
                                 </Box>
-                                <Box sx={{ width: "2px", height: "30px", bgcolor: "#f1f5f9" }} />
+                                <Box sx={{ width: "2px", height: "30px", bgcolor: "divider" }} />
                                 <Box>
-                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#ef4444", lineHeight: 1 }}>{soldItems}</Typography>
-                                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Sold</Typography>
+                                    <Typography sx={{ fontSize: 22, fontWeight: 800, color: "error.main", lineHeight: 1 }}>{soldItems}</Typography>
+                                    <Typography sx={{ fontSize: 13, color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", mt: 0.5 }}>Sold</Typography>
                                 </Box>
                             </Box>
                         </Box>
@@ -255,10 +263,10 @@ export default function SellerProfile() {
 
                     {/* Listings Grid */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
-                        <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#0f172a" }}>
+                        <Typography sx={{ fontSize: 22, fontWeight: 800, color: "text.primary" }}>
                             Seller Listings
                         </Typography>
-                        <Box sx={{ px: 1.5, py: 0.5, bgcolor: "#e0e7ff", color: "#4f46e5", fontWeight: 800, borderRadius: "10px", fontSize: 14 }}>
+                        <Box sx={{ px: 1.5, py: 0.5, bgcolor: "background.subtle", color: "primary.main", fontWeight: 800, borderRadius: "10px", fontSize: 14 }}>
                             {sellerItems.length} items
                         </Box>
                     </Box>
@@ -304,18 +312,20 @@ export default function SellerProfile() {
                         width: "100%",
                         p: { xs: 2.5, sm: 3.5 },
                         maxWidth: { xs: "100%", sm: "440px" },
-                        boxShadow: "0 -8px 40px rgba(0,0,0,0.1)",
-                        border: "1px solid rgba(255,255,255,0.8)",
+                        boxShadow: (theme) => theme.palette.mode === 'light' ? "0 -8px 40px rgba(0,0,0,0.1)" : "none",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        backgroundImage: "none",
                     }
                 }}
             >
                 {/* Header */}
-                <DialogTitle sx={{ fontWeight: 900, color: "#0f172a", p: 0, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "1.3rem" }}>
+                <DialogTitle sx={{ fontWeight: 900, color: "text.primary", p: 0, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "1.3rem" }}>
                     Contact Seller
                     <IconButton
                         onClick={() => { setIsContactOpen(false); setTimeout(() => setShowPhone(false), 300); }}
                         size="small"
-                        sx={{ color: "#64748b", bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}
+                        sx={{ color: "text.secondary", bgcolor: "background.subtle", "&:hover": { bgcolor: "divider" } }}
                     >
                         <CloseIcon />
                     </IconButton>
@@ -326,22 +336,22 @@ export default function SellerProfile() {
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1.5 }}>
                         <Avatar
                             src={seller?.profilePhoto || "/default-avatar.png"}
-                            sx={{ width: 56, height: 56, border: "2px solid #f1f5f9" }}
+                            sx={{ width: 56, height: 56, border: "2px solid", borderColor: "divider" }}
                         />
                         <Box>
                             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>
+                                <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "text.primary" }}>
                                     {sellerName}
                                 </Typography>
                                 <VerifiedUserIcon sx={{ color: "#3b82f6", fontSize: "1.1rem" }} />
                             </Box>
-                            <Typography sx={{ fontSize: "0.9rem", color: "#64748b", fontWeight: 500 }}>
+                            <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", fontWeight: 500 }}>
                                 {seller?.major || "Verified Student"}
                             </Typography>
                         </Box>
                     </Box>
 
-                    <Typography sx={{ color: "#475569", mb: 3.5, fontSize: "0.95rem", fontWeight: 500 }}>
+                    <Typography sx={{ color: "text.secondary", mb: 3.5, fontSize: "0.95rem", fontWeight: 500 }}>
                         Choose how you want to contact the seller
                     </Typography>
 
@@ -383,12 +393,12 @@ export default function SellerProfile() {
                             >
                                 Chat on WhatsApp
                             </Button>
-                            <Typography sx={{ textAlign: "center", mt: 1.2, color: "#94a3b8", fontSize: "0.85rem", fontWeight: 500 }}>
+                            <Typography sx={{ textAlign: "center", mt: 1.2, color: "text.secondary", fontSize: "0.85rem", fontWeight: 500 }}>
                                 You will continue in WhatsApp
                             </Typography>
                         </Box>
 
-                        <Divider variant="middle" sx={{ borderColor: "#e2e8f0" }} />
+                        <Divider variant="middle" sx={{ borderColor: "divider" }} />
 
                         {/* Phone Number Section */}
                         <Box
@@ -399,21 +409,22 @@ export default function SellerProfile() {
                                 flexDirection: "column",
                                 alignItems: "flex-start",
                                 gap: 1.5,
-                                border: "1px solid #e2e8f0",
-                                bgcolor: "#f8fafc",
+                                border: "1px solid",
+                                borderColor: "divider",
+                                bgcolor: "background.subtle",
                             }}
                         >
                             <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: "100%" }}>
-                                <Avatar sx={{ bgcolor: "rgba(15,23,42,0.06)", color: "#475569", width: 44, height: 44 }}>
+                                <Avatar sx={{ bgcolor: "background.default", color: "text.primary", width: 44, height: 44 }}>
                                     <PhoneIcon />
                                 </Avatar>
                                 <Box sx={{ flex: 1 }}>
-                                    <Typography sx={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.2 }}>
+                                    <Typography sx={{ fontSize: "0.8rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.2 }}>
                                         Phone Number
                                     </Typography>
                                     {showPhone ? (
                                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 0.5 }}>
-                                            <Typography sx={{ fontSize: "1.1rem", color: "#0f172a", fontWeight: 800, letterSpacing: "0.5px" }}>
+                                            <Typography sx={{ fontSize: "1.1rem", color: "text.primary", fontWeight: 800, letterSpacing: "0.5px" }}>
                                                 {(seller?.phoneNumber || seller?.phone) || "Unavailable"}
                                             </Typography>
                                             {(seller?.phoneNumber || seller?.phone) && (
@@ -434,7 +445,7 @@ export default function SellerProfile() {
                                         </Box>
                                     ) : (
                                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 0.5 }}>
-                                            <Typography sx={{ fontSize: "1.1rem", color: "#0f172a", fontWeight: 800, letterSpacing: "2px" }}>
+                                            <Typography sx={{ fontSize: "1.1rem", color: "text.primary", fontWeight: 800, letterSpacing: "2px" }}>
                                                 +20 1•• ••• ••••
                                             </Typography>
                                             <Button

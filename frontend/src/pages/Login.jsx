@@ -22,51 +22,59 @@ import { login } from "../services/auth";
 
 /* ================= BACKGROUND ================= */
 
-const PageWrapper = styled(Box)({
+const PageWrapper = styled(Box)(({ theme }) => ({
     minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
     overflow: "hidden",
-    background:
-        "linear-gradient(135deg, #e0ecff 0%, #c8dcff 40%, #b7d1ff 100%)",
-});
+    background: theme.palette.mode === 'light'
+        ? "linear-gradient(135deg, #e0ecff 0%, #c8dcff 40%, #b7d1ff 100%)"
+        : "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+}));
 
-const BlurTop = styled(Box)({
+const BlurTop = styled(Box)(({ theme }) => ({
     position: "absolute",
     top: "-150px",
     right: "-150px",
     width: "400px",
     height: "400px",
-    background: "#9ec5ff",
+    background: theme.palette.mode === 'light' ? "#9ec5ff" : "#1e40af",
     borderRadius: "50%",
     filter: "blur(120px)",
-    opacity: 0.4,
-});
+    opacity: theme.palette.mode === 'light' ? 0.4 : 0.2,
+}));
 
-const BlurBottom = styled(Box)({
+const BlurBottom = styled(Box)(({ theme }) => ({
     position: "absolute",
     bottom: "-150px",
     left: "-150px",
     width: "400px",
     height: "400px",
-    background: "#b7d1ff",
+    background: theme.palette.mode === 'light' ? "#b7d1ff" : "#1e40af",
     borderRadius: "50%",
     filter: "blur(120px)",
-    opacity: 0.4,
-});
+    opacity: theme.palette.mode === 'light' ? 0.4 : 0.2,
+}));
 
 /* ================= CARD ================= */
 
-const GlassCard = styled(Box)({
+const GlassCard = styled(Box)(({ theme }) => ({
     width: "420px",
     padding: "50px 40px",
     borderRadius: "24px",
     backdropFilter: "blur(20px)",
-    background: "rgba(255,255,255,0.75)",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
-    border: "1px solid rgba(255,255,255,0.4)",
+    background: theme.palette.mode === 'light' 
+        ? "rgba(255, 255, 255, 0.75)" 
+        : "rgba(30, 41, 59, 0.7)",
+    boxShadow: theme.palette.mode === 'light'
+        ? "0 20px 60px rgba(0,0,0,0.08)"
+        : "0 20px 60px rgba(0,0,0,0.4)",
+    border: "1px solid",
+    borderColor: theme.palette.mode === 'light'
+        ? "rgba(255,255,255,0.4)"
+        : "rgba(255,255,255,0.05)",
     position: "relative",
     zIndex: 2,
     animation: "fadeIn 0.6s ease",
@@ -74,7 +82,7 @@ const GlassCard = styled(Box)({
         from: { opacity: 0, transform: "translateY(20px)" },
         to: { opacity: 1, transform: "translateY(0)" },
     },
-});
+}));
 
 /* ================= BUTTON ================= */
 
@@ -168,7 +176,7 @@ export default function Login() {
                         textAlign="center"
                         fontWeight={600}
                         mb={4}
-                        color="#334155"
+                        color="text.primary"
                     >
                         Sign In
                     </Typography>
@@ -237,7 +245,7 @@ export default function Login() {
                         </SoftButton>
 
                         <Box textAlign="center" mt={2}>
-                            <Typography fontSize="14px" color="#64748b">
+                            <Typography fontSize="14px" color="text.secondary">
                                 Don't have an account?{" "}
                                 <span
                                     onClick={() => navigate("/signup")}
