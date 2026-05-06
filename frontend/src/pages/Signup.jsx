@@ -29,39 +29,93 @@ const PageWrapper = styled(Box)(({ theme }) => ({
     alignItems: "center",
     justifyContent: "center",
     background: theme.palette.mode === 'light'
-        ? "linear-gradient(135deg, #e0ecff 0%, #c8dcff 40%, #b7d1ff 100%)"
-        : "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        ? "linear-gradient(135deg, #f0f7ff 0%, #e0ecff 40%, #c8dcff 100%)"
+        : "linear-gradient(135deg, #020617 0%, #0f172a 40%, #1e293b 100%)",
 }));
 
 const GlassCard = styled(Box)(({ theme }) => ({
-    width: "450px",
-    padding: "45px 40px",
-    borderRadius: "24px",
-    backdropFilter: "blur(20px)",
+    width: "100%",
+    maxWidth: "500px",
+    padding: "50px 45px",
+    borderRadius: "32px",
+    backdropFilter: "blur(25px)",
     background: theme.palette.mode === 'light' 
-        ? "rgba(255, 255, 255, 0.75)" 
-        : "rgba(30, 41, 59, 0.7)",
+        ? "rgba(255, 255, 255, 0.8)" 
+        : "rgba(15, 23, 42, 0.65)",
     boxShadow: theme.palette.mode === 'light'
-        ? "0 20px 60px rgba(0,0,0,0.08)"
-        : "0 20px 60px rgba(0,0,0,0.4)",
+        ? "0 25px 50px -12px rgba(0,0,0,0.08)"
+        : "0 25px 50px -12px rgba(0,0,0,0.5)",
     border: "1px solid",
     borderColor: theme.palette.mode === 'light'
-        ? "rgba(255,255,255,0.4)"
-        : "rgba(255,255,255,0.05)",
+        ? "rgba(255,255,255,0.5)"
+        : "rgba(255,255,255,0.08)",
+    margin: "20px",
+    transition: "all 0.3s ease",
+    animation: "fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
+    "@keyframes fadeIn": {
+        from: { opacity: 0, transform: "translateY(30px)" },
+        to: { opacity: 1, transform: "translateY(0)" },
+    },
 }));
 
-const SoftButton = styled(Button)({
-    background: "linear-gradient(90deg, #7db7ff, #5da9ff)",
-    color: "#fff",
-    padding: "14px",
-    borderRadius: "12px",
-    fontWeight: 600,
-    textTransform: "none",
-    fontSize: "16px",
-    "&:hover": {
-        background: "linear-gradient(90deg, #5da9ff, #3f95ff)",
+const StyledTextField = styled(TextField)(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        borderRadius: '16px',
+        backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.03)',
+        transition: 'all 0.2s ease',
+        '& fieldset': {
+            borderColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+        },
+        '&:hover fieldset': {
+            borderColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.mode === 'light' ? '#3b82f6' : '#60a5fa',
+            borderWidth: '2px',
+        },
     },
-});
+    '& .MuiInputLabel-root': {
+        color: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)',
+        fontWeight: 500,
+        '&.Mui-focused': {
+            color: theme.palette.mode === 'light' ? '#2563eb' : '#60a5fa',
+            fontWeight: 700,
+        },
+    },
+    '& .MuiOutlinedInput-input': {
+        padding: '16px 20px',
+        fontWeight: 500,
+    }
+}));
+
+const SoftButton = styled(Button)(({ theme }) => ({
+    background: theme.palette.mode === 'light'
+        ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+        : "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
+    color: "#fff",
+    padding: "16px",
+    borderRadius: "16px",
+    fontWeight: 800,
+    textTransform: "none",
+    fontSize: "17px",
+    letterSpacing: "0.5px",
+    boxShadow: theme.palette.mode === 'light'
+        ? "0 10px 25px -5px rgba(37,99,235,0.4)"
+        : "0 10px 25px -5px rgba(59,130,246,0.3)",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    "&:hover": {
+        background: theme.palette.mode === 'light'
+            ? "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)"
+            : "linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%)",
+        transform: "translateY(-2px)",
+        boxShadow: theme.palette.mode === 'light'
+            ? "0 15px 30px -5px rgba(37,99,235,0.5)"
+            : "0 15px 30px -5px rgba(59,130,246,0.4)",
+    },
+    "&:active": {
+        transform: "scale(0.98)",
+    },
+}));
 
 /* ================= COMPONENT ================= */
 
@@ -157,7 +211,7 @@ export default function Signup() {
 
                     {!submitted ? (
                         <>
-                            <Typography variant="h4" textAlign="center" mb={4} color="text.primary">
+                             <Typography variant="h4" textAlign="center" mb={4} color="text.primary" fontWeight={900} sx={{ letterSpacing: "-0.5px" }}>
                                 Create Account
                             </Typography>
 
@@ -168,28 +222,28 @@ export default function Signup() {
                             )}
 
                             <Box display="flex" flexDirection="column" gap={3}>
-                                <TextField
+                                <StyledTextField
                                     label="First Name"
                                     name="firstName"
                                     onChange={handleChange}
                                     fullWidth
                                 />
 
-                                <TextField
+                                <StyledTextField
                                     label="Last Name"
                                     name="lastName"
                                     onChange={handleChange}
                                     fullWidth
                                 />
 
-                                <TextField
+                                <StyledTextField
                                     label="Email"
                                     name="email"
                                     onChange={handleChange}
                                     fullWidth
                                 />
 
-                                <TextField
+                                <StyledTextField
                                     label="Phone Number"
                                     name="phone"
                                     onChange={handleChange}
@@ -197,7 +251,10 @@ export default function Signup() {
                                 />
 
                                 {/* University */}
-                                <FormControl fullWidth>
+                                <FormControl fullWidth sx={{ 
+                                    '& .MuiOutlinedInput-root': { borderRadius: '16px' },
+                                    '& .MuiInputLabel-root': { color: (theme) => theme.palette.mode === 'light' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }
+                                }}>
                                     <InputLabel>University</InputLabel>
                                     <Select
                                         value={selectedUniversity}
@@ -206,6 +263,7 @@ export default function Signup() {
                                             setSelectedUniversity(e.target.value);
                                             setSelectedFaculty("");
                                         }}
+                                        sx={{ borderRadius: '16px' }}
                                     >
                                         <MenuItem value="Cairo University">Cairo University</MenuItem>
                                         <MenuItem value="Ain Shams University">Ain Shams University</MenuItem>
@@ -228,7 +286,7 @@ export default function Signup() {
                                 </FormControl>
 
                                 {selectedUniversity === "Others" && (
-                                    <TextField
+                                    <StyledTextField
                                         label="Enter Your University"
                                         value={customUniversity}
                                         onChange={(e) => setCustomUniversity(e.target.value)}
@@ -237,12 +295,16 @@ export default function Signup() {
                                 )}
 
                                 {/* Faculty */}
-                                <FormControl fullWidth disabled={!selectedUniversity}>
+                                <FormControl fullWidth disabled={!selectedUniversity} sx={{ 
+                                    '& .MuiOutlinedInput-root': { borderRadius: '16px' },
+                                    '& .MuiInputLabel-root': { color: (theme) => theme.palette.mode === 'light' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }
+                                }}>
                                     <InputLabel>Faculty</InputLabel>
                                     <Select
                                         value={selectedFaculty}
                                         label="Faculty"
                                         onChange={(e) => setSelectedFaculty(e.target.value)}
+                                        sx={{ borderRadius: '16px' }}
                                     >
                                         <MenuItem value="Engineering">Engineering</MenuItem>
                                         <MenuItem value="Medicine">Medicine</MenuItem>
@@ -262,7 +324,7 @@ export default function Signup() {
                                 </FormControl>
 
                                 {selectedFaculty === "Others" && (
-                                    <TextField
+                                    <StyledTextField
                                         label="Enter Your Faculty"
                                         value={customFaculty}
                                         onChange={(e) => setCustomFaculty(e.target.value)}
@@ -271,7 +333,7 @@ export default function Signup() {
                                 )}
 
                                 {/* Password */}
-                                <TextField
+                                <StyledTextField
                                     label="Password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
@@ -282,6 +344,7 @@ export default function Signup() {
                                             <InputAdornment position="end">
                                                 <IconButton
                                                     onClick={() => setShowPassword(!showPassword)}
+                                                    sx={{ mr: 1, color: 'text.secondary' }}
                                                 >
                                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                                 </IconButton>
@@ -291,7 +354,7 @@ export default function Signup() {
                                 />
 
                                 {/* Confirm Password */}
-                                <TextField
+                                <StyledTextField
                                     label="Confirm Password"
                                     name="confirmPassword"
                                     type={showConfirmPassword ? "text" : "password"}
@@ -304,6 +367,7 @@ export default function Signup() {
                                                     onClick={() =>
                                                         setShowConfirmPassword(!showConfirmPassword)
                                                     }
+                                                    sx={{ mr: 1, color: 'text.secondary' }}
                                                 >
                                                     {showConfirmPassword ? (
                                                         <VisibilityOff />
