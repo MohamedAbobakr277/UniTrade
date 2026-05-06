@@ -133,6 +133,7 @@ export default function SellTool() {
 
             await addDoc(collection(db, "products"), {
                 ...form,
+                university: form.university === "Others" ? customUniversity : form.university,
                 price: Number(form.price),
                 quantityAvailable: parseInt(form.quantityAvailable),
                 images: imageUrls,
@@ -169,7 +170,7 @@ export default function SellTool() {
                             onClick={() => fileInputRef.current.click()}
                             sx={{ border: "2px dashed", borderColor: "primary.main", borderRadius: 3, p: 4, textAlign: "center", cursor: "pointer", mb: 3, backgroundColor: "background.subtle" }}
                         >
-                            <CloudUploadIcon sx={{ fontSize: 40, color: "#2563eb" }} />
+                            <CloudUploadIcon sx={{ fontSize: 40, color: "primary.main" }} />
                             <Typography sx={{ mt: 2, fontWeight: 500 }}>Upload Image</Typography>
                             <input type="file" multiple hidden ref={fileInputRef} onChange={(e) => handleFiles(Array.from(e.target.files))} />
                         </Box>
@@ -212,9 +213,47 @@ export default function SellTool() {
                                 <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} sx={{ mb: 3 }} />
                                 
                                 <FormControl fullWidth sx={{ mb: 3 }}>
+                                    <InputLabel>University</InputLabel>
+                                    <Select 
+                                        value={form.university} 
+                                        label="University" 
+                                        onChange={(e) => setForm({...form, university: e.target.value})}
+                                    >
+                                        {["Cairo University", "Ain Shams University", "Alexandria University", "Mansoura University", "Assiut University", "Helwan University", "Tanta University", "Zagazig University", "Suez Canal University", "Al-Azhar University", "German University in Cairo", "British University in Egypt", "October 6 University", "Future University in Egypt", "AASTMT", "Nile University", "Others"].map(uni => (
+                                            <MenuItem key={uni} value={uni}>{uni}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                {form.university === "Others" && (
+                                    <TextField 
+                                        fullWidth 
+                                        label="Enter University Name" 
+                                        value={customUniversity} 
+                                        onChange={(e) => setCustomUniversity(e.target.value)} 
+                                        sx={{ mb: 3 }} 
+                                    />
+                                )}
+
+                                <FormControl fullWidth sx={{ mb: 3 }}>
                                     <InputLabel>Category</InputLabel>
                                     <Select value={form.category} label="Category" onChange={(e) => setForm({...form, category: e.target.value})}>
                                         {["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{ mb: 3 }}>
+                                    <InputLabel>Condition</InputLabel>
+                                    <Select 
+                                        value={form.condition} 
+                                        label="Condition" 
+                                        onChange={(e) => setForm({...form, condition: e.target.value})}
+                                    >
+                                        <MenuItem value="New">New</MenuItem>
+                                        <MenuItem value="Like New">Like New</MenuItem>
+                                        <MenuItem value="Good">Good</MenuItem>
+                                        <MenuItem value="Fair">Fair</MenuItem>
+                                        <MenuItem value="Poor">Poor</MenuItem>
                                     </Select>
                                 </FormControl>
                             </>
@@ -223,7 +262,31 @@ export default function SellTool() {
                         <TextField fullWidth type="number" label="Price (EGP)" value={form.price} onChange={(e) => setForm({...form, price: e.target.value})} sx={{ mb: 3 }} />
                         <TextField fullWidth type="number" label="Available Quantity" value={form.quantityAvailable} onChange={(e) => setForm({...form, quantityAvailable: e.target.value})} sx={{ mb: 3 }} />
 
-                        <Button fullWidth variant="contained" onClick={handleSubmit} sx={{ py: 1.5, borderRadius: 3, bgcolor: "#2563eb" }}>Post Item</Button>
+                        <Button 
+                            fullWidth 
+                            variant="contained" 
+                            onClick={handleSubmit} 
+                            sx={{ 
+                                py: 1.8, 
+                                borderRadius: 3, 
+                                fontWeight: 800,
+                                fontSize: '1.05rem',
+                                background: (theme) => theme.palette.mode === 'light' 
+                                    ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
+                                    : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
+                                boxShadow: "0 8px 20px rgba(37,99,235,0.2)",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 12px 25px rgba(37,99,235,0.3)",
+                                    background: (theme) => theme.palette.mode === 'light' 
+                                        ? "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)"
+                                        : "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
+                                }
+                            }}
+                        >
+                            Post Item
+                        </Button>
                     </Box>
                 </Box>
                 <Footer />
