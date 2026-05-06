@@ -11,6 +11,7 @@ import {
     LinearProgress,
     Alert,
     Snackbar,
+    Skeleton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -198,15 +199,25 @@ export default function SellTool() {
 
                     {aiLoading && <LinearProgress sx={{ mb: 3 }} />}
 
-                    <TextField fullWidth label="Title" name="title" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} sx={{ mb: 3 }} />
-                    <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} sx={{ mb: 3 }} />
-                    
-                    <FormControl fullWidth sx={{ mb: 3 }}>
-                        <InputLabel>Category</InputLabel>
-                        <Select value={form.category} label="Category" onChange={(e) => setForm({...form, category: e.target.value})}>
-                            {["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+                    {aiLoading ? (
+                        <>
+                            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2, mb: 3 }} />
+                            <Skeleton variant="rectangular" height={120} sx={{ borderRadius: 2, mb: 3 }} />
+                            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2, mb: 3 }} />
+                        </>
+                    ) : (
+                        <>
+                            <TextField fullWidth label="Title" name="title" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} sx={{ mb: 3 }} />
+                            <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} sx={{ mb: 3 }} />
+                            
+                            <FormControl fullWidth sx={{ mb: 3 }}>
+                                <InputLabel>Category</InputLabel>
+                                <Select value={form.category} label="Category" onChange={(e) => setForm({...form, category: e.target.value})}>
+                                    {["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                                </Select>
+                            </FormControl>
+                        </>
+                    )}
 
                     <TextField fullWidth type="number" label="Price (EGP)" value={form.price} onChange={(e) => setForm({...form, price: e.target.value})} sx={{ mb: 3 }} />
                     <TextField fullWidth type="number" label="Available Quantity" value={form.quantityAvailable} onChange={(e) => setForm({...form, quantityAvailable: e.target.value})} sx={{ mb: 3 }} />
