@@ -19,11 +19,7 @@ import { db, auth } from "../services/firebase";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../constants/ThemeContext";
 import { Feather } from "@expo/vector-icons";
-
-// ─── Settings ───
-const CLOUD_NAME = "dstfo8pxq";
-const UPLOAD_PRESET = "unitrade_upload";
-const BACKEND_URL = "http://192.168.1.9:3000";
+import * as api from "../services/api";
 
 const CATEGORIES = [
   { name: "Books & Notes", icon: "book" },
@@ -44,51 +40,7 @@ const CONDITIONS = [
   { label: "Poor", color: "#9d174d", bg: "#fce7f3" },
 ];
 
-// ─── Helper: get Firebase auth token ───
-async function getAuthToken(): Promise<string | null> {
-  try {
-    return auth.currentUser ? await auth.currentUser.getIdToken() : null;
-  } catch {
-    return null;
-  }
-}
-
-// ─── Helper: call backend /generate ───
-async function callBackendGenerate(body: object): Promise<string> {
-  const token = await getAuthToken();
-  const response = await fetch(`${BACKEND_URL}/generate`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.message || `Server error ${response.status}`);
-  }
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message || data.error);
-  if (!data.text) throw new Error("No response from AI");
-  return data.text as string;
-}
-
-// ─── Helper: upload local URI to Cloudinary, return public URL ───
-async function uploadToCloudinary(uri: string): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", { uri, type: "image/jpeg", name: "product.jpg" } as any);
-  formData.append("upload_preset", UPLOAD_PRESET);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-    method: "POST",
-    body: formData,
-  });
-  const data = await res.json();
-  if (!data.secure_url) throw new Error("Cloudinary upload failed");
-  return data.secure_url;
-}
+// Remove local helpers and use central api service instead
 
 export default function Sell() {
   const router = useRouter();
@@ -114,14 +66,13 @@ export default function Sell() {
 
     setAiLoading(true);
     try {
-      // Upload the local image to Cloudinary to get a public URL the backend can fetch
-      const imageUrl = await uploadToCloudinary(images[0]);
+      const { secure_url: imageUrl } = await api.uploadImage(images[0]);
 
-      const rawText = await callBackendGenerate({
-        prompt:
-          'Marketplace Assistant: Analyze this photo for a student shop. Output ONLY a raw JSON: {"title": "", "description": "", "category": ""}. Categories: Books & Notes, Calculators, Electronics, Engineering Tools.',
-        imageUrl,
-      });
+      const data = await api.generateAI(
+        'Marketplace Assistant: Analyze this photo for a student shop. Output ONLY a raw JSON: {"title": "", "description": "", "category": ""}. Categories: Books & Notes, Calculators, Electronics, Engineering Tools.',
+        imageUrl
+      );
+      const rawText = data.text;
 
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -150,9 +101,8 @@ export default function Sell() {
 
     setAiTitleLoading(true);
     try {
-      const rawText = await callBackendGenerate({
-        prompt: `Marketplace Assistant: I have a product with the title "${title}". Output ONLY a raw JSON with reasonable estimates: {"description": "write a catchy description in Egyptian Arabic", "price": "estimated price in EGP as a number string", "category": "one of: Books & Notes, Calculators, Electronics, Engineering Tools, Medical Tools, Lab Equipment, Stationery, Bags & Accessories"}.`,
-      });
+      const data = await api.generateAI(`Marketplace Assistant: I have a product with the title "${title}". Output ONLY a raw JSON with reasonable estimates: {"description": "write a catchy description in Egyptian Arabic", "price": "estimated price in EGP as a number string", "category": "one of: Books & Notes, Calculators, Electronics, Engineering Tools, Medical Tools, Lab Equipment, Stationery, Bags & Accessories"}.`);
+      const rawText = data.text;
 
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -190,11 +140,8 @@ export default function Sell() {
   };
 
   const uploadImage = async (uri: string) => {
-    const formData = new FormData();
-    formData.append("file", { uri, type: "image/jpeg", name: "product.jpg" } as any);
-    formData.append("upload_preset", UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
-    return (await res.json()).secure_url;
+    const data = await api.uploadImage(uri);
+    return data.secure_url;
   };
 
   const handlePost = async () => {
@@ -209,28 +156,32 @@ export default function Sell() {
       for (const img of images) imageUrls.push(await uploadImage(img));
 
       const uid = auth.currentUser?.uid || "";
-      let sellerName = "", sellerPhoto = "", userUniversity = "";
       const snap = await getDoc(doc(db, "users", uid));
-      if (snap.exists()) {
-        const d = snap.data();
-        sellerName = `${d.firstName || ""} ${d.lastName || ""}`.trim();
-        sellerPhoto = d.profilePhoto || "";
-        userUniversity = d.university || "";
+      const user = snap.exists() ? snap.data() : null;
+
+      // 1. Upload all to Cloudinary via backend
+      const uploadedUrls = [];
+      for (const uri of images) {
+        const { secure_url } = await api.uploadImage(uri);
+        uploadedUrls.push(secure_url);
       }
 
-      await addDoc(collection(db, "products"), {
-        title, description, category, condition,
+      // 2. Post to backend
+      const productData = {
+        title,
+        description,
         price: Number(price),
-        quantityAvailable: Number(quantityAvailable),
-        images: imageUrls,
-        userId: uid,
-        sellerName,
-        sellerEmail: auth.currentUser?.email || "",
-        sellerPhoto,
-        university: userUniversity,
+        condition,
+        category,
+        images: uploadedUrls,
+        university: user?.university || "Unknown",
+        sellerName: `${user?.firstName || ""} ${user?.lastName || ""}`.trim(),
+        phone: user?.phoneNumber || "",
         status: "available",
-        createdAt: new Date(),
-      });
+        quantityAvailable: Number(quantityAvailable),
+      };
+
+      await api.createProduct(productData);
 
       Alert.alert("Success", "Product posted successfully!");
       router.replace("/Home/home");

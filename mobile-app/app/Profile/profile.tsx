@@ -15,6 +15,7 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { auth, db } from "../services/firebase";
 import { useTheme } from "../../constants/ThemeContext";
+import * as api from "../services/api";
 import {
   doc,
   updateDoc,
@@ -25,9 +26,6 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-
-const CLOUD_NAME = "dstfo8pxq";
-const UPLOAD_PRESET = "unitrade_upload";
 
 const UNIVERSITIES = [
   "Cairo University", "Ain Shams University", "Alexandria University",
@@ -100,19 +98,13 @@ export default function Profile() {
   /* ─── Toggle status ─── */
   const toggleStatus = (item: any) => {
     const newStatus = item.status === "sold" ? "available" : "sold";
-    updateDoc(doc(db, "products", item.id), { status: newStatus });
+    api.updateProduct(item.id, { status: newStatus });
   };
 
   /* ─── Upload image ─── */
   const uploadImage = async (uri: string) => {
-    const data = new FormData();
-    data.append("file", { uri, type: "image/jpeg", name: "profile.jpg" } as any);
-    data.append("upload_preset", UPLOAD_PRESET);
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      { method: "POST", body: data }
-    );
-    return (await res.json()).secure_url;
+    const data = await api.uploadImage(uri);
+    return data.secure_url;
   };
 
   /* ─── Pick image ─── */
@@ -125,7 +117,7 @@ export default function Profile() {
       const url = await uploadImage(result.assets[0].uri);
       const uid = auth.currentUser?.uid;
       if (!uid) return;
-      await updateDoc(doc(db, "users", uid), { profilePhoto: url });
+      await api.updateProfile({ profilePhoto: url });
       setUser({ ...user, profilePhoto: url });
     }
   };
@@ -134,7 +126,7 @@ export default function Profile() {
   const saveProfile = async () => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    await updateDoc(doc(db, "users", uid), {
+    await api.updateProfile({
       firstName, lastName, phoneNumber: phone, faculty, university,
     });
     setUser({ ...user, firstName, lastName, phoneNumber: phone, faculty, university });

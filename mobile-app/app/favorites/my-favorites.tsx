@@ -22,6 +22,7 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
+import * as api from "../services/api";
 import styles from "./my-favoriyes.styles";
 
 const PLACEHOLDER = "https://via.placeholder.com/150";
@@ -95,22 +96,20 @@ export default function MyFavorites() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
     try {
-      const userRef = doc(db, "users", uid);
-      if (favoriteIds.includes(productId)) {
-        await updateDoc(userRef, { favourites: arrayRemove(productId) });
+      const isFav = favoriteIds.includes(productId);
+      if (isFav) {
+        await api.toggleFavorite(productId, "remove");
       } else {
-        await updateDoc(userRef, { favourites: arrayUnion(productId) });
+        await api.toggleFavorite(productId, "add");
         // Send notification
         const item = favorites.find((i) => i.id === productId);
         if (item && item.userId !== uid) {
-          const myName = users[uid]?.firstName || "A user";
-          await addDoc(collection(db, "users", item.userId, "notifications"), {
-            type: "favorite",
-            message: `${myName} added your item '${item.title}' to their favorites! ❤️`,
-            link: `/product/${productId}`,
-            read: false,
-            createdAt: serverTimestamp(),
-          });
+          await api.sendNotification(
+            item.userId,
+            "favorite",
+            `${auth.currentUser?.displayName || "Someone"} liked your product: ${item.title}`,
+            `/product/${item.id}`
+          );
         }
       }
     } catch (err) {
