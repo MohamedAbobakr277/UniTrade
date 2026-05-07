@@ -21,7 +21,7 @@ const CATEGORIES = [
   { name: "Bags & Accessories", icon: "briefcase",   color: "#b45309", bg: "#fef9c3" },
 ];
 
-const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor", "Used"];
+const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor"];
 
 export default function EditProduct() {
   const { theme } = useTheme();

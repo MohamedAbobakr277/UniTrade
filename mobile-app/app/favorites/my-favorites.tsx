@@ -146,8 +146,18 @@ export default function MyFavorites() {
               <Text style={styles.soldOutText}>Sold Out</Text>
             </View>
           ) : item.condition ? (
-            <View style={styles.conditionBadge}>
-              <Text style={styles.conditionText}>{item.condition}</Text>
+            <View style={[styles.conditionBadge, { 
+              backgroundColor: item.condition === "New" ? "#dcfce7" : 
+                              item.condition === "Like New" ? "#dbeafe" :
+                              item.condition === "Good" ? "#fef9c3" :
+                              item.condition === "Fair" ? "#fee2e2" : "#fce7f3"
+            }]}>
+              <Text style={[styles.conditionText, { 
+                color: item.condition === "New" ? "#166534" : 
+                       item.condition === "Like New" ? "#1e40af" :
+                       item.condition === "Good" ? "#854d0e" :
+                       item.condition === "Fair" ? "#991b1b" : "#9d174d"
+              }]}>{item.condition}</Text>
             </View>
           ) : null}
           <TouchableOpacity
@@ -164,15 +174,27 @@ export default function MyFavorites() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.cardContent}>
-          <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
+        <View style={styles.cardBody}>
+          <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
             {item.title}
           </Text>
           <Text style={styles.price}>{item.price} EGP</Text>
-          <Text style={styles.meta} numberOfLines={1}>
+          <Text style={styles.university} numberOfLines={1}>
             {item.university}
           </Text>
           
+          {item.quantityAvailable !== undefined && item.quantityAvailable > 0 && item.status !== "sold" && (
+            <Text style={{ 
+              fontSize: 11, 
+              color: item.quantityAvailable < 5 ? "#d97706" : "#16a34a", 
+              fontWeight: "600", 
+              marginTop: 2, 
+              marginBottom: 4 
+            }}>
+              {item.quantityAvailable < 5 ? "Low Stock: " : "In stock: "}{item.quantityAvailable}
+            </Text>
+          )}
+
           <View style={styles.sellerRow}>
             <View style={styles.sellerInfo}>
               <Image source={{ uri: sellerPhoto }} style={styles.avatar} />

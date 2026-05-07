@@ -77,7 +77,7 @@ const CATEGORIES = [
   { name: "Bags & Accessories", icon: "briefcase",   color: "#b45309", bg: "#fef9c3" },
 ];
 
-const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor", "Used"];
+const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor"];
 
 const ALL_UNIVERSITIES = [
   "Cairo University", "Ain Shams University", "Alexandria University",
@@ -109,6 +109,8 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const [filterVisible, setFilterVisible] = useState(false);
+  const [timeSort, setTimeSort] = useState(""); // newest, oldest
+  const [priceSort, setPriceSort] = useState(""); // low-high, high-low
   const [selectedUniversity, setSelectedUniversity] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -308,13 +310,14 @@ export default function HomeScreen() {
     setSearch("");
     setSubmittedSearch("");
     setSuggestions([]);
-    inputRef.current?.focus();
   };
 
   const resetFilters = () => {
     setSelectedCategory("All");
-    setSelectedUniversity("");
     setSelectedCondition("");
+    setSelectedUniversity("");
+    setTimeSort("");
+    setPriceSort("");
     setMinPrice("");
     setMaxPrice("");
     setSearch("");
@@ -335,22 +338,46 @@ export default function HomeScreen() {
   ];
 
   const filteredItems = items.filter((item) => {
-    const q = submittedSearch.toLowerCase();
-    return (
-      item.title?.toLowerCase().includes(q) &&
-      (selectedCategory === "All" || item.category === selectedCategory) &&
-      (!selectedUniversity || item.university === selectedUniversity) &&
-      (!selectedCondition || item.condition === selectedCondition) &&
-      (!minPrice || item.price >= Number(minPrice)) &&
-      (!maxPrice || item.price <= Number(maxPrice))
-    );
+    const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
+    const matchesCondition = !selectedCondition || item.condition === selectedCondition;
+    const matchesUni = !selectedUniversity || item.university === selectedUniversity;
+    const matchesSearch = !submittedSearch || 
+      item.title.toLowerCase().includes(submittedSearch.toLowerCase()) ||
+      item.category.toLowerCase().includes(submittedSearch.toLowerCase());
+    
+    return matchesCategory && matchesCondition && matchesUni && matchesSearch;
+  }).sort((a, b) => {
+    const getT = (val: any) => {
+      if (!val) return 0;
+      if (val.toDate) return val.toDate().getTime();
+      if (val instanceof Date) return val.getTime();
+      if (typeof val === 'number') return val;
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? 0 : d.getTime();
+    };
+
+    let priceRes = 0;
+    if (priceSort === "low-high") priceRes = a.price - b.price;
+    else if (priceSort === "high-low") priceRes = b.price - a.price;
+
+    let timeRes = 0;
+    const tA = getT(a.createdAt);
+    const tB = getT(b.createdAt);
+    if (timeSort === "newest") timeRes = tB - tA;
+    else if (timeSort === "oldest") timeRes = tA - tB;
+
+    if (priceSort && timeSort) {
+      return priceRes !== 0 ? priceRes : timeRes;
+    }
+    return priceRes || timeRes || 0;
   });
 
   const activeFiltersCount = [
-    selectedUniversity,
-    selectedCondition,
-    minPrice,
-    maxPrice,
+    selectedCategory !== "All",
+    selectedCondition !== "",
+    selectedUniversity !== "",
+    timeSort !== "",
+    priceSort !== "",
   ].filter(Boolean).length;
 
   /* Highlight matching part */
@@ -400,8 +427,18 @@ export default function HomeScreen() {
               <Text style={s.soldOutText}>Sold Out</Text>
             </View>
           ) : item.condition ? (
-            <View style={s.conditionBadge}>
-              <Text style={s.conditionText}>{item.condition}</Text>
+            <View style={[s.conditionBadge, { 
+              backgroundColor: item.condition === "New" ? "#dcfce7" : 
+                              item.condition === "Like New" ? "#dbeafe" :
+                              item.condition === "Good" ? "#fef9c3" :
+                              item.condition === "Fair" ? "#fee2e2" : "#fce7f3"
+            }]}>
+              <Text style={[s.conditionText, { 
+                color: item.condition === "New" ? "#166534" : 
+                       item.condition === "Like New" ? "#1e40af" :
+                       item.condition === "Good" ? "#854d0e" :
+                       item.condition === "Fair" ? "#991b1b" : "#9d174d"
+              }]}>{item.condition}</Text>
             </View>
           ) : null}
           <TouchableOpacity
@@ -427,8 +464,14 @@ export default function HomeScreen() {
             {item.university}
           </Text>
           {item.quantityAvailable !== undefined && item.quantityAvailable > 0 && item.status !== "sold" && (
-            <Text style={{ fontSize: 11, color: "#16a34a", fontWeight: "600", marginTop: 2, marginBottom: 4 }}>
-              In stock: {item.quantityAvailable}
+            <Text style={{ 
+              fontSize: 11, 
+              color: item.quantityAvailable < 5 ? "#d97706" : "#16a34a", 
+              fontWeight: "600", 
+              marginTop: 2, 
+              marginBottom: 4 
+            }}>
+              {item.quantityAvailable < 5 ? "Low Stock: " : "In stock: "}{item.quantityAvailable}
             </Text>
           )}
           <View style={s.sellerRow}>
@@ -462,7 +505,7 @@ export default function HomeScreen() {
             source={require("../../assets/images/logo.png")}
             style={s.logo}
           />
-          <Text style={[s.headerTitle, { color: theme.text }]}>Marketplace</Text>
+          <Text style={[s.headerTitle, { color: theme.text }]}>UniTrade</Text>
         </View>
         <TouchableOpacity 
           onPress={() => router.push("/notifications/notifications")}
@@ -863,6 +906,44 @@ export default function HomeScreen() {
                   },
                 ]}
               />
+            </View>
+
+            <Text style={[s.filterLabel, { color: "#64748b" }]}>Time Sort</Text>
+            <View style={{ flexDirection: "row", gap: 10, marginBottom: 12 }}>
+              {["newest", "oldest"].map((opt) => (
+                <TouchableOpacity
+                  key={opt}
+                  onPress={() => setTimeSort(timeSort === opt ? "" : opt)}
+                  style={[
+                    s.chip,
+                    s.chipBlue,
+                    timeSort === opt && s.chipSelected,
+                  ]}
+                >
+                  <Text style={[s.chipText, timeSort === opt && s.chipTextSelected]}>
+                    {opt === "newest" ? "Newest" : "Oldest"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={[s.filterLabel, { color: "#64748b" }]}>Price Sort</Text>
+            <View style={{ flexDirection: "row", gap: 10, marginBottom: 16 }}>
+              {["low-high", "high-low"].map((opt) => (
+                <TouchableOpacity
+                  key={opt}
+                  onPress={() => setPriceSort(priceSort === opt ? "" : opt)}
+                  style={[
+                    s.chip,
+                    s.chipBlue,
+                    priceSort === opt && s.chipSelected,
+                  ]}
+                >
+                  <Text style={[s.chipText, priceSort === opt && s.chipTextSelected]}>
+                    {opt === "low-high" ? "Low to High" : "High to Low"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
 
             <View style={s.sheetActions}>

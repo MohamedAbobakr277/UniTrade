@@ -42,7 +42,6 @@ const CONDITIONS = [
   { label: "Good", color: "#854d0e", bg: "#fef9c3" },
   { label: "Fair", color: "#991b1b", bg: "#fee2e2" },
   { label: "Poor", color: "#9d174d", bg: "#fce7f3" },
-  { label: "Used", color: "#475569", bg: "#f1f5f9" },
 ];
 
 // ─── Helper: get Firebase auth token ───

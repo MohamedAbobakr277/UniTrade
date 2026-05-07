@@ -13,6 +13,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -56,8 +57,8 @@ const CONDITION_COLOR: Record<string, { bg: string; text: string }> = {
   New: { bg: "#dcfce7", text: "#166534" },
   "Like New": { bg: "#dbeafe", text: "#1e40af" },
   Good: { bg: "#fef9c3", text: "#854d0e" },
-  Used: { bg: "#f1f5f9", text: "#475569" },
   Fair: { bg: "#fee2e2", text: "#991b1b" },
+  Poor: { bg: "#fce7f3", text: "#9d174d" },
 };
 
 /* ─────────────────────────────────────────────
@@ -175,6 +176,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [recommended, setRecommended] = useState<Product[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   // ── Seller rating state ──
   const [sellerRating, setSellerRating] = useState<{
@@ -332,7 +334,7 @@ export default function ProductDetails() {
     } else if (cleaned.startsWith("1") && cleaned.length < 12) {
       cleaned = "20" + cleaned;
     }
-    const message = `Hi! 👋\n\nI'm interested in your listing on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
+    const message = `Hello! 👋\n\nI want to buy ${selectedQuantity} item${selectedQuantity > 1 ? 's' : ''} of this product on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
     const url = `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
     Linking.canOpenURL(url)
       .then((supported) => {
@@ -437,21 +439,37 @@ export default function ProductDetails() {
             </Text>
             <View style={{ flexDirection: 'row', gap: 6 }}>
               {product.condition && (
-                <View style={[s.badge, { backgroundColor: condStyle.bg }]}>
-                  <Text style={[s.badgeText, { color: condStyle.text }]}>
+                <View style={[s.badge, { backgroundColor: CONDITION_COLOR[product.condition]?.bg || "#f1f5f9" }]}>
+                  <Text style={[s.badgeText, { color: CONDITION_COLOR[product.condition]?.text || "#475569" }]}>
                     {product.condition}
                   </Text>
                 </View>
               )}
-              {product.status === "sold" || product.quantityAvailable === 0 ? (
-                <View style={[s.badge, { backgroundColor: "#fee2e2" }]}>
-                  <Text style={[s.badgeText, { color: "#ef4444" }]}>Sold Out</Text>
-                </View>
-              ) : (product.quantityAvailable !== undefined && product.quantityAvailable > 0) ? (
-                <View style={[s.badge, { backgroundColor: "#dcfce7" }]}>
-                  <Text style={[s.badgeText, { color: "#16a34a" }]}>Stock: {product.quantityAvailable}</Text>
-                </View>
-              ) : null}
+              {(() => {
+                const stock = product.quantityAvailable ?? 1;
+                const isOutOfStock = stock === 0 || product.status === "sold";
+                const isLowStock = stock > 0 && stock < 5;
+                
+                let bg = "#dcfce7";
+                let text = "#16a34a";
+                let label = `In Stock: ${stock}`;
+
+                if (isOutOfStock) {
+                  bg = "#fee2e2";
+                  text = "#ef4444";
+                  label = "Sold Out";
+                } else if (isLowStock) {
+                  bg = "#fef3c7";
+                  text = "#d97706";
+                  label = `Low Stock: ${stock}`;
+                }
+
+                return (
+                  <View style={[s.badge, { backgroundColor: bg }]}>
+                    <Text style={[s.badgeText, { color: text }]}>{label}</Text>
+                  </View>
+                );
+              })()}
             </View>
           </View>
 
@@ -474,6 +492,61 @@ export default function ProductDetails() {
             )}
             <Text style={s.timeText}>{timeAgo(product.createdAt)}</Text>
           </View>
+
+          {/* Quantity Selector */}
+          {product.quantityAvailable !== undefined && product.quantityAvailable > 0 && product.status !== "sold" && (
+            <View style={[s.qtyCard, { backgroundColor: theme.card }]}>
+              <View style={s.qtyHeader}>
+                <Feather name="shopping-cart" size={16} color="#2563eb" />
+                <Text style={[s.qtyLabel, { color: theme.text }]}>Select Quantity</Text>
+                <Text style={s.qtyStockText}>
+                  {product.quantityAvailable} available
+                </Text>
+              </View>
+              
+              <View style={s.quantityRow}>
+                <TouchableOpacity 
+                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]} 
+                  onPress={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
+                  activeOpacity={0.7}
+                >
+                  <Feather name="minus" size={18} color={selectedQuantity <= 1 ? "#cbd5e1" : "#2563eb"} />
+                </TouchableOpacity>
+                
+                <TextInput
+                  keyboardType="numeric"
+                  value={String(selectedQuantity)}
+                  onChangeText={(t) => {
+                    const val = parseInt(t.replace(/[^0-9]/g, ""));
+                    if (!isNaN(val)) {
+                      setSelectedQuantity(Math.min(product.quantityAvailable || 1, Math.max(1, val)));
+                    } else if (t === "") {
+                      setSelectedQuantity(0); 
+                    }
+                  }}
+                  onBlur={() => {
+                    if (selectedQuantity < 1) setSelectedQuantity(1);
+                  }}
+                  style={[s.qtyInput, { color: theme.text, backgroundColor: theme.background, borderColor: theme.border }]}
+                />
+
+                <TouchableOpacity 
+                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]} 
+                  onPress={() => setSelectedQuantity(Math.min(product.quantityAvailable || 1, selectedQuantity + 1))}
+                  activeOpacity={0.7}
+                >
+                  <Feather name="plus" size={18} color={selectedQuantity >= (product.quantityAvailable || 1) ? "#cbd5e1" : "#2563eb"} />
+                </TouchableOpacity>
+
+                <View style={s.totalPriceBox}>
+                  <Text style={s.totalLabel}>Subtotal</Text>
+                  <Text style={[s.totalVal, { color: theme.text }]}>
+                    EGP {(product.price * (selectedQuantity || 1)).toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           <View style={[s.divider, { backgroundColor: theme.card }]} />
 
@@ -792,6 +865,72 @@ const s = StyleSheet.create({
     flexDirection: "row", gap: 10,
     paddingHorizontal: 16, paddingTop: 12,
     paddingBottom: 30, borderTopWidth: 1, borderTopColor: "#f1f5f9",
+  },
+  /* Quantity Selector card */
+  qtyCard: {
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#f1f5f9",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  qtyHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 8,
+  },
+  qtyLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    flex: 1,
+  },
+  qtyStockText: {
+    fontSize: 12,
+    color: "#94a3b8",
+    fontWeight: "500",
+  },
+  quantityRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  qtyBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+  },
+  qtyInput: {
+    width: 60,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  totalPriceBox: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  totalLabel: {
+    fontSize: 11,
+    color: "#94a3b8",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  totalVal: {
+    fontSize: 15,
+    fontWeight: "800",
   },
   contactBtn: {
     flex: 1, flexDirection: "row", alignItems: "center",

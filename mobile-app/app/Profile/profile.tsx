@@ -306,6 +306,21 @@ export default function Profile() {
                     <Text style={s.soldBadgeText}>SOLD</Text>
                   </View>
                 )}
+                {item.condition && (
+                  <View style={[s.condBadge, { 
+                    backgroundColor: item.condition === "New" ? "#dcfce7" : 
+                                    item.condition === "Like New" ? "#dbeafe" :
+                                    item.condition === "Good" ? "#fef9c3" :
+                                    item.condition === "Fair" ? "#fee2e2" : "#fce7f3"
+                  }]}>
+                    <Text style={[s.condBadgeText, { 
+                      color: item.condition === "New" ? "#166534" : 
+                             item.condition === "Like New" ? "#1e40af" :
+                             item.condition === "Good" ? "#854d0e" :
+                             item.condition === "Fair" ? "#991b1b" : "#9d174d"
+                    }]}>{item.condition}</Text>
+                  </View>
+                )}
                 <Image source={{ uri: img }} style={s.productImg} />
               </View>
 
@@ -315,23 +330,23 @@ export default function Profile() {
                 </Text>
                 <Text style={s.productPrice}>{item.price} EGP</Text>
 
-                <View style={s.productActions}>
-                  <TouchableOpacity
-                    style={[s.actionBtn, { borderColor: "#2563eb" }]}
-                    onPress={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
-                  >
-                    <Feather name="edit-3" size={12} color="#2563eb" />
-                    <Text style={[s.actionBtnText, { color: "#2563eb" }]}>Edit</Text>
-                  </TouchableOpacity>
+                  <View style={s.productActions}>
+                    <TouchableOpacity
+                      style={[s.actionBtn, { backgroundColor: "#eff6ff", borderColor: "#bfdbfe" }]}
+                      onPress={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
+                    >
+                      <Feather name="edit-3" size={12} color="#2563eb" />
+                      <Text style={[s.actionBtnText, { color: "#2563eb" }]}>Edit</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity 
-                    style={[s.actionBtn, { borderColor: "#ef4444" }]} 
-                    onPress={() => deleteProduct(item.id)}
-                  >
-                    <Feather name="trash-2" size={12} color="#ef4444" />
-                    <Text style={[s.actionBtnText, { color: "#ef4444" }]}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity 
+                      style={[s.actionBtn, { backgroundColor: "#fef2f2", borderColor: "#fecaca" }]} 
+                      onPress={() => deleteProduct(item.id)}
+                    >
+                      <Feather name="trash-2" size={12} color="#ef4444" />
+                      <Text style={[s.actionBtnText, { color: "#ef4444" }]}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
 
                 <TouchableOpacity
                   style={[s.soldToggle, item.status === "sold" ? s.soldToggleActive : { borderColor: border }]}
@@ -614,6 +629,16 @@ const s = StyleSheet.create({
     zIndex: 10,
   },
   soldBadgeText: { color: "#fff", fontSize: 10, fontWeight: "700" },
+  condBadge: {
+    position: "absolute",
+    bottom: 7,
+    left: 7,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 10,
+  },
+  condBadgeText: { fontSize: 9, fontWeight: "700" },
   productBody: { padding: 9 },
   productTitle: { fontSize: 13, fontWeight: "600", marginBottom: 2 },
   productPrice: { fontSize: 14, fontWeight: "700", color: "#2563eb", marginBottom: 8 },
