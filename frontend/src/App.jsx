@@ -12,6 +12,7 @@ import ItemDetails from "./pages/ItemDetails";
 import MyListings from "./pages/MyListings";
 import Favourites from "./pages/Favourites";
 import SellerProfile from "./pages/SellerProfile";
+import Notifications from "./pages/Notifications";
 import AIChatbot from "./components/AIChatbot";
 
 export default function App() {
@@ -89,6 +90,15 @@ export default function App() {
         element={
           <ProtectedRoute>
             <SellerProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         }
       />
