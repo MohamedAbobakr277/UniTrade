@@ -7,13 +7,12 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   Animated,
   PanResponder,
   Dimensions,
   Modal,
-  StatusBar,
+  Keyboard,
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../constants/ThemeContext";
@@ -151,6 +150,8 @@ export default function FloatingChatbot() {
   const [isTyping, setIsTyping] = useState(false);
   const [userName, setUserName] = useState("Student");
   const [user, setUser] = useState(auth.currentUser);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -182,12 +183,39 @@ export default function FloatingChatbot() {
     }
   }, [userName]);
 
+  /* ─── Keyboard listeners (WhatsApp-style) ─── */
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const onShow = (e: any) => {
+      setKeyboardHeight(e.endCoordinates.height);
+      // Scroll to bottom when keyboard opens
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    };
+
+    const onHide = () => {
+      setKeyboardHeight(0);
+    };
+
+    const subShow = Keyboard.addListener(showEvent, onShow);
+    const subHide = Keyboard.addListener(hideEvent, onHide);
+
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
+  }, []);
+
   const openChat = () => {
     setIsOpen(true);
     Animated.spring(slideAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 11 }).start();
   };
 
   const closeChat = () => {
+    Keyboard.dismiss();
     Animated.timing(slideAnim, { toValue: 0, duration: 220, useNativeDriver: true }).start(() => setIsOpen(false));
   };
 
@@ -333,11 +361,17 @@ export default function FloatingChatbot() {
           {/* Tap outside to close */}
           <TouchableOpacity style={s.backdrop} activeOpacity={1} onPress={closeChat} />
 
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
+          {/* Sheet */}
+          <Animated.View
+            style={[
+              s.sheet,
+              { backgroundColor: theme.background },
+              slideStyle,
+              { height: SCREEN_HEIGHT * 0.85 } // Fixed height as requested
+            ]}
           >
-            <Animated.View style={[s.sheet, { backgroundColor: theme.background }, slideStyle]}>
+            {/* Inner content wrapper to handle spacing */}
+            <View style={{ flex: 1 }}>
               {/* Header */}
               <View style={[s.sheetHeader, { backgroundColor: theme.card, borderBottomColor: border }]}>
                 <View style={s.sheetHandle} />
@@ -365,7 +399,7 @@ export default function FloatingChatbot() {
                 </View>
               </View>
 
-              {/* Messages */}
+              {/* Messages — flex: 1 so it shrinks and allows scrolling */}
               <FlatList
                 ref={flatListRef}
                 data={messages}
@@ -373,7 +407,10 @@ export default function FloatingChatbot() {
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={s.messageList}
                 onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                showsVerticalScrollIndicator={false}
+                onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
+                showsVerticalScrollIndicator={true}
+                keyboardShouldPersistTaps="handled"
+                style={{ flex: 1 }}
                 ListFooterComponent={
                   isTyping ? (
                     <View style={[s.msgRow, s.msgRowAI]}>
@@ -414,8 +451,11 @@ export default function FloatingChatbot() {
               <View style={[s.poweredBy, { backgroundColor: theme.card, borderTopColor: border }]}>
                 <Text style={{ fontSize: 11, color: "#94a3b8" }}>🤖 Powered by UniTrade AI</Text>
               </View>
-            </Animated.View>
-          </KeyboardAvoidingView>
+
+              {/* Manual Spacer for Keyboard — Pushes input up without moving the whole sheet */}
+              <View style={{ height: keyboardHeight }} />
+            </View>
+          </Animated.View>
         </View>
       </Modal>
     </>
@@ -454,10 +494,11 @@ const s = StyleSheet.create({
 
   /* Sheet */
   sheet: {
-    height: SCREEN_HEIGHT * 0.78,
+    maxHeight: SCREEN_HEIGHT * 0.9,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     overflow: "hidden",
+    flexDirection: "column",
   },
   sheetHandle: {
     width: 40, height: 4, borderRadius: 2,

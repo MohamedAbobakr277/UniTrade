@@ -30,17 +30,17 @@ const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
 
 const UNIVERSITIES = [
-  "Cairo University","Ain Shams University","Alexandria University",
-  "Mansoura University","Assiut University","Helwan University",
-  "Tanta University","Zagazig University","Suez Canal University",
-  "Al-Azhar University","German University in Cairo",
-  "British University in Egypt","October 6 University",
-  "Future University in Egypt","AASTMT","Nile University","Others",
+  "Cairo University", "Ain Shams University", "Alexandria University",
+  "Mansoura University", "Assiut University", "Helwan University",
+  "Tanta University", "Zagazig University", "Suez Canal University",
+  "Al-Azhar University", "German University in Cairo",
+  "British University in Egypt", "October 6 University",
+  "Future University in Egypt", "AASTMT", "Nile University", "Others",
 ];
 
 const FACULTIES = [
-  "Computer Science","Engineering","Medicine","Pharmacy","Law",
-  "Business Administration","Dentistry","Arts","Science","Nursing","Others",
+  "Computer Science", "Engineering", "Medicine", "Pharmacy", "Law",
+  "Business Administration", "Dentistry", "Arts", "Science", "Nursing", "Others",
 ];
 
 export default function Profile() {
@@ -274,11 +274,21 @@ export default function Profile() {
 
       {/* ── My Listings ── */}
       <View style={s.sectionHeader}>
-        <Feather name="grid" size={16} color="#2563eb" />
-        <Text style={[s.sectionTitle, { color: theme.text }]}>My Listings</Text>
-        <View style={s.countBadge}>
-          <Text style={s.countText}>{items.length}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1 }}>
+          <Feather name="grid" size={18} color="#2563eb" />
+          <Text style={[s.sectionTitle, { color: theme.text, marginBottom: 0 }]}>My Listings</Text>
+          <View style={s.countBadge}>
+            <Text style={s.countText}>{items.length}</Text>
+          </View>
         </View>
+        <TouchableOpacity 
+          style={s.sellHeaderBtn} 
+          onPress={() => router.push("/Sell/sell")}
+          activeOpacity={0.8}
+        >
+          <Feather name="plus" size={14} color="#fff" />
+          <Text style={s.sellHeaderBtnText}>Sell Item</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={s.grid}>
@@ -307,26 +317,33 @@ export default function Profile() {
 
                 <View style={s.productActions}>
                   <TouchableOpacity
-                    style={s.editBtn}
+                    style={[s.actionBtn, { borderColor: "#2563eb" }]}
                     onPress={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
                   >
-                    <Feather name="edit" size={12} color="#fff" />
-                    <Text style={s.actionText}>Edit</Text>
+                    <Feather name="edit-3" size={12} color="#2563eb" />
+                    <Text style={[s.actionBtnText, { color: "#2563eb" }]}>Edit</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={s.deleteBtn} onPress={() => deleteProduct(item.id)}>
-                    <Feather name="trash-2" size={12} color="#fff" />
-                    <Text style={s.actionText}>Delete</Text>
+                  <TouchableOpacity 
+                    style={[s.actionBtn, { borderColor: "#ef4444" }]} 
+                    onPress={() => deleteProduct(item.id)}
+                  >
+                    <Feather name="trash-2" size={12} color="#ef4444" />
+                    <Text style={[s.actionBtnText, { color: "#ef4444" }]}>Delete</Text>
                   </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
-                  style={[s.soldToggle, item.status === "sold" && s.soldToggleActive]}
+                  style={[s.soldToggle, item.status === "sold" ? s.soldToggleActive : { borderColor: border }]}
                   onPress={() => toggleStatus(item)}
                 >
-                  <Feather name="check-circle" size={13} color={item.status === "sold" ? "#fff" : "#64748b"} />
-                  <Text style={[s.soldToggleText, item.status === "sold" && { color: "#fff" }]}>
-                    {item.status === "sold" ? "Sold" : "Mark Sold"}
+                  <Feather 
+                    name={item.status === "sold" ? "check-circle" : "circle"} 
+                    size={13} 
+                    color={item.status === "sold" ? "#fff" : "#94a3b8"} 
+                  />
+                  <Text style={[s.soldToggleText, { color: item.status === "sold" ? "#fff" : "#64748b" }]}>
+                    {item.status === "sold" ? "Sold Out" : "Mark Sold"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -600,40 +617,62 @@ const s = StyleSheet.create({
   productBody: { padding: 9 },
   productTitle: { fontSize: 13, fontWeight: "600", marginBottom: 2 },
   productPrice: { fontSize: 14, fontWeight: "700", color: "#2563eb", marginBottom: 8 },
-  productActions: { flexDirection: "row", gap: 6, marginBottom: 6 },
-  editBtn: {
+  productActions: { 
+    flexDirection: "row", 
+    gap: 6, 
+    marginBottom: 6 
+  },
+  actionBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 3,
-    backgroundColor: "#2563eb",
-    paddingVertical: 6,
-    borderRadius: 7,
+    gap: 4,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1.5,
   },
-  deleteBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-    backgroundColor: "#ef4444",
-    paddingVertical: 6,
-    borderRadius: 7,
+  actionBtnText: { 
+    fontSize: 11, 
+    fontWeight: "700" 
   },
-  actionText: { color: "#fff", fontSize: 11, fontWeight: "600" },
   soldToggle: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
-    paddingVertical: 6,
-    borderRadius: 7,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    backgroundColor: "transparent",
   },
-  soldToggleActive: { backgroundColor: "#16a34a", borderColor: "#16a34a" },
-  soldToggleText: { fontSize: 11, fontWeight: "600", color: "#64748b" },
+  soldToggleActive: { 
+    backgroundColor: "#16a34a", 
+    borderColor: "#16a34a" 
+  },
+  soldToggleText: { 
+    fontSize: 11, 
+    fontWeight: "700" 
+  },
+  sellHeaderBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#2563eb",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    shadowColor: "#2563eb",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  sellHeaderBtnText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
 
   emptyWrap: { alignItems: "center", paddingVertical: 32 },
 

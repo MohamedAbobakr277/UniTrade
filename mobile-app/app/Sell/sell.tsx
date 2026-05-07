@@ -13,7 +13,6 @@ import {
   Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system/legacy"; 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db, auth } from "../services/firebase";
@@ -24,8 +23,7 @@ import { Feather } from "@expo/vector-icons";
 // ─── Settings ───
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
-// Read strictly from EXPO_PUBLIC environment variables
-const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+const BACKEND_URL = "http://192.168.1.9:3000";
 
 const CATEGORIES = [
   { name: "Books & Notes", icon: "book" },
@@ -36,7 +34,6 @@ const CATEGORIES = [
   { name: "Lab Equipment", icon: "activity" },
   { name: "Stationery", icon: "edit-3" },
   { name: "Bags & Accessories", icon: "briefcase" },
-
 ];
 
 const CONDITIONS = [
@@ -47,6 +44,52 @@ const CONDITIONS = [
   { label: "Poor", color: "#9d174d", bg: "#fce7f3" },
   { label: "Used", color: "#475569", bg: "#f1f5f9" },
 ];
+
+// ─── Helper: get Firebase auth token ───
+async function getAuthToken(): Promise<string | null> {
+  try {
+    return auth.currentUser ? await auth.currentUser.getIdToken() : null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Helper: call backend /generate ───
+async function callBackendGenerate(body: object): Promise<string> {
+  const token = await getAuthToken();
+  const response = await fetch(`${BACKEND_URL}/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.message || `Server error ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message || data.error);
+  if (!data.text) throw new Error("No response from AI");
+  return data.text as string;
+}
+
+// ─── Helper: upload local URI to Cloudinary, return public URL ───
+async function uploadToCloudinary(uri: string): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", { uri, type: "image/jpeg", name: "product.jpg" } as any);
+  formData.append("upload_preset", UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  if (!data.secure_url) throw new Error("Cloudinary upload failed");
+  return data.secure_url;
+}
 
 export default function Sell() {
   const router = useRouter();
@@ -66,99 +109,68 @@ export default function Sell() {
 
   const border = darkMode ? "#1e293b" : "#e2e8f0";
 
+  // ─── ✨ AI Auto-fill (image → backend) ───
   const handleAIAutoFill = async () => {
     if (images.length === 0) return Alert.alert("Error", "Please select an image first");
 
     setAiLoading(true);
     try {
-      const base64 = await FileSystem.readAsStringAsync(images[0], {
-        encoding: "base64" as any,
+      // Upload the local image to Cloudinary to get a public URL the backend can fetch
+      const imageUrl = await uploadToCloudinary(images[0]);
+
+      const rawText = await callBackendGenerate({
+        prompt:
+          'Marketplace Assistant: Analyze this photo for a student shop. Output ONLY a raw JSON: {"title": "", "description": "", "category": ""}. Categories: Books & Notes, Calculators, Electronics, Engineering Tools.',
+        imageUrl,
       });
 
-      // using gemini-2.5-flash
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: "Marketplace Assistant: Analyze this photo for a student shop. Output ONLY a raw JSON: {\"title\": \"\", \"description\": \"\", \"category\": \"\"}. Categories: Books & Notes, Calculators, Electronics, Engineering Tools." },
-              { inline_data: { mime_type: "image/jpeg", data: base64 } }
-            ]
-          }]
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.error) {
-        console.warn("Retrying with alternate model name...");
-        // last attempt with alternate path if the first one failed
-        throw new Error(data.error.message);
-      }
-
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        let rawText = data.candidates[0].content.parts[0].text;
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const cleanJson = JSON.parse(jsonMatch[0]);
-          setTitle(cleanJson.title || "");
-          setDescription(cleanJson.description || "");
-          if (CATEGORIES.some(c => c.name === cleanJson.category)) {
-            setCategory(cleanJson.category);
-          }
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const cleanJson = JSON.parse(jsonMatch[0]);
+        setTitle(cleanJson.title || "");
+        setDescription(cleanJson.description || "");
+        if (CATEGORIES.some((c) => c.name === cleanJson.category)) {
+          setCategory(cleanJson.category);
         }
       }
     } catch (e: any) {
-      console.error("DEBUG ERROR:", e.message);
-      Alert.alert(
-        "Technical Issue",
-        "The model is currently unavailable for your account. Please ensure that (Generative Language API) is enabled in the Google Cloud Console for the project associated with this key."
-      );
+      console.error("AI Auto-fill Error:", e.message);
+      if (e.message?.includes("Network") || e.message?.includes("fetch")) {
+        Alert.alert("Server Offline", "Cannot reach the backend. Make sure the server is running.");
+      } else {
+        Alert.alert("AI Error", e.message || "Failed to analyse image.");
+      }
     } finally {
       setAiLoading(false);
     }
   };
 
+  // ─── ✨ Auto-fill details (title → backend) ───
   const handleAITitleAutoFill = async () => {
     if (!title.trim()) return Alert.alert("Error", "Please enter a title first");
-    
+
     setAiTitleLoading(true);
     try {
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-      
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: `Marketplace Assistant: I have a product with the title "${title}". Output ONLY a raw JSON with reasonable estimates: {"description": "write a catchy description in Egyptian Arabic", "price": "estimated price in EGP as a number string", "category": "one of: Books & Notes, Calculators, Electronics, Engineering Tools, Medical Tools, Lab Equipment, Stationery, Bags & Accessories"}.` }
-            ]
-          }]
-        })
+      const rawText = await callBackendGenerate({
+        prompt: `Marketplace Assistant: I have a product with the title "${title}". Output ONLY a raw JSON with reasonable estimates: {"description": "write a catchy description in Egyptian Arabic", "price": "estimated price in EGP as a number string", "category": "one of: Books & Notes, Calculators, Electronics, Engineering Tools, Medical Tools, Lab Equipment, Stationery, Bags & Accessories"}.`,
       });
 
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        let rawText = data.candidates[0].content.parts[0].text;
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const cleanJson = JSON.parse(jsonMatch[0]);
-          if (cleanJson.description) setDescription(cleanJson.description);
-          if (cleanJson.price) setPrice(String(cleanJson.price).replace(/[^0-9]/g, ""));
-          if (CATEGORIES.some(c => c.name === cleanJson.category)) {
-            setCategory(cleanJson.category);
-          }
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const cleanJson = JSON.parse(jsonMatch[0]);
+        if (cleanJson.description) setDescription(cleanJson.description);
+        if (cleanJson.price) setPrice(String(cleanJson.price).replace(/[^0-9]/g, ""));
+        if (CATEGORIES.some((c) => c.name === cleanJson.category)) {
+          setCategory(cleanJson.category);
         }
       }
     } catch (e: any) {
-      console.error("DEBUG ERROR:", e.message);
-      Alert.alert("Technical Issue", "Failed to generate details from title.");
+      console.error("AI Title Auto-fill Error:", e.message);
+      if (e.message?.includes("Network") || e.message?.includes("fetch")) {
+        Alert.alert("Server Offline", "Cannot reach the backend. Make sure the server is running.");
+      } else {
+        Alert.alert("AI Error", e.message || "Failed to generate details from title.");
+      }
     } finally {
       setAiTitleLoading(false);
     }
