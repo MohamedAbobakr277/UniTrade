@@ -27,6 +27,8 @@ export function useAdminListings() {
       description: fields.description,
       category: fields.category,
       price: Number(fields.price),
+      quantityAvailable: Number(fields.quantityAvailable),
+      status: fields.status,
     });
     closeEdit();
   };

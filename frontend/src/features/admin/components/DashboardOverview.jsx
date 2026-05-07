@@ -127,7 +127,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
     { label: "Total Listings", value: listings.length, Icon: ListAltIcon,            iconBg: isDark ? "rgba(37, 99, 235, 0.15)" : "#eff6ff", iconColor: "#2563eb" },
     { label: "Available",      value: available,        Icon: CheckCircleOutlineIcon, iconBg: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", iconColor: "#10b981" },
     { label: "Sold",           value: sold,             Icon: LocalOfferIcon,         iconBg: isDark ? "rgba(245, 158, 11, 0.15)" : "#fffbeb", iconColor: "#f59e0b" },
-    { label: "Total Users",    value: users.length,     Icon: PeopleIcon,             iconBg: isDark ? "rgba(139, 92, 246, 0.15)" : "#f5f3ff", iconColor: "#8b5cf6" },
+    { label: "Avg User Rating", value: users.length > 0 ? (users.reduce((acc, u) => acc + (u.averageRating || 0), 0) / users.length).toFixed(1) : "0.0", Icon: PeopleIcon, iconBg: isDark ? "rgba(139, 92, 246, 0.15)" : "#f5f3ff", iconColor: "#8b5cf6" },
   ];
 
   return (
@@ -300,7 +300,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
             sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
           >
             <Typography sx={{ fontWeight: 700, color: "text.primary", mb: 2, fontSize: "1rem" }}>
-              Category Breakdown
+              Category Breakdown (Item Count)
             </Typography>
             {categoryBreakdown.length === 0 ? (
               <Typography sx={{ fontSize: "0.85rem", color: "text.secondary" }}>No data yet.</Typography>

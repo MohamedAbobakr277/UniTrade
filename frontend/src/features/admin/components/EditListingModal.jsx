@@ -41,6 +41,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
     price:       "",
     condition:   "",
     status:      "available",
+    quantityAvailable: 1,
   });
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -54,6 +55,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
         price:       item.price       ?? "",
         condition:   item.condition   ?? "",
         status:      item.status      ?? "available",
+        quantityAvailable: item.quantityAvailable ?? 1,
       });
     }
   }, [item]);
@@ -172,7 +174,7 @@ export default function EditListingModal({ item, onClose, onSave }) {
           />
         </Box>
 
-        {/* Condition + Status */}
+        {/* Condition + Status + Quantity */}
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             select
@@ -188,8 +190,18 @@ export default function EditListingModal({ item, onClose, onSave }) {
             ))}
           </TextField>
 
-          {/* ── Admin-only: change listing status ── */}
           <TextField
+            fullWidth
+            label="Stock"
+            name="quantityAvailable"
+            type="number"
+            value={form.quantityAvailable}
+            onChange={handleChange}
+            size="small"
+          />
+        </Box>
+
+        <TextField
             select
             fullWidth
             label="Status"
@@ -229,7 +241,6 @@ export default function EditListingModal({ item, onClose, onSave }) {
               </MenuItem>
             ))}
           </TextField>
-        </Box>
       </DialogContent>
 
       <Divider />

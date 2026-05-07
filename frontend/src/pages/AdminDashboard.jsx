@@ -81,6 +81,7 @@ export default function AdminDashboard() {
           {activeTab === "users" && (
             <UsersTable
               users={users}
+              listings={listings}
               onViewUser={openUserDetail}
             />
           )}
