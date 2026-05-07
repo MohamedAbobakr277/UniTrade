@@ -17,7 +17,6 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import * as api from "../services/api";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where,
@@ -93,8 +92,23 @@ ${JSON.stringify(catalogue, null, 2)}
 Task: Return ONLY a JSON array of up to 4 product IDs (strings) from the candidates list that are STRONGLY similar or highly relevant to the current product. Base similarity on semantic meaning of title + description + category. If none are truly similar, return an empty array []. Respond with ONLY the JSON array, no explanation. Example: ["id1","id2"]`;
 
   try {
-    const data = await api.getRecommendations(prompt);
-    const raw = data.text || "[]";
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!response.ok) throw new Error("API Request Failed");
+
+    const data = await response.json();
+    const raw = data.content?.find((b: any) => b.type === "text")?.text || "[]";
     const clean = raw.replace(/```json|```/g, "").trim();
     const rankedIds: string[] = JSON.parse(clean);
 
@@ -281,18 +295,22 @@ export default function ProductDetails() {
     const user = auth.currentUser;
     if (!user || !product) return;
     try {
+      const userRef = doc(db, "users", user.uid);
       if (favorite) {
-        await api.toggleFavorite(product.id, "remove");
+        await updateDoc(userRef, { favourites: arrayRemove(product.id) });
       } else {
-        await api.toggleFavorite(product.id, "add");
+        await updateDoc(userRef, { favourites: arrayUnion(product.id) });
         // Send notification
         if (product.userId && product.userId !== user.uid) {
-          await api.sendNotification(
-            product.userId,
-            "favorite",
-            `${user.displayName || "Someone"} liked your product: ${product.title}`,
-            `/product/${product.id}`
-          );
+          const userSnap = await getDoc(userRef);
+          const myName = userSnap.exists() ? (userSnap.data().firstName || "A user") : "A user";
+          await addDoc(collection(db, "users", product.userId, "notifications"), {
+            type: "favorite",
+            message: `${myName} added your item '${product.title}' to their favorites! ❤️`,
+            link: `/product/${product.id}`,
+            read: false,
+            createdAt: serverTimestamp(),
+          });
         }
       }
     } catch (err) {
@@ -431,7 +449,7 @@ export default function ProductDetails() {
                 const stock = product.quantityAvailable ?? 1;
                 const isOutOfStock = stock === 0 || product.status === "sold";
                 const isLowStock = stock > 0 && stock < 5;
-
+                
                 let bg = "#dcfce7";
                 let text = "#16a34a";
                 let label = `In Stock: ${stock}`;
@@ -485,16 +503,16 @@ export default function ProductDetails() {
                   {product.quantityAvailable} available
                 </Text>
               </View>
-
+              
               <View style={s.quantityRow}>
-                <TouchableOpacity
-                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]}
+                <TouchableOpacity 
+                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]} 
                   onPress={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
                   activeOpacity={0.7}
                 >
                   <Feather name="minus" size={18} color={selectedQuantity <= 1 ? "#cbd5e1" : "#2563eb"} />
                 </TouchableOpacity>
-
+                
                 <TextInput
                   keyboardType="numeric"
                   value={String(selectedQuantity)}
@@ -503,7 +521,7 @@ export default function ProductDetails() {
                     if (!isNaN(val)) {
                       setSelectedQuantity(Math.min(product.quantityAvailable || 1, Math.max(1, val)));
                     } else if (t === "") {
-                      setSelectedQuantity(0);
+                      setSelectedQuantity(0); 
                     }
                   }}
                   onBlur={() => {
@@ -512,8 +530,8 @@ export default function ProductDetails() {
                   style={[s.qtyInput, { color: theme.text, backgroundColor: theme.background, borderColor: theme.border }]}
                 />
 
-                <TouchableOpacity
-                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]}
+                <TouchableOpacity 
+                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]} 
                   onPress={() => setSelectedQuantity(Math.min(product.quantityAvailable || 1, selectedQuantity + 1))}
                   activeOpacity={0.7}
                 >
