@@ -59,9 +59,14 @@ export default function Favourites() {
   });
 
   return (
-    <Box sx={{ minHeight: "100vh", background: "background.default" }}>
+    <Box sx={{ 
+      minHeight: "100vh", 
+      background: "background.default",
+      display: "flex",
+      flexDirection: "column"
+    }}>
       <Navbar items={items} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
-      <Box sx={{ p: { xs: 2, md: 5 } }}>
+      <Box sx={{ p: { xs: 2, md: 5 }, flex: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
           <Button
               startIcon={<ArrowBackIcon />}

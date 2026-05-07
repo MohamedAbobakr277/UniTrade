@@ -303,10 +303,11 @@ export default function ItemDetails() {
     return (
         <Box sx={{ 
             minHeight: "100vh", 
+            display: "flex",
+            flexDirection: "column",
             background: (theme) => theme.palette.mode === 'light' 
                 ? "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)"
-                : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)", 
-            pb: 4 
+                : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)" 
         }}>
             <Navbar />
 

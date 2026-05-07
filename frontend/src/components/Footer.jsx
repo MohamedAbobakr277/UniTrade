@@ -28,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 
 /* ─── Style Constants ─── */
-const DARK_BG = "linear-gradient(175deg, #347aecff 0%, #164a9cff 100%)";
+const DARK_BG = "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)";
 const ACCENT = "#12284bff";
 const ACCENT_HOVER = "#174277ff";
 const TEXT_PRIMARY = "#140b66ff";

@@ -87,13 +87,13 @@ export default function ItemCard({ item }) {
   const sellerName =
     item.sellerName || editData?.name || editData?.fullName || "Unknown Seller";
 
-  const safeDate = item.createdAt 
+  const safeDate = item.createdAt
     ? (item.createdAt.seconds ? new Date(item.createdAt.seconds * 1000) : new Date(item.createdAt))
     : new Date();
 
-  const formattedDate = item.createdAt
-    ? safeDate.toLocaleString()
-    : "Just now";
+  //  // const formattedDate = item.createdAt
+  //     ? safeDate.toLocaleString()
+  //     : "Just now";
 
   const conditionColor =
     item.condition === "New"
@@ -138,7 +138,7 @@ export default function ItemCard({ item }) {
             display: "block",
             transition: "transform 0.35s ease",
             ...(item.status === "sold" && {
-                filter: "grayscale(100%) brightness(0.9)",
+              filter: "grayscale(100%) brightness(0.9)",
             }),
             "&:hover": {
               transform: item.status === "sold" ? "scale(1)" : "scale(1.04)",
@@ -147,35 +147,35 @@ export default function ItemCard({ item }) {
         />
 
         {item.status === "sold" && (
-            <Box
-                sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
-                    zIndex: 10,
-                }}
-            >
-                <Chip
-                    label="SOLD OUT"
-                    sx={{
-                        fontWeight: 900,
-                        fontSize: "0.95rem",
-                        letterSpacing: "1px",
-                        px: 1.5,
-                        py: 2.5,
-                        borderRadius: "16px",
-                        backgroundColor: "#1e293b",
-                        color: "#ffffff",
-                        boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
-                    }}
-                />
-            </Box>
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
+              zIndex: 10,
+            }}
+          >
+            <Chip
+              label="SOLD OUT"
+              sx={{
+                fontWeight: 900,
+                fontSize: "0.95rem",
+                letterSpacing: "1px",
+                px: 1.5,
+                py: 2.5,
+                borderRadius: "16px",
+                backgroundColor: "#1e293b",
+                color: "#ffffff",
+                boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+              }}
+            />
+          </Box>
         )}
 
         {item.badge && (
@@ -351,16 +351,16 @@ export default function ItemCard({ item }) {
               sx={{ width: 42, height: 42, border: "2px solid", borderColor: "divider", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
             />
             <Box sx={{ minWidth: 0 }}>
-              <Typography 
-                sx={{ 
-                  fontSize: 14.5, 
-                  fontWeight: 800, 
-                  color: "text.primary", 
+              <Typography
+                sx={{
+                  fontSize: 14.5,
+                  fontWeight: 800,
+                  color: "text.primary",
                   lineHeight: 1.2,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  maxWidth: { xs: "70px", sm: "110px" } 
+                  maxWidth: { xs: "70px", sm: "110px" }
                 }}
               >
                 {sellerName}
@@ -371,19 +371,19 @@ export default function ItemCard({ item }) {
             </Box>
           </Box>
 
-          <Box 
-            sx={{ 
-                display: "flex", 
-                alignItems: "center", 
-                gap: 0.8,
-                bgcolor: "background.subtle",
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: "20px",
-                px: 1.5,
-                py: 0.8,
-                flexShrink: 0,
-                boxShadow: "0 2px 6px rgba(0,0,0,0.02)"
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0.8,
+              bgcolor: "background.subtle",
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "20px",
+              px: 1.5,
+              py: 0.8,
+              flexShrink: 0,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.02)"
             }}
           >
             <AccessTimeIcon sx={{ fontSize: 15, color: "#94a3b8" }} />

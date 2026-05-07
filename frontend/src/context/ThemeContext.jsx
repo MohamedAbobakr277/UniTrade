@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-const ColorModeContext = createContext({ toggleColorMode: () => {} });
+const ColorModeContext = createContext({ toggleColorMode: () => { } });
 
 export const useColorMode = () => useContext(ColorModeContext);
 
@@ -58,8 +58,8 @@ export const ThemeContextProvider = ({ children }) => {
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        boxShadow: mode === 'light' 
-                            ? '0 4px 20px rgba(0,0,0,0.05)' 
+                        boxShadow: mode === 'light'
+                            ? '0 4px 20px rgba(0,0,0,0.05)'
                             : '0 4px 20px rgba(0,0,0,0.4)',
                         backgroundImage: 'none',
                     },

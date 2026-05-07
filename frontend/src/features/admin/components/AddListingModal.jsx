@@ -8,7 +8,7 @@ import {
   MenuItem,
   Button,
   Box,
-  useTheme,
+  // useTheme,
 } from "@mui/material";
 
 const CATEGORIES = [
@@ -34,7 +34,7 @@ const EMPTY_FORM = {
 
 export default function AddListingModal({ open, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const theme = useTheme();
+  // const theme = useTheme();
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));

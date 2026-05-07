@@ -54,7 +54,7 @@ export default function Home() {
     if (selectedCategories.length > 0) {
       q = query(q, where("category", "in", selectedCategories.slice(0, 10)));
     }
-    
+
     if (selectedCategories.length === 0 && selectedUniversities.length > 0) {
       q = query(q, where("university", "in", selectedUniversities.slice(0, 10)));
     }
@@ -68,7 +68,7 @@ export default function Home() {
         }));
         data.sort((a, b) => {
           const getTime = (val) => {
-            if (!val) return Date.now(); 
+            if (!val) return Date.now();
             if (val.seconds) return val.seconds * 1000;
             if (val instanceof Date) return val.getTime();
             if (typeof val.getTime === "function") return val.getTime();
@@ -126,7 +126,7 @@ export default function Home() {
   }).sort((a, b) => {
     if (sortBy === "price_low_high") return a.price - b.price;
     if (sortBy === "price_high_low") return b.price - a.price;
-    
+
     // sort by newest by default
     const getTime = (val) => {
       if (!val) return Date.now();
@@ -145,7 +145,9 @@ export default function Home() {
       <Box
         sx={{
           minHeight: "100vh",
-          background: (theme) => theme.palette.mode === 'light' 
+          display: "flex",
+          flexDirection: "column",
+          background: (theme) => theme.palette.mode === 'light'
             ? "linear-gradient(180deg, #f8fbff 0%, #f5f7fb 35%, #eef4ff 100%)"
             : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
         }}
@@ -296,7 +298,7 @@ export default function Home() {
               ) : (
                 <EmptyState
                   title={submittedSearch ? "No Matches Found" : "No Items Found"}
-                  description={submittedSearch 
+                  description={submittedSearch
                     ? `No items matched "${submittedSearch}". Try clearing your search or adjusting your filters.`
                     : "We couldn't find any items matching your current filters. Try adjusting your filters to see more results."
                   }
@@ -326,7 +328,7 @@ export default function Home() {
           position: "fixed",
           bottom: 32,
           right: 32,
-          background: (theme) => theme.palette.mode === 'light' 
+          background: (theme) => theme.palette.mode === 'light'
             ? "linear-gradient(135deg, #2563eb, #3b82f6)"
             : "linear-gradient(135deg, #3b82f6, #60a5fa)",
           color: "#fff",
@@ -336,9 +338,9 @@ export default function Home() {
           transition: "opacity 0.3s ease, transform 0.3s ease",
           pointerEvents: showScrollTop ? "auto" : "none",
           "&:hover": {
-            background: (theme) => theme.palette.mode === 'light' 
-                ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
-                : "linear-gradient(135deg, #2563eb, #3b82f6)",
+            background: (theme) => theme.palette.mode === 'light'
+              ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
+              : "linear-gradient(135deg, #2563eb, #3b82f6)",
             boxShadow: "0 10px 30px rgba(37, 99, 235, 0.45)",
           },
           zIndex: 1000,

@@ -22,7 +22,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NorthWestIcon from "@mui/icons-material/NorthWest";
 import logo from "../assets/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -58,7 +58,7 @@ function HighlightMatch({ text, query }) {
     return (
         <span>
             {text.slice(0, idx)}
-            <strong style={{ color: theme.palette.primary.main }}>{text.slice(idx, idx + query.length)}</strong>
+            <strong style={{ color: '#3b82f6' }}>{text.slice(idx, idx + query.length)}</strong>
             {text.slice(idx + query.length)}
         </span>
     );
@@ -83,11 +83,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
 
     const unreadCount = notifications.filter(n => !n.read).length;
     const isNotifOpen = Boolean(notifAnchorEl);
-    
+
     const handleNotifClick = (event) => {
         setNotifAnchorEl(event.currentTarget);
     };
-    
+
     const handleNotifClose = () => {
         setNotifAnchorEl(null);
     };
@@ -114,7 +114,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
                 setEditData(userSnap.exists() ? userSnap.data() : {});
-            } catch (error) {
+            } catch {
                 setEditData({});
             }
         };
@@ -226,8 +226,8 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     item.category?.toLowerCase().includes(inputValue.toLowerCase())
                 )
                 .map((item) => [item.title?.toLowerCase(), item])
-          ).values()]
-          .slice(0, 7)
+        ).values()]
+            .slice(0, 7)
         : [];
 
     const hasItemsSource = items && items.length > 0;
@@ -329,13 +329,13 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             placeholder="Search for books, electronics, tools and more..."
                             inputProps={{ "aria-label": "search items", autoComplete: "off" }}
                             sx={{
-                            pl: 0,
-                            py: 1.3,
-                            fontSize: "0.93rem",
-                            color: theme.palette.text.primary,
-                            fontWeight: 500,
-                            "& input::placeholder": { color: isDark ? "#64748b" : "#a0aec0", fontWeight: 400 },
-                        }}
+                                pl: 0,
+                                py: 1.3,
+                                fontSize: "0.93rem",
+                                color: theme.palette.text.primary,
+                                fontWeight: 500,
+                                "& input::placeholder": { color: isDark ? "#64748b" : "#a0aec0", fontWeight: 400 },
+                            }}
                         />
 
                         {inputValue && (
@@ -392,12 +392,12 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                     px: 2.5,
                                                     py: 1.4,
                                                     cursor: "pointer",
-                                                    backgroundColor: activeIndex === idx 
-                                                        ? (isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)") 
+                                                    backgroundColor: activeIndex === idx
+                                                        ? (isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)")
                                                         : "transparent",
                                                     transition: "background 0.15s",
-                                                    "&:hover": { 
-                                                        backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)" 
+                                                    "&:hover": {
+                                                        backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)"
                                                     },
                                                 }}
                                             >
@@ -451,8 +451,8 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                         px: 2.5,
                                                         py: 1.2,
                                                         cursor: "pointer",
-                                                        "&:hover": { 
-                                                            backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)" 
+                                                        "&:hover": {
+                                                            backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.05)"
                                                         },
                                                         transition: "background 0.15s",
                                                     }}
@@ -497,8 +497,8 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                                         cursor: "pointer",
                                                         transition: "all 0.18s ease",
                                                         "&:hover": {
-                                                            backgroundColor: (theme) => theme.palette.mode === 'light' 
-                                                                ? "rgba(37,99,235,0.08)" 
+                                                            backgroundColor: (theme) => theme.palette.mode === 'light'
+                                                                ? "rgba(37,99,235,0.08)"
                                                                 : "rgba(255,255,255,0.1)",
                                                             borderColor: "primary.main",
                                                             color: "primary.main",
@@ -524,7 +524,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         startIcon={<AddIcon />}
                         onClick={() => navigate("/sell")}
                         sx={{
-                            background: (theme) => theme.palette.mode === 'light' 
+                            background: (theme) => theme.palette.mode === 'light'
                                 ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
                                 : "linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)",
                             color: "white",
@@ -536,12 +536,12 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             fontSize: "0.9rem",
                             boxShadow: "0 4px 14px rgba(37,99,235,0.2)",
                             display: { xs: "none", sm: "flex" },
-                            "&:hover": { 
-                                background: (theme) => theme.palette.mode === 'light' 
+                            "&:hover": {
+                                background: (theme) => theme.palette.mode === 'light'
                                     ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
                                     : "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
-                                transform: "translateY(-1px)", 
-                                boxShadow: "0 6px 20px rgba(37,99,235,0.3)" 
+                                transform: "translateY(-1px)",
+                                boxShadow: "0 6px 20px rgba(37,99,235,0.3)"
                             },
                         }}
                     >

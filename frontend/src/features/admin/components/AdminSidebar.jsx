@@ -8,11 +8,11 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import DashboardIcon   from "@mui/icons-material/Dashboard";
-import ListAltIcon     from "@mui/icons-material/ListAlt";
-import PeopleIcon      from "@mui/icons-material/People";
-import LogoutIcon      from "@mui/icons-material/Logout";
-import ChevronLeftIcon  from "@mui/icons-material/ChevronLeft";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import PeopleIcon from "@mui/icons-material/People";
+import LogoutIcon from "@mui/icons-material/Logout";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
@@ -21,11 +21,11 @@ import { useTheme } from "@mui/material/styles";
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
-  { key: "listings",  label: "Listings",  Icon: ListAltIcon },
-  { key: "users",     label: "Users",     Icon: PeopleIcon },
+  { key: "listings", label: "Listings", Icon: ListAltIcon },
+  { key: "users", label: "Users", Icon: PeopleIcon },
 ];
 
-const FULL_WIDTH      = 240;
+const FULL_WIDTH = 240;
 const COLLAPSED_WIDTH = 72;
 
 export default function AdminSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse }) {
@@ -45,7 +45,7 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   const width = collapsed ? COLLAPSED_WIDTH : FULL_WIDTH;
 
   /* ── helper: nav button ── */
-  const NavBtn = ({ label, isActive, Icon, onClick }) => {
+  const NavBtn = ({ label, isActive, onClick }) => {
     const btn = (
       <ListItemButton
         selected={isActive}
@@ -90,11 +90,10 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   };
 
   /* ── helper: bottom action button ── */
-  const ActionBtn = ({ label, Icon, onClick, color, hoverBg }) => {
+  const ActionBtn = ({ label, onClick, color, hoverBg }) => {
     const defaultColor = theme.palette.text.secondary;
     const btnColor = color || defaultColor;
     const btnHoverBg = hoverBg || (isDark ? "rgba(255, 255, 255, 0.05)" : "#f8fafc");
-
     const btn = (
       <ListItemButton
         onClick={onClick}

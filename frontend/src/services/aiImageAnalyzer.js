@@ -48,7 +48,7 @@ export const analyzeWithAI = async (prompt, imageUrl = null) => {
 
     const res = await fetch(`${API_URL}/generate`, {
         method: 'POST',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'Authorization': token ? `Bearer ${token}` : ''
         },
@@ -61,14 +61,14 @@ export const analyzeWithAI = async (prompt, imageUrl = null) => {
     }
 
     const data = await res.json();
-    
+
     // Attempt to parse text as JSON if the prompt asked for it
     try {
         const jsonMatch = data.text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
             return JSON.parse(jsonMatch[0]);
         }
-    } catch (e) {
+    } catch {
         console.warn("Could not parse AI response as JSON, returning raw text.");
     }
 
