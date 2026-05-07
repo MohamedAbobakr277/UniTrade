@@ -20,6 +20,7 @@ import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where,
   getDocs, updateDoc, arrayUnion, arrayRemove, onSnapshot,
+  addDoc, serverTimestamp,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 
@@ -39,6 +40,7 @@ type Product = {
   sellerName?: string;
   phone?: string;
   status?: string;
+  quantityAvailable?: number;
 };
 
 function timeAgo(timestamp: any): string {
@@ -296,6 +298,18 @@ export default function ProductDetails() {
         await updateDoc(userRef, { favourites: arrayRemove(product.id) });
       } else {
         await updateDoc(userRef, { favourites: arrayUnion(product.id) });
+        // Send notification
+        if (product.userId && product.userId !== user.uid) {
+          const userSnap = await getDoc(userRef);
+          const myName = userSnap.exists() ? (userSnap.data().firstName || "A user") : "A user";
+          await addDoc(collection(db, "users", product.userId, "notifications"), {
+            type: "favorite",
+            message: `${myName} added your item '${product.title}' to their favorites! ❤️`,
+            link: `/product/${product.id}`,
+            read: false,
+            createdAt: serverTimestamp(),
+          });
+        }
       }
     } catch (err) {
       console.log(err);
@@ -328,7 +342,9 @@ export default function ProductDetails() {
       .catch(() => Alert.alert("Error", "Could not open WhatsApp"));
   };
 
+
   const callSeller = () => Linking.openURL(`tel:${phone}`);
+
 
   /* ─── Loading / Error states ─── */
   if (loading) {
@@ -419,14 +435,26 @@ export default function ProductDetails() {
             <Text style={[s.price, { color: theme.text }]}>
               EGP {Number(product.price).toLocaleString()}
             </Text>
-            {product.condition && (
-              <View style={[s.badge, { backgroundColor: condStyle.bg }]}>
-                <Text style={[s.badgeText, { color: condStyle.text }]}>
-                  {product.condition}
-                </Text>
-              </View>
-            )}
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {product.condition && (
+                <View style={[s.badge, { backgroundColor: condStyle.bg }]}>
+                  <Text style={[s.badgeText, { color: condStyle.text }]}>
+                    {product.condition}
+                  </Text>
+                </View>
+              )}
+              {product.status === "sold" || product.quantityAvailable === 0 ? (
+                <View style={[s.badge, { backgroundColor: "#fee2e2" }]}>
+                  <Text style={[s.badgeText, { color: "#ef4444" }]}>Sold Out</Text>
+                </View>
+              ) : (product.quantityAvailable !== undefined && product.quantityAvailable > 0) ? (
+                <View style={[s.badge, { backgroundColor: "#dcfce7" }]}>
+                  <Text style={[s.badgeText, { color: "#16a34a" }]}>Stock: {product.quantityAvailable}</Text>
+                </View>
+              ) : null}
+            </View>
           </View>
+
 
           <Text style={[s.title, { color: theme.text }]}>{product.title}</Text>
 
@@ -609,17 +637,26 @@ export default function ProductDetails() {
 
       {/* ── Contact bar ── */}
       <View style={[s.contactBar, { backgroundColor: theme.background }]}>
-        <TouchableOpacity
-          style={[s.contactBtn, s.whatsappBtn]}
-          onPress={openWhatsApp}
-        >
-          <Feather name="message-circle" size={18} color="#fff" />
-          <Text style={s.contactText}>WhatsApp</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[s.contactBtn, s.callBtn]} onPress={callSeller}>
-          <Feather name="phone" size={18} color="#fff" />
-          <Text style={s.contactText}>Call</Text>
-        </TouchableOpacity>
+        {(product?.status === "sold" || product?.quantityAvailable === 0) ? (
+          <View style={[s.contactBtn, { backgroundColor: "#ef4444" }]}>
+            <Feather name="slash" size={18} color="#fff" />
+            <Text style={s.contactText}>Sold Out</Text>
+          </View>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={[s.contactBtn, s.whatsappBtn]}
+              onPress={openWhatsApp}
+            >
+              <Feather name="message-circle" size={18} color="#fff" />
+              <Text style={s.contactText}>WhatsApp</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[s.contactBtn, s.callBtn]} onPress={callSeller}>
+              <Feather name="phone" size={18} color="#fff" />
+              <Text style={s.contactText}>Call</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       {/* ── Zoom modal ── */}

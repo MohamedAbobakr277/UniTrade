@@ -33,6 +33,7 @@ export default function EditProduct() {
   const [condition, setCondition] = useState("");
   const [category, setCategory] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [quantityAvailable, setQuantityAvailable] = useState("1");
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -45,6 +46,7 @@ export default function EditProduct() {
         setCondition(data.condition);
         setCategory(data.category);
         if (data.images) setImages(data.images);
+        if (data.quantityAvailable !== undefined) setQuantityAvailable(String(data.quantityAvailable));
       }
     };
     loadProduct();
@@ -65,6 +67,7 @@ export default function EditProduct() {
     try {
       await updateDoc(doc(db, "products", id as string), {
         title, price: Number(price), condition, category, images,
+        quantityAvailable: Number(quantityAvailable)
       });
       Alert.alert("Success", "Product updated");
       router.back();
@@ -90,6 +93,13 @@ export default function EditProduct() {
       <TextInput
         placeholder="Price" placeholderTextColor="#9ca3af"
         value={price} onChangeText={setPrice} keyboardType="numeric"
+        style={[styles.input, { color: theme.text, backgroundColor: theme.card }]}
+      />
+
+      {/* Quantity */}
+      <TextInput
+        placeholder="Available Quantity" placeholderTextColor="#9ca3af"
+        value={quantityAvailable} onChangeText={(t) => setQuantityAvailable(t.replace(/[^0-9]/g, ""))} keyboardType="numeric"
         style={[styles.input, { color: theme.text, backgroundColor: theme.card }]}
       />
 

@@ -12,6 +12,8 @@ import {
   Keyboard,
   Alert,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
@@ -177,247 +179,252 @@ const SignUpScreen: React.FC = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.logo}
-        />
-
-        <Text style={styles.title}>Create Account</Text>
-
-        {/* First Name */}
-        <View style={styles.inputBox}>
-          <Feather name="user" size={18} color="#396cda" />
-          <TextInput
-            placeholder="First Name"
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholderTextColor="#9CA3AF"
-            style={styles.input}
-          />
-        </View>
-
-        {/* Last Name */}
-        <View style={styles.inputBox}>
-          <Feather name="user" size={18} color="#396cda" />
-          <TextInput
-            placeholder="Last Name"
-            value={lastName}
-            onChangeText={setLastName}
-            placeholderTextColor="#9CA3AF"
-            style={styles.input}
-          />
-        </View>
-
-        {/* Email */}
-        <View style={styles.inputBox}>
-          <Feather name="mail" size={18} color="#396cda" />
-          <TextInput
-            placeholder="University Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholderTextColor="#9CA3AF"
-            style={styles.input}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
-        {email.length > 0 && !emailRegex.test(email) && (
-          <Text style={localStyles.errorHint}>Must end with .edu.eg</Text>
-        )}
-
-        {/* University */}
-        <View
-          style={[
-            styles.inputBox,
-            showUniversityList && localStyles.inputBoxActive,
-          ]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={[styles.container, { flexGrow: 1 }]}
+          keyboardShouldPersistTaps="handled"
         >
-          <Feather name="book" size={18} color="#396cda" />
-          <TextInput
-            placeholder="University"
-            value={university}
-            onFocus={() => setShowUniversityList(true)}
-            onChangeText={(text) => {
-              setUniversity(text);
-              setShowUniversityList(true);
-            }}
-            style={[styles.input, { flex: 1 }]}
+          <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={styles.logo}
           />
 
-          <TouchableOpacity
-            onPress={() => setShowUniversityList(!showUniversityList)}
+          <Text style={styles.title}>Create Account</Text>
+
+          {/* First Name */}
+          <View style={styles.inputBox}>
+            <Feather name="user" size={18} color="#396cda" />
+            <TextInput
+              placeholder="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholderTextColor="#9CA3AF"
+              style={styles.input}
+            />
+          </View>
+
+          {/* Last Name */}
+          <View style={styles.inputBox}>
+            <Feather name="user" size={18} color="#396cda" />
+            <TextInput
+              placeholder="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+              placeholderTextColor="#9CA3AF"
+              style={styles.input}
+            />
+          </View>
+
+          {/* Email */}
+          <View style={styles.inputBox}>
+            <Feather name="mail" size={18} color="#396cda" />
+            <TextInput
+              placeholder="University Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholderTextColor="#9CA3AF"
+              style={styles.input}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          {email.length > 0 && !emailRegex.test(email) && (
+            <Text style={localStyles.errorHint}>Must end with .edu.eg</Text>
+          )}
+
+          {/* University */}
+          <View
+            style={[
+              styles.inputBox,
+              showUniversityList && localStyles.inputBoxActive,
+            ]}
           >
-            <Feather
-              name={showUniversityList ? "chevron-up" : "chevron-down"}
-              size={20}
-              color="#9CA3AF"
+            <Feather name="book" size={18} color="#396cda" />
+            <TextInput
+              placeholder="University"
+              value={university}
+              onFocus={() => setShowUniversityList(true)}
+              onChangeText={(text) => {
+                setUniversity(text);
+                setShowUniversityList(true);
+              }}
+              style={[styles.input, { flex: 1 }]}
             />
-          </TouchableOpacity>
-        </View>
 
-        {renderDropdownList(
-          universities.filter((u) =>
-            u.toLowerCase().includes(university.toLowerCase())
-          ),
-          university,
-          (val) => {
-            setUniversity(val);
-            setShowUniversityList(false);
-            Keyboard.dismiss();
-          },
-          showUniversityList,
-          "map-pin"
-        )}
+            <TouchableOpacity
+              onPress={() => setShowUniversityList(!showUniversityList)}
+            >
+              <Feather
+                name={showUniversityList ? "chevron-up" : "chevron-down"}
+                size={20}
+                color="#9CA3AF"
+              />
+            </TouchableOpacity>
+          </View>
 
-        {/* Faculty */}
-        <View
-          style={[
-            styles.inputBox,
-            showFacultyList && localStyles.inputBoxActive,
-          ]}
-        >
-          <Feather name="briefcase" size={18} color="#396cda" />
-          <TextInput
-            placeholder="Faculty"
-            value={faculty}
-            onFocus={() => setShowFacultyList(true)}
-            onChangeText={(text) => {
-              setFaculty(text);
-              setShowFacultyList(true);
-            }}
-            style={[styles.input, { flex: 1 }]}
-          />
+          {renderDropdownList(
+            universities.filter((u) =>
+              u.toLowerCase().includes(university.toLowerCase())
+            ),
+            university,
+            (val) => {
+              setUniversity(val);
+              setShowUniversityList(false);
+              Keyboard.dismiss();
+            },
+            showUniversityList,
+            "map-pin"
+          )}
 
-          <TouchableOpacity
-            onPress={() => setShowFacultyList(!showFacultyList)}
+          {/* Faculty */}
+          <View
+            style={[
+              styles.inputBox,
+              showFacultyList && localStyles.inputBoxActive,
+            ]}
           >
-            <Feather
-              name={showFacultyList ? "chevron-up" : "chevron-down"}
-              size={20}
-              color="#9CA3AF"
+            <Feather name="briefcase" size={18} color="#396cda" />
+            <TextInput
+              placeholder="Faculty"
+              value={faculty}
+              onFocus={() => setShowFacultyList(true)}
+              onChangeText={(text) => {
+                setFaculty(text);
+                setShowFacultyList(true);
+              }}
+              style={[styles.input, { flex: 1 }]}
             />
-          </TouchableOpacity>
-        </View>
 
-        {renderDropdownList(
-          faculties.filter((f) =>
-            f.toLowerCase().includes(faculty.toLowerCase())
-          ),
-          faculty,
-          (val) => {
-            setFaculty(val);
-            setShowFacultyList(false);
-            Keyboard.dismiss();
-          },
-          showFacultyList,
-          "layers"
-        )}
+            <TouchableOpacity
+              onPress={() => setShowFacultyList(!showFacultyList)}
+            >
+              <Feather
+                name={showFacultyList ? "chevron-up" : "chevron-down"}
+                size={20}
+                color="#9CA3AF"
+              />
+            </TouchableOpacity>
+          </View>
 
-        {/* Phone */}
-        <View style={styles.inputBox}>
-          <Feather name="phone" size={18} color="#396cda" />
-          <TextInput
-            placeholder="Phone Number"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            maxLength={11}
-            placeholderTextColor="#9CA3AF"
-            style={styles.input}
-          />
-        </View>
+          {renderDropdownList(
+            faculties.filter((f) =>
+              f.toLowerCase().includes(faculty.toLowerCase())
+            ),
+            faculty,
+            (val) => {
+              setFaculty(val);
+              setShowFacultyList(false);
+              Keyboard.dismiss();
+            },
+            showFacultyList,
+            "layers"
+          )}
 
-        {phone.length > 0 && !phoneRegex.test(phone) && (
-          <Text style={localStyles.errorHint}>
-            Start with 010/011/012/015 (11 digits)
-          </Text>
-        )}
-
-        {/* Password */}
-        <View style={styles.inputBox}>
-          <Feather name="lock" size={18} color="#396cda" />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            style={styles.input}
-          />
-
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Feather
-              name={showPassword ? "eye" : "eye-off"}
-              size={18}
-              color="#2563EB"
+          {/* Phone */}
+          <View style={styles.inputBox}>
+            <Feather name="phone" size={18} color="#396cda" />
+            <TextInput
+              placeholder="Phone Number"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              maxLength={11}
+              placeholderTextColor="#9CA3AF"
+              style={styles.input}
             />
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        {password.length > 0 && password.length < 6 && (
-          <Text style={localStyles.errorHint}>
-            Password must be at least 6 characters
-          </Text>
-        )}
-
-        {/* Confirm Password */}
-        <View style={styles.inputBox}>
-          <Feather name="lock" size={18} color="#396cda" />
-          <TextInput
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={!showConfirm}
-            style={styles.input}
-          />
-
-          <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
-            <Feather
-              name={showConfirm ? "eye" : "eye-off"}
-              size={18}
-              color="#2563EB"
-            />
-          </TouchableOpacity>
-        </View>
-
-        {confirmPassword.length > 0 && confirmPassword !== password && (
-          <Text style={localStyles.errorHint}>Passwords do not match</Text>
-        )}
-
-        {/* Button */}
-        <TouchableOpacity
-          style={[styles.button, { opacity: isFormValid ? 1 : 0.6 }]}
-          disabled={!isFormValid || loading}
-          onPress={handleSignUp}
-        >
-          <LinearGradient
-            colors={["#3B82F6", "#2563EB"]}
-            style={styles.buttonGradient}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? "Creating Account..." : "Sign Up"}
+          {phone.length > 0 && !phoneRegex.test(phone) && (
+            <Text style={localStyles.errorHint}>
+              Start with 010/011/012/015 (11 digits)
             </Text>
-          </LinearGradient>
-        </TouchableOpacity>
+          )}
 
-        <Text style={styles.signup}>
-          Already have an account?{" "}
-          <Text
-            style={{ color: "#2563EB", fontWeight: "600" }}
-            onPress={() => router.back()}
+          {/* Password */}
+          <View style={styles.inputBox}>
+            <Feather name="lock" size={18} color="#396cda" />
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              style={styles.input}
+            />
+
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Feather
+                name={showPassword ? "eye" : "eye-off"}
+                size={18}
+                color="#2563EB"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {password.length > 0 && password.length < 6 && (
+            <Text style={localStyles.errorHint}>
+              Password must be at least 6 characters
+            </Text>
+          )}
+
+          {/* Confirm Password */}
+          <View style={styles.inputBox}>
+            <Feather name="lock" size={18} color="#396cda" />
+            <TextInput
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirm}
+              style={styles.input}
+            />
+
+            <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
+              <Feather
+                name={showConfirm ? "eye" : "eye-off"}
+                size={18}
+                color="#2563EB"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {confirmPassword.length > 0 && confirmPassword !== password && (
+            <Text style={localStyles.errorHint}>Passwords do not match</Text>
+          )}
+
+          {/* Button */}
+          <TouchableOpacity
+            style={[styles.button, { opacity: isFormValid ? 1 : 0.6 }]}
+            disabled={!isFormValid || loading}
+            onPress={handleSignUp}
           >
-            Log In
+            <LinearGradient
+              colors={["#3B82F6", "#2563EB"]}
+              style={styles.buttonGradient}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? "Creating Account..." : "Sign Up"}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <Text style={styles.signup}>
+            Already have an account?{" "}
+            <Text
+              style={{ color: "#2563EB", fontWeight: "600" }}
+              onPress={() => router.back()}
+            >
+              Log In
+            </Text>
           </Text>
-        </Text>
-      </ScrollView>
-    </TouchableWithoutFeedback>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

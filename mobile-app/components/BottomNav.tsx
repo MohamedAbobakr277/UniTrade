@@ -15,10 +15,10 @@ export default function BottomNav() {
   const { theme } = useTheme();
 
   return (
-    <View 
+    <View
       style={[
-        styles.container, 
-        { 
+        styles.container,
+        {
           backgroundColor: theme.card,
           borderTopWidth: 0, // إخفاء الخط الأبيض تماماً
           elevation: 0,      // إلغاء الظل في أندرويد لمنع أي خطوط
@@ -26,32 +26,32 @@ export default function BottomNav() {
         }
       ]}
     >
-      <TouchableOpacity 
-        style={styles.item} 
+      <TouchableOpacity
+        style={styles.item}
         onPress={() => router.push("/Home/home")}
       >
         <Feather name="home" size={22} color="#2563EB" />
         <Text style={[styles.text, { color: theme.text }]}>Home</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.item} 
+      <TouchableOpacity
+        style={styles.item}
         onPress={() => router.push("/Sell/sell")}
       >
         <Feather name="plus-circle" size={22} color="#2563EB" />
         <Text style={[styles.text, { color: theme.text }]}>Sell</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.item} 
+      <TouchableOpacity
+        style={styles.item}
         onPress={() => router.push("/favorites/my-favorites")}
       >
         <Feather name="heart" size={22} color="#2563EB" />
         <Text style={[styles.text, { color: theme.text }]}>Favorites</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.item} 
+      <TouchableOpacity
+        style={styles.item}
         onPress={() => router.push("/Profile/profile")}
       >
         <Feather name="user" size={22} color="#2563EB" />

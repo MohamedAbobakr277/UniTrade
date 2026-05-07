@@ -25,6 +25,10 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 import BottomNav from "../../components/BottomNav";
@@ -40,6 +44,7 @@ interface Product {
   userId: string;
   status?: string;
   createdAt?: { toDate: () => Date };
+  quantityAvailable?: number;
 }
 
 interface UserMap {
@@ -108,6 +113,7 @@ export default function HomeScreen() {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const inputRef = useRef<TextInput>(null);
   const sheetY = useRef(new Animated.Value(0)).current;
@@ -175,7 +181,7 @@ export default function HomeScreen() {
     const unsub = onSnapshot(collection(db, "products"), (snap) => {
       const data = snap.docs
         .map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Product, "id">) }))
-        .filter((item) => item.status !== "sold");
+        .filter((item) => item.status !== "sold" && item.quantityAvailable !== 0);
       setItems(data);
     });
     return unsub;
@@ -195,6 +201,19 @@ export default function HomeScreen() {
     if (!uid) return;
     const unsub = onSnapshot(doc(db, "users", uid), (snap) => {
       if (snap.exists()) setFavorites(snap.data().favourites || []);
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const q = query(
+      collection(db, "users", uid, "notifications"),
+      where("read", "==", false)
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      setUnreadCount(snap.size);
     });
     return unsub;
   }, []);
@@ -257,6 +276,18 @@ export default function HomeScreen() {
         await updateDoc(userRef, { favourites: arrayRemove(productId) });
       } else {
         await updateDoc(userRef, { favourites: arrayUnion(productId) });
+        // Send notification
+        const item = items.find((i) => i.id === productId);
+        if (item && item.userId !== uid) {
+          const myName = users[uid]?.firstName || "A user";
+          await addDoc(collection(db, "users", item.userId, "notifications"), {
+            type: "favorite",
+            message: `${myName} added your item '${item.title}' to their favorites! ❤️`,
+            link: `/product/${productId}`,
+            read: false,
+            createdAt: serverTimestamp(),
+          });
+        }
       }
     } catch (err) {
       console.error("Error toggling favorite:", err);
@@ -364,7 +395,11 @@ export default function HomeScreen() {
       >
         <View style={s.imageWrapper}>
           <Image source={{ uri: imageUri }} style={s.image} />
-          {item.condition ? (
+          {item.status === "sold" || item.quantityAvailable === 0 ? (
+            <View style={s.soldOutBadge}>
+              <Text style={s.soldOutText}>Sold Out</Text>
+            </View>
+          ) : item.condition ? (
             <View style={s.conditionBadge}>
               <Text style={s.conditionText}>{item.condition}</Text>
             </View>
@@ -391,6 +426,11 @@ export default function HomeScreen() {
           <Text style={s.university} numberOfLines={1}>
             {item.university}
           </Text>
+          {item.quantityAvailable !== undefined && item.quantityAvailable > 0 && item.status !== "sold" && (
+            <Text style={{ fontSize: 11, color: "#16a34a", fontWeight: "600", marginTop: 2, marginBottom: 4 }}>
+              In stock: {item.quantityAvailable}
+            </Text>
+          )}
           <View style={s.sellerRow}>
             <View style={s.sellerInfo}>
               <Image source={{ uri: sellerPhoto }} style={s.avatar} />
@@ -416,12 +456,23 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[s.container, { backgroundColor: theme.background }]}>
       {/* Header */}
-      <View style={s.header}>
-        <Text style={[s.headerTitle, { color: theme.text }]}>Marketplace</Text>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={s.logo}
-        />
+      <View style={[s.header, { justifyContent: "space-between", alignItems: "center", flexDirection: "row", paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }]}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={s.logo}
+          />
+          <Text style={[s.headerTitle, { color: theme.text }]}>Marketplace</Text>
+        </View>
+        <TouchableOpacity 
+          onPress={() => router.push("/notifications/notifications")}
+          style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: theme.card, alignItems: "center", justifyContent: "center" }}
+        >
+          <Feather name="bell" size={20} color={theme.text} />
+          {unreadCount > 0 && (
+            <View style={{ position: "absolute", top: 8, right: 8, width: 10, height: 10, borderRadius: 5, backgroundColor: "#ef4444", borderWidth: 1.5, borderColor: theme.card }} />
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* ── Search ── */}
@@ -1016,6 +1067,16 @@ const s = StyleSheet.create({
     borderRadius: 6,
   },
   conditionText: { color: "#fff", fontSize: 11, fontWeight: "600" },
+  soldOutBadge: {
+    position: "absolute",
+    top: "40%",
+    alignSelf: "center",
+    backgroundColor: "rgba(239, 68, 68, 0.9)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  soldOutText: { color: "#fff", fontSize: 14, fontWeight: "800", textTransform: "uppercase" },
   favBtn: {
     position: "absolute",
     top: 8,

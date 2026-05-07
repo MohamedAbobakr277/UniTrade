@@ -9,6 +9,8 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy"; 
@@ -60,6 +62,7 @@ export default function Sell() {
   const [category, setCategory] = useState("");
   const [condition, setCondition] = useState("");
   const [price, setPrice] = useState("");
+  const [quantityAvailable, setQuantityAvailable] = useState("1");
 
   const border = darkMode ? "#1e293b" : "#e2e8f0";
 
@@ -207,6 +210,7 @@ export default function Sell() {
       await addDoc(collection(db, "products"), {
         title, description, category, condition,
         price: Number(price),
+        quantityAvailable: Number(quantityAvailable),
         images: imageUrls,
         userId: uid,
         sellerName,
@@ -227,97 +231,107 @@ export default function Sell() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-        <Text style={[s.pageTitle, { color: theme.text }]}>Sell Your Item</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+        <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+          <Text style={[s.pageTitle, { color: theme.text }]}>Sell Your Item</Text>
 
-        <View style={[s.imageSection, { backgroundColor: theme.card, borderColor: border }]}>
-          {images.length === 0 ? (
-            <TouchableOpacity style={s.imagePlaceholder} onPress={pickImage}>
-              <Feather name="camera" size={28} color="#94a3b8" />
-              <Text style={s.imagePlaceholderText}>Add photos</Text>
-            </TouchableOpacity>
-          ) : (
-            <>
-              <Image source={{ uri: images[0] }} style={s.mainPreview} />
-              <ScrollView horizontal contentContainerStyle={s.thumbRow}>
-                {images.map((img, i) => (
-                  <View key={i} style={s.thumbWrap}>
-                    <Image source={{ uri: img }} style={s.thumb} />
-                    <TouchableOpacity style={s.removeBtn} onPress={() => setImages(images.filter((_, idx) => idx !== i))}>
-                      <Feather name="x" size={10} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-                {images.length < 10 && (
-                  <TouchableOpacity style={[s.addMoreBtn, { backgroundColor: theme.background }]} onPress={pickImage}>
-                    <Feather name="plus" size={20} color="#2563eb" />
-                  </TouchableOpacity>
-                )}
-              </ScrollView>
-            </>
-          )}
-        </View>
-
-        {images.length > 0 && (
-          <TouchableOpacity onPress={handleAIAutoFill} style={[s.aiBtn, { opacity: aiLoading ? 0.7 : 1 }]} disabled={aiLoading}>
-            {aiLoading ? <ActivityIndicator color="white" /> : <Text style={s.aiBtnText}>✨ AI Auto-fill</Text>}
-          </TouchableOpacity>
-        )}
-
-        <View style={s.fieldGroup}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <Text style={[s.label, { color: theme.text, marginBottom: 0 }]}>Title *</Text>
-            {title.trim().length > 0 && (
-              <TouchableOpacity onPress={handleAITitleAutoFill} disabled={aiTitleLoading}>
-                {aiTitleLoading ? <ActivityIndicator size="small" color="#8b5cf6" /> : <Text style={{ color: "#8b5cf6", fontSize: 13, fontWeight: "600" }}>✨ Auto-fill details</Text>}
+          <View style={[s.imageSection, { backgroundColor: theme.card, borderColor: border }]}>
+            {images.length === 0 ? (
+              <TouchableOpacity style={s.imagePlaceholder} onPress={pickImage}>
+                <Feather name="camera" size={28} color="#94a3b8" />
+                <Text style={s.imagePlaceholderText}>Add photos</Text>
               </TouchableOpacity>
+            ) : (
+              <>
+                <Image source={{ uri: images[0] }} style={s.mainPreview} />
+                <ScrollView horizontal contentContainerStyle={s.thumbRow}>
+                  {images.map((img, i) => (
+                    <View key={i} style={s.thumbWrap}>
+                      <Image source={{ uri: img }} style={s.thumb} />
+                      <TouchableOpacity style={s.removeBtn} onPress={() => setImages(images.filter((_, idx) => idx !== i))}>
+                        <Feather name="x" size={10} color="#fff" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                  {images.length < 10 && (
+                    <TouchableOpacity style={[s.addMoreBtn, { backgroundColor: theme.background }]} onPress={pickImage}>
+                      <Feather name="plus" size={20} color="#2563eb" />
+                    </TouchableOpacity>
+                  )}
+                </ScrollView>
+              </>
             )}
           </View>
-          <TextInput placeholder="Item name" placeholderTextColor="#9ca3af" value={title} onChangeText={setTitle} style={[s.input, { backgroundColor: theme.card, color: theme.text, borderColor: border }]} />
-        </View>
 
-        <View style={s.fieldGroup}>
-          <Text style={[s.label, { color: theme.text }]}>Description</Text>
-          <TextInput placeholder="More details..." placeholderTextColor="#9ca3af" value={description} onChangeText={setDescription} multiline style={[s.input, s.textArea, { backgroundColor: theme.card, color: theme.text, borderColor: border }]} />
-        </View>
+          {images.length > 0 && (
+            <TouchableOpacity onPress={handleAIAutoFill} style={[s.aiBtn, { opacity: aiLoading ? 0.7 : 1 }]} disabled={aiLoading}>
+              {aiLoading ? <ActivityIndicator color="white" /> : <Text style={s.aiBtnText}>✨ AI Auto-fill</Text>}
+            </TouchableOpacity>
+          )}
 
-        <View style={s.fieldGroup}>
-          <Text style={[s.label, { color: theme.text }]}>Price (EGP) *</Text>
-          <View style={[s.priceWrap, { backgroundColor: theme.card, borderColor: border }]}>
-            <Text style={s.pricePrefix}>EGP</Text>
-            <TextInput placeholder="0" placeholderTextColor="#9ca3af" value={price} onChangeText={(t) => setPrice(t.replace(/[^0-9]/g, ""))} keyboardType="numeric" style={[s.priceInput, { color: theme.text }]} />
+          <View style={s.fieldGroup}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <Text style={[s.label, { color: theme.text, marginBottom: 0 }]}>Title *</Text>
+              {title.trim().length > 0 && (
+                <TouchableOpacity onPress={handleAITitleAutoFill} disabled={aiTitleLoading}>
+                  {aiTitleLoading ? <ActivityIndicator size="small" color="#8b5cf6" /> : <Text style={{ color: "#8b5cf6", fontSize: 13, fontWeight: "600" }}>✨ Auto-fill details</Text>}
+                </TouchableOpacity>
+              )}
+            </View>
+            <TextInput placeholder="Item name" placeholderTextColor="#9ca3af" value={title} onChangeText={setTitle} style={[s.input, { backgroundColor: theme.card, color: theme.text, borderColor: border }]} />
           </View>
-        </View>
 
-        <View style={s.fieldGroup}>
-          <Text style={[s.label, { color: theme.text }]}>Category *</Text>
-          <View style={s.chipGrid}>
-            {CATEGORIES.map((cat) => (
-              <TouchableOpacity key={cat.name} onPress={() => setCategory(cat.name)} style={[s.catChip, { backgroundColor: category === cat.name ? "#2563eb" : theme.card, borderColor: category === cat.name ? "#2563eb" : border }]}>
-                <Feather name={cat.icon as any} size={13} color={category === cat.name ? "#fff" : "#64748b"} />
-                <Text style={[s.catChipText, { color: category === cat.name ? "#fff" : theme.text }]}>{cat.name}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={s.fieldGroup}>
+            <Text style={[s.label, { color: theme.text }]}>Description</Text>
+            <TextInput placeholder="More details..." placeholderTextColor="#9ca3af" value={description} onChangeText={setDescription} multiline style={[s.input, s.textArea, { backgroundColor: theme.card, color: theme.text, borderColor: border }]} />
           </View>
-        </View>
 
-        <View style={s.fieldGroup}>
-          <Text style={[s.label, { color: theme.text }]}>Condition *</Text>
-          <View style={s.condGrid}>
-            {CONDITIONS.map((c) => (
-              <TouchableOpacity key={c.label} onPress={() => setCondition(c.label)} style={[s.condChip, { backgroundColor: condition === c.label ? c.bg : theme.card, borderColor: condition === c.label ? c.color : border }]}>
-                <Text style={[s.condChipText, { color: condition === c.label ? c.color : "#64748b" }]}>{c.label}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={s.fieldGroup}>
+            <Text style={[s.label, { color: theme.text }]}>Price (EGP) *</Text>
+            <View style={[s.priceWrap, { backgroundColor: theme.card, borderColor: border }]}>
+              <Text style={s.pricePrefix}>EGP</Text>
+              <TextInput placeholder="0" placeholderTextColor="#9ca3af" value={price} onChangeText={(t) => setPrice(t.replace(/[^0-9]/g, ""))} keyboardType="numeric" style={[s.priceInput, { color: theme.text }]} />
+            </View>
           </View>
-        </View>
 
-        <TouchableOpacity style={[s.postBtn, loading && { opacity: 0.7 }]} onPress={handlePost} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.postBtnText}>Post Item</Text>}
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+          <View style={s.fieldGroup}>
+            <Text style={[s.label, { color: theme.text }]}>Available Quantity *</Text>
+            <TextInput placeholder="1" placeholderTextColor="#9ca3af" value={quantityAvailable} onChangeText={(t) => setQuantityAvailable(t.replace(/[^0-9]/g, ""))} keyboardType="numeric" style={[s.input, { backgroundColor: theme.card, color: theme.text, borderColor: border }]} />
+          </View>
+
+          <View style={s.fieldGroup}>
+            <Text style={[s.label, { color: theme.text }]}>Category *</Text>
+            <View style={s.chipGrid}>
+              {CATEGORIES.map((cat) => (
+                <TouchableOpacity key={cat.name} onPress={() => setCategory(cat.name)} style={[s.catChip, { backgroundColor: category === cat.name ? "#2563eb" : theme.card, borderColor: category === cat.name ? "#2563eb" : border }]}>
+                  <Feather name={cat.icon as any} size={13} color={category === cat.name ? "#fff" : "#64748b"} />
+                  <Text style={[s.catChipText, { color: category === cat.name ? "#fff" : theme.text }]}>{cat.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={s.fieldGroup}>
+            <Text style={[s.label, { color: theme.text }]}>Condition *</Text>
+            <View style={s.condGrid}>
+              {CONDITIONS.map((c) => (
+                <TouchableOpacity key={c.label} onPress={() => setCondition(c.label)} style={[s.condChip, { backgroundColor: condition === c.label ? c.bg : theme.card, borderColor: condition === c.label ? c.color : border }]}>
+                  <Text style={[s.condChipText, { color: condition === c.label ? c.color : "#64748b" }]}>{c.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <TouchableOpacity style={[s.postBtn, loading && { opacity: 0.7 }]} onPress={handlePost} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.postBtnText}>Post Item</Text>}
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 

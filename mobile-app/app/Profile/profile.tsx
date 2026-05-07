@@ -17,7 +17,6 @@ import { auth, db } from "../services/firebase";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc,
-  getDoc,
   updateDoc,
   collection,
   query,
@@ -59,11 +58,11 @@ export default function Profile() {
   const [showUniversityList, setShowUniversityList] = useState(false);
   const [showFacultyList, setShowFacultyList] = useState(false);
 
-  /* ─── Load user ─── */
+  /* ─── Load user (real-time) ─── */
   useEffect(() => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    getDoc(doc(db, "users", uid)).then((snap) => {
+    const unsub = onSnapshot(doc(db, "users", uid), (snap) => {
       if (snap.exists()) {
         const d = snap.data();
         setUser(d);
@@ -74,6 +73,7 @@ export default function Profile() {
         setUniversity(d.university || "");
       }
     });
+    return unsub;
   }, []);
 
   /* ─── Load products ─── */
@@ -229,6 +229,47 @@ export default function Profile() {
             </Text>
           </View>
         ))}
+      </View>
+
+      {/* ── Rating card ── */}
+      <View style={[s.card, { backgroundColor: theme.card }]}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 14 }}>
+          <View style={[s.iconCircle, { backgroundColor: "#fef9c3" }]}>
+            <Text style={{ fontSize: 15 }}>⭐</Text>
+          </View>
+          <Text style={[s.sectionTitle, { color: theme.text, marginBottom: 0 }]}>Seller Rating</Text>
+        </View>
+
+        {(user?.ratingsCount ?? 0) > 0 ? (
+          <View style={{ alignItems: "center", gap: 6 }}>
+            <Text style={{ fontSize: 40, fontWeight: "800", color: theme.text, lineHeight: 44 }}>
+              {(user?.averageRating ?? 0).toFixed(1)}
+            </Text>
+            {/* Stars row */}
+            <View style={{ flexDirection: "row", gap: 4 }}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Text
+                  key={i}
+                  style={{ fontSize: 26, color: i <= Math.round(user?.averageRating ?? 0) ? "#f59e0b" : "#e2e8f0" }}
+                >
+                  ★
+                </Text>
+              ))}
+            </View>
+            <Text style={{ fontSize: 13, color: "#94a3b8", marginTop: 2 }}>
+              Based on {user?.ratingsCount} {user?.ratingsCount === 1 ? "review" : "reviews"}
+            </Text>
+          </View>
+        ) : (
+          <View style={{ alignItems: "center", paddingVertical: 12, gap: 6 }}>
+            <View style={{ flexDirection: "row", gap: 4 }}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Text key={i} style={{ fontSize: 26, color: "#e2e8f0" }}>★</Text>
+              ))}
+            </View>
+            <Text style={{ fontSize: 13, color: "#94a3b8" }}>No ratings yet</Text>
+          </View>
+        )}
       </View>
 
       {/* ── My Listings ── */}

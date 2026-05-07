@@ -8,7 +8,10 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
-  Alert
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -95,117 +98,122 @@ const LoginScreen: React.FC = () => {
   /* ================= UI ================= */
 
   return (
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView 
+        contentContainerStyle={[styles.container, { flexGrow: 1 }]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <StatusBar barStyle="dark-content" backgroundColor="#fff"/>
 
-    <View style={styles.container}>
-
-      <StatusBar barStyle="dark-content" backgroundColor="#fff"/>
-
-      <Image
-        source={require("../assets/images/logo.png")}
-        style={styles.logo}
-      />
-
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Sign in to your account</Text>
-
-
-      {/* EMAIL */}
-
-      <View style={styles.inputBox}>
-
-        <Feather name="mail" size={18} color="#396cda"/>
-
-        <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          placeholderTextColor="#9CA3AF"
-          style={styles.input}
+        <Image
+          source={require("../assets/images/logo.png")}
+          style={styles.logo}
         />
 
-      </View>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>Sign in to your account</Text>
 
 
-      {/* PASSWORD */}
+        {/* EMAIL */}
 
-      <View style={styles.inputBox}>
+        <View style={styles.inputBox}>
 
-        <Feather name="lock" size={18} color="#4b76d2"/>
+          <Feather name="mail" size={18} color="#396cda"/>
 
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-          placeholderTextColor="#9CA3AF"
-          style={styles.input}
-        />
-
-        <TouchableOpacity onPress={()=>setShowPassword(!showPassword)}>
-
-          <Feather
-            name={showPassword ? "eye" : "eye-off"}
-            size={18}
-            color="#2563EB"
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholderTextColor="#9CA3AF"
+            style={styles.input}
           />
+
+        </View>
+
+
+        {/* PASSWORD */}
+
+        <View style={styles.inputBox}>
+
+          <Feather name="lock" size={18} color="#4b76d2"/>
+
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            placeholderTextColor="#9CA3AF"
+            style={styles.input}
+          />
+
+          <TouchableOpacity onPress={()=>setShowPassword(!showPassword)}>
+
+            <Feather
+              name={showPassword ? "eye" : "eye-off"}
+              size={18}
+              color="#2563EB"
+            />
+
+          </TouchableOpacity>
+
+        </View>
+
+
+        {/* FORGOT PASSWORD */}
+
+        <TouchableOpacity onPress={()=>router.push("/forgot-password/forgot-password")}>
+
+          <Text style={styles.forgot}>Forgot Password?</Text>
 
         </TouchableOpacity>
 
-      </View>
 
+        {/* LOGIN BUTTON */}
 
-      {/* FORGOT PASSWORD */}
-
-      <TouchableOpacity onPress={()=>router.push("/forgot-password/forgot-password")}>
-
-        <Text style={styles.forgot}>Forgot Password?</Text>
-
-      </TouchableOpacity>
-
-
-      {/* LOGIN BUTTON */}
-
-      <TouchableOpacity
-        style={[styles.button,{opacity: email && password ? 1 : 0.6}]}
-        disabled={!email || !password || loading}
-        onPress={handleLogin}
-      >
-
-        <LinearGradient
-          colors={["#3B82F6","#2563EB"]}
-          style={styles.buttonGradient}
+        <TouchableOpacity
+          style={[styles.button,{opacity: email && password ? 1 : 0.6}]}
+          disabled={!email || !password || loading}
+          onPress={handleLogin}
         >
 
-          <Text style={styles.buttonText}>
-            {loading ? "Logging in..." : "Log In"}
+          <LinearGradient
+            colors={["#3B82F6","#2563EB"]}
+            style={styles.buttonGradient}
+          >
+
+            <Text style={styles.buttonText}>
+              {loading ? "Logging in..." : "Log In"}
+            </Text>
+
+          </LinearGradient>
+
+        </TouchableOpacity>
+
+
+        {/* SIGNUP */}
+
+        <Text style={styles.signup}>
+
+          Don’t have an account?{" "}
+
+          <Text
+            style={{color:"#2563EB",fontWeight:"600"}}
+            onPress={()=>router.push("/SignUp/signup")}
+          >
+
+            Sign Up
+
           </Text>
 
-        </LinearGradient>
-
-      </TouchableOpacity>
-
-
-      {/* SIGNUP */}
-
-      <Text style={styles.signup}>
-
-        Don’t have an account?{" "}
-
-        <Text
-          style={{color:"#2563EB",fontWeight:"600"}}
-          onPress={()=>router.push("/SignUp/signup")}
-        >
-
-          Sign Up
-
         </Text>
-
-      </Text>
-
-    </View>
-
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 
 };

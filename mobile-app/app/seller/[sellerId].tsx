@@ -9,7 +9,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
 import {
   doc, getDoc, collection, query, where, getDocs,
-  setDoc, serverTimestamp, onSnapshot,
+  setDoc, serverTimestamp, onSnapshot, addDoc,
   QuerySnapshot, DocumentData,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
@@ -364,6 +364,22 @@ export default function SellerProfile() {
     await setDoc(doc(db, "ratings", uid, "userRatings", currentUid), {
       rating, comment, createdAt: serverTimestamp(),
     });
+    
+    // Send notification to seller
+    try {
+      const userSnap = await getDoc(doc(db, "users", currentUid));
+      const myName = userSnap.exists() ? (userSnap.data().firstName || "A user") : "A user";
+      await addDoc(collection(db, "users", uid, "notifications"), {
+        type: "rating",
+        message: `${myName} gave you a ${rating}-star rating! ⭐`,
+        link: `/seller/${uid}`,
+        read: false,
+        createdAt: serverTimestamp(),
+      });
+    } catch (e) {
+      console.error("Error sending rating notification:", e);
+    }
+    
     await loadRatings();
   };
 
