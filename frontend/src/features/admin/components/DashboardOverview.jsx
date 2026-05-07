@@ -38,7 +38,7 @@ const STATUS_CHIP = (isDark) => ({
 /* ─────────────────────────────────────────
    Stat card  (label top-left, icon top-right, big number below)
 ───────────────────────────────────────── */
-function StatCard({ label, value, iconBg, iconColor }) {
+function StatCard({ label, value, Icon, iconBg, iconColor }) {
   return (
     <Paper
       elevation={0}
