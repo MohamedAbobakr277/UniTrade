@@ -28,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 
 /* ─── Style Constants ─── */
-const DARK_BG = "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)";
+const DARK_BG = "linear-gradient(175deg, #294adf 0%, #2c69ee 100%)";
 const ACCENT = "#12284bff";
 const ACCENT_HOVER = "#174277ff";
 const TEXT_PRIMARY = "#140b66ff";
@@ -106,10 +106,10 @@ export default function Footer() {
   const isDark = theme.palette.mode === "dark";
 
   /* ─── Dynamic Theme Colors ─── */
-  const footerBg = isDark 
-    ? "linear-gradient(180deg, #0f172a 0%, #020617 100%)" 
+  const footerBg = isDark
+    ? "linear-gradient(180deg, #0f172a 0%, #020617 100%)"
     : DARK_BG;
-  
+
   const currentTextPrimary = isDark ? "#ffffff" : TEXT_PRIMARY;
   const currentTextSecondary = isDark ? "rgba(255,255,255,0.7)" : TEXT_SECONDARY;
   const currentTextMuted = isDark ? "rgba(255,255,255,0.5)" : TEXT_MUTED;
@@ -152,7 +152,7 @@ export default function Footer() {
             width: 380,
             height: 380,
             borderRadius: "50%",
-            background: isDark 
+            background: isDark
               ? `radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)`
               : `radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)`,
             pointerEvents: "none",
@@ -268,8 +268,8 @@ export default function Footer() {
                   <Link
                     key={link.name}
                     underline="none"
-                    sx={{ 
-                      ...linkSx, 
+                    sx={{
+                      ...linkSx,
                       color: currentTextSecondary,
                       cursor: "pointer",
                       "&:hover": {
@@ -298,8 +298,8 @@ export default function Footer() {
                       <Link
                         href={item.href}
                         underline="none"
-                        sx={{ 
-                          ...linkSx, 
+                        sx={{
+                          ...linkSx,
                           color: currentTextSecondary,
                           "&:hover": {
                             ...linkSx["&:hover"],
