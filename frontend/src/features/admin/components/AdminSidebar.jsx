@@ -45,7 +45,7 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   const width = collapsed ? COLLAPSED_WIDTH : FULL_WIDTH;
 
   /* ── helper: nav button ── */
-  const NavBtn = ({ label, isActive, onClick }) => {
+  const NavBtn = ({ label, isActive, onClick, Icon }) => {
     const btn = (
       <ListItemButton
         selected={isActive}
@@ -90,7 +90,7 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   };
 
   /* ── helper: bottom action button ── */
-  const ActionBtn = ({ label, onClick, color, hoverBg }) => {
+  const ActionBtn = ({ label, onClick, color, hoverBg, Icon }) => {
     const defaultColor = theme.palette.text.secondary;
     const btnColor = color || defaultColor;
     const btnHoverBg = hoverBg || (isDark ? "rgba(255, 255, 255, 0.05)" : "#f8fafc");
