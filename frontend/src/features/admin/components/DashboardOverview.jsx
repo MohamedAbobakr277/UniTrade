@@ -22,31 +22,18 @@ const CAT_COLORS = [
   "#2563eb", "#10b981", "#f59e0b", "#8b5cf6",
   "#06b6d4", "#ef4444", "#ec4899", "#64748b",
 ];
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-const STATUS_CHIP = {
-  available: { label: "Available", bgcolor: "#ecfdf5", color: "#10b981" },
-  sold: { label: "Sold", bgcolor: "#fef2f2", color: "#ef4444" },
-};
-=======
->>>>>>> Stashed changes
 const STATUS_CHIP = (isDark) => ({
-  available: { 
-    label: "Available", 
-    bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", 
-    color: isDark ? "#34d399" : "#10b981" 
+  available: {
+    label: "Available",
+    bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5",
+    color: isDark ? "#34d399" : "#10b981"
   },
-  sold: { 
-    label: "Sold",      
-    bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2", 
-    color: isDark ? "#f87171" : "#ef4444" 
+  sold: {
+    label: "Sold",
+    bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2",
+    color: isDark ? "#f87171" : "#ef4444"
   },
 });
-<<<<<<< Updated upstream
-=======
->>>>>>> f10fad8c94f0fdef89119a554007f23735186255
->>>>>>> Stashed changes
 
 /* ─────────────────────────────────────────
    Stat card  (label top-left, icon top-right, big number below)
@@ -120,7 +107,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-  const chips = STATUS_CHIP(isDark);
+  // const chips = STATUS_CHIP(isDark);
 
   const available = listings.filter((l) => l.status !== "sold").length;
   const sold = listings.filter((l) => l.status === "sold").length;
@@ -137,23 +124,10 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
   const categoryBreakdown = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
 
   const stats = [
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-    { label: "Total Listings", value: listings.length, Icon: ListAltIcon, iconBg: "#eff6ff", iconColor: "#2563eb" },
-    { label: "Available", value: available, Icon: CheckCircleOutlineIcon, iconBg: "#ecfdf5", iconColor: "#10b981" },
-    { label: "Sold", value: sold, Icon: LocalOfferIcon, iconBg: "#fffbeb", iconColor: "#f59e0b" },
-    { label: "Total Users", value: users.length, Icon: PeopleIcon, iconBg: "#f5f3ff", iconColor: "#8b5cf6" },
-=======
->>>>>>> Stashed changes
-    { label: "Total Listings", value: listings.length, Icon: ListAltIcon,            iconBg: isDark ? "rgba(37, 99, 235, 0.15)" : "#eff6ff", iconColor: "#2563eb" },
-    { label: "Available",      value: available,        Icon: CheckCircleOutlineIcon, iconBg: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", iconColor: "#10b981" },
-    { label: "Sold",           value: sold,             Icon: LocalOfferIcon,         iconBg: isDark ? "rgba(245, 158, 11, 0.15)" : "#fffbeb", iconColor: "#f59e0b" },
+    { label: "Total Listings", value: listings.length, Icon: ListAltIcon, iconBg: isDark ? "rgba(37, 99, 235, 0.15)" : "#eff6ff", iconColor: "#2563eb" },
+    { label: "Available", value: available, Icon: CheckCircleOutlineIcon, iconBg: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", iconColor: "#10b981" },
+    { label: "Sold", value: sold, Icon: LocalOfferIcon, iconBg: isDark ? "rgba(245, 158, 11, 0.15)" : "#fffbeb", iconColor: "#f59e0b" },
     { label: "Avg User Rating", value: users.length > 0 ? (users.reduce((acc, u) => acc + (u.averageRating || 0), 0) / users.length).toFixed(1) : "0.0", Icon: PeopleIcon, iconBg: isDark ? "rgba(139, 92, 246, 0.15)" : "#f5f3ff", iconColor: "#8b5cf6" },
-<<<<<<< Updated upstream
-=======
->>>>>>> f10fad8c94f0fdef89119a554007f23735186255
->>>>>>> Stashed changes
   ];
 
   return (

@@ -90,21 +90,10 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   };
 
   /* ── helper: bottom action button ── */
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-  const ActionBtn = ({ label, onClick, color = "#64748b", hoverBg = "#f8fafc" }) => {
-=======
->>>>>>> Stashed changes
-  const ActionBtn = ({ label, Icon, onClick, color, hoverBg }) => {
+  const ActionBtn = ({ label, onClick, color, hoverBg }) => {
     const defaultColor = theme.palette.text.secondary;
     const btnColor = color || defaultColor;
     const btnHoverBg = hoverBg || (isDark ? "rgba(255, 255, 255, 0.05)" : "#f8fafc");
-
-<<<<<<< Updated upstream
-=======
->>>>>>> f10fad8c94f0fdef89119a554007f23735186255
->>>>>>> Stashed changes
     const btn = (
       <ListItemButton
         onClick={onClick}
