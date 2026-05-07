@@ -10,44 +10,44 @@ import {
   Button,
   useTheme,
 } from "@mui/material";
-import CloseIcon          from "@mui/icons-material/Close";
-import SchoolIcon         from "@mui/icons-material/School";
-import EmailIcon          from "@mui/icons-material/Email";
-import PhoneIcon          from "@mui/icons-material/Phone";
-import BlockIcon          from "@mui/icons-material/Block";
+import CloseIcon from "@mui/icons-material/Close";
+import SchoolIcon from "@mui/icons-material/School";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import BlockIcon from "@mui/icons-material/Block";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import DeleteIcon         from "@mui/icons-material/Delete";
-import PersonIcon         from "@mui/icons-material/Person";
-import StarIcon           from "@mui/icons-material/Star";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PersonIcon from "@mui/icons-material/Person";
+import StarIcon from "@mui/icons-material/Star";
 
-export default function UserDetailModal({ 
+export default function UserDetailModal({
   user,
   listings = [],
-  onClose, 
-  onToggleBan, 
-  onToggleRole, 
-  onDelete 
+  onClose,
+  onToggleBan,
+  onToggleRole,
+  onDelete
 }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   if (!user) return null;
 
-  const fullName = user.firstName && user.lastName 
-    ? `${user.firstName} ${user.lastName}` 
+  const fullName = user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
     : user.name ?? "Unknown User";
 
   const isBanned = !!user.isBanned;
   const isAdmin = user.role === "admin";
 
-  const userListings = listings.filter(l => 
-    l.userId === user.id || 
-    l.user === user.id || 
+  const userListings = listings.filter(l =>
+    l.userId === user.id ||
+    l.user === user.id ||
     l.sellerName === fullName ||
     l.user === fullName // fallback for older data
   );
 
   const activeItems = userListings.filter(l => l.status !== "sold").length;
-  const soldItems   = userListings.filter(l => l.status === "sold").length;
+  const soldItems = userListings.filter(l => l.status === "sold").length;
 
   return (
     <Dialog
@@ -56,7 +56,7 @@ export default function UserDetailModal({
       fullWidth
       maxWidth="sm"
       PaperProps={{
-        sx: { borderRadius: 4, overflow: "hidden", fontFamily: "'Outfit', sans-serif", bgcolor: "background.paper", backgroundImage: "none" }
+        sx: { borderRadius: "6px", overflow: "hidden", fontFamily: "'Outfit', sans-serif", bgcolor: "background.paper", backgroundImage: "none" }
       }}
     >
       <DialogContent sx={{ p: 0 }}>
@@ -76,19 +76,19 @@ export default function UserDetailModal({
           >
             {fullName.charAt(0).toUpperCase()}
           </Avatar>
-          
+
           <Typography sx={{ fontWeight: 800, fontSize: "1.4rem", color: "text.primary" }}>
             {fullName}
           </Typography>
-          
+
           <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}>
             {isAdmin && <Chip label="Admin" size="small" color="primary" sx={{ fontWeight: 700, fontSize: "0.7rem" }} />}
             {isBanned && <Chip label="Banned" size="small" color="error" sx={{ fontWeight: 700, fontSize: "0.7rem" }} />}
-            <Chip 
-              label={user.emailVerified ? "Verified" : "Unverified"} 
-              size="small" 
-              color={user.emailVerified ? "success" : "default"} 
-              sx={{ fontWeight: 700, fontSize: "0.7rem", bgcolor: user.emailVerified ? (isDark ? "rgba(16, 185, 129, 0.15)" : "success.main") : "divider" }} 
+            <Chip
+              label={user.emailVerified ? "Verified" : "Unverified"}
+              size="small"
+              color={user.emailVerified ? "success" : "default"}
+              sx={{ fontWeight: 700, fontSize: "0.7rem", bgcolor: user.emailVerified ? (isDark ? "rgba(16, 185, 129, 0.15)" : "success.main") : "divider" }}
             />
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, ml: 1 }}>
               <StarIcon sx={{ color: "#f59e0b", fontSize: "1rem" }} />
@@ -135,7 +135,7 @@ export default function UserDetailModal({
               </Box>
             </Box>
           </Box>
-          
+
           <Divider sx={{ my: 3 }} />
 
           {/* ── User Listings Stats & Mini List ── */}
@@ -148,7 +148,7 @@ export default function UserDetailModal({
                 {activeItems} Active • {soldItems} Sold
               </Typography>
             </Box>
-            
+
             {userListings.length === 0 ? (
               <Box sx={{ p: 2, bgcolor: "background.subtle", borderRadius: 2, textAlign: "center" }}>
                 <Typography sx={{ fontSize: "0.8rem", color: "text.secondary" }}>No listings found for this user.</Typography>
@@ -166,18 +166,18 @@ export default function UserDetailModal({
                         {Number(item.price ?? 0).toLocaleString()} EGP
                       </Typography>
                     </Box>
-                    <Chip 
-                      label={item.status === "sold" ? "Sold" : "Active"} 
-                      size="small" 
-                      sx={{ 
-                        height: 20, fontSize: "0.6rem", fontWeight: 700, 
-                        bgcolor: item.status === "sold" 
-                          ? (isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2") 
-                          : (isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5"), 
-                        color: item.status === "sold" 
-                          ? (isDark ? "#f87171" : "#ef4444") 
-                          : (isDark ? "#34d399" : "#10b981") 
-                      }} 
+                    <Chip
+                      label={item.status === "sold" ? "Sold" : "Active"}
+                      size="small"
+                      sx={{
+                        height: 20, fontSize: "0.6rem", fontWeight: 700,
+                        bgcolor: item.status === "sold"
+                          ? (isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2")
+                          : (isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5"),
+                        color: item.status === "sold"
+                          ? (isDark ? "#f87171" : "#ef4444")
+                          : (isDark ? "#34d399" : "#10b981")
+                      }}
                     />
                   </Box>
                 ))}
