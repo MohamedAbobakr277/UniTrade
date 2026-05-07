@@ -42,7 +42,7 @@ export default function SellTool() {
 
     const [images, setImages] = useState([]);
     const [customUniversity, setCustomUniversity] = useState("");
-    const [setUploadProgress] = useState(0);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const [aiLoading, setAiLoading] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -165,8 +165,8 @@ export default function SellTool() {
 
     return (
         <>
-            <Box sx={{ 
-                backgroundColor: "background.default", 
+            <Box sx={{
+                backgroundColor: "background.default",
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column"
@@ -328,7 +328,15 @@ export default function SellTool() {
                     </Box>
                 </Box>
                 <Footer />
-                <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={4000}
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center"
+                    }}
+                >
                     <Alert severity="success" variant="filled">{snackbar.message}</Alert>
                 </Snackbar>
             </Box>
