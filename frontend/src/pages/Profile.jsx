@@ -852,12 +852,15 @@ export default function Profile() {
                 <DialogContent>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>Enter your new password below to update your account security.</Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        {/* Hidden username field to trap browser autofill and prevent it from filling the search bar */}
+                        <input type="text" name="email" value={user.email} style={{ display: 'none' }} readOnly autoComplete="username" />
                         <TextField
                             fullWidth
                             label="New Password"
                             type={showPassword ? "text" : "password"}
                             value={passwords.new}
                             onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                            autoComplete="new-password"
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -872,6 +875,7 @@ export default function Profile() {
                             type={showPassword ? "text" : "password"}
                             value={passwords.confirm}
                             onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                            autoComplete="new-password"
                         />
                         <Box sx={{ p: 2, bgcolor: 'background.subtle', borderRadius: 2 }}>
                             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mb: 1, display: 'block' }}>PASSWORD REQUIREMENTS:</Typography>

@@ -327,7 +327,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 }
                             }}
                             placeholder="Search for books, electronics, tools and more..."
-                            inputProps={{ "aria-label": "search items", autoComplete: "off" }}
+                            inputProps={{ "aria-label": "search items", autoComplete: "search-no-autofill", name: "search-query" }}
                             sx={{
                                 pl: 0,
                                 py: 1.3,
