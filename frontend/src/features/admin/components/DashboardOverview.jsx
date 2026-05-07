@@ -71,7 +71,7 @@ function StatCard({ label, value, Icon, iconBg, iconColor }) {
             color: iconColor,
           }}
         >
-          <Icon />
+          {Icon && <Icon />}
         </Box>
       </Box>
       <Typography sx={{ fontSize: "2.4rem", fontWeight: 800, color: "text.primary", lineHeight: 1 }}>
