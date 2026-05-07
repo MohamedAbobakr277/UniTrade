@@ -94,7 +94,7 @@ app.post('/chat', authenticateUser, chatLimiter, async (req, res) => {
     try {
         const { chatHistory } = req.body;
         const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // Call the SDK instead of manual fetch
         const result = await model.generateContent({ contents: chatHistory });
@@ -127,7 +127,7 @@ app.post('/generate', authenticateUser, async (req, res) => {
         }
 
         const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         let content;
         if (imageUrl) {
