@@ -26,7 +26,7 @@ import { useState, useEffect, useRef } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { subscribeToNotifications, markNotificationAsRead } from "../services/notifications";
+import { subscribeToNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "../services/notifications";
 import Popover from "@mui/material/Popover";
 import { useColorMode } from "../context/ThemeContext";
 
@@ -99,6 +99,12 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
         setNotifAnchorEl(null);
         if (notif.link) {
             navigate(notif.link);
+        }
+    };
+
+    const handleMarkAllRead = async () => {
+        if (auth.currentUser) {
+            await markAllNotificationsAsRead(auth.currentUser.uid);
         }
     };
 
@@ -603,61 +609,114 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         PaperProps={{
                             sx: {
                                 mt: 1.5,
-                                width: 320,
-                                maxHeight: 400,
-                                borderRadius: "16px",
+                                width: 340,
+                                maxHeight: 480,
+                                borderRadius: "20px",
                                 backgroundColor: "background.paper",
-                                boxShadow: isDark ? "0 10px 40px rgba(0,0,0,0.4)" : "0 10px 40px rgba(15,23,42,0.12)",
+                                boxShadow: isDark ? "0 20px 50px rgba(0,0,0,0.5)" : "0 20px 50px rgba(15,23,42,0.15)",
                                 border: "1px solid",
                                 borderColor: "divider",
+                                overflow: "hidden",
+                                display: "flex",
+                                flexDirection: "column",
                             }
                         }}
                     >
-                        <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: "text.primary" }}>
+                        {/* Header */}
+                        <Box sx={{ p: "18px 24px", borderBottom: "1px solid", borderColor: "divider", display: "flex", justifyContent: "space-between", alignItems: "center", bgcolor: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.01)" }}>
+                            <Typography sx={{ fontWeight: 800, fontSize: "1.1rem", color: "text.primary", letterSpacing: "-0.01em" }}>
                                 Notifications
                             </Typography>
+                            {unreadCount > 0 && (
+                                <Typography 
+                                    onClick={handleMarkAllRead}
+                                    sx={{ 
+                                        fontSize: "0.82rem", 
+                                        fontWeight: 700, 
+                                        color: "primary.main", 
+                                        cursor: "pointer",
+                                        "&:hover": { textDecoration: "underline", opacity: 0.8 },
+                                        transition: "opacity 0.2s"
+                                    }}
+                                >
+                                    Mark all as read
+                                </Typography>
+                            )}
                         </Box>
-                        <Box sx={{ p: 0 }}>
+
+                        {/* List */}
+                        <Box sx={{ flex: 1, overflowY: "auto", py: 1 }}>
                             {notifications.length === 0 ? (
-                                <Box sx={{ p: 3, textAlign: "center" }}>
-                                    <NotificationsNoneIcon sx={{ fontSize: 40, color: "#cbd5e1", mb: 1 }} />
-                                    <Typography sx={{ color: "#64748b", fontSize: "0.9rem" }}>
+                                <Box sx={{ p: 6, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                                    <Box sx={{ width: 64, height: 64, borderRadius: "50%", bgcolor: "background.subtle", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                        <NotificationsNoneIcon sx={{ fontSize: 32, color: "text.secondary", opacity: 0.5 }} />
+                                    </Box>
+                                    <Typography sx={{ color: "text.secondary", fontSize: "0.95rem", fontWeight: 500 }}>
                                         No notifications yet
                                     </Typography>
                                 </Box>
                             ) : (
-                                notifications.map((notif) => (
+                                notifications.map((notif, idx) => (
                                     <Box
                                         key={notif.id}
                                         onClick={() => handleNotifItemClick(notif)}
                                         sx={{
-                                            p: 2,
+                                            p: "16px 24px",
                                             cursor: "pointer",
                                             display: "flex",
                                             gap: 2,
                                             alignItems: "flex-start",
-                                            backgroundColor: notif.read ? "transparent" : (isDark ? "rgba(37,99,235,0.1)" : "#f0f6ff"),
-                                            borderBottom: "1px solid",
-                                            borderColor: "divider",
-                                            "&:hover": { backgroundColor: "background.subtle" },
-                                            transition: "background 0.2s"
+                                            backgroundColor: notif.read ? "transparent" : (isDark ? "rgba(37,99,235,0.08)" : "#f0f7ff"),
+                                            "&:hover": { backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" },
+                                            transition: "all 0.2s"
                                         }}
                                     >
                                         <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ fontSize: "0.9rem", color: "text.primary", fontWeight: notif.read ? 500 : 700 }}>
+                                            <Typography sx={{ 
+                                                fontSize: "0.92rem", 
+                                                color: "text.primary", 
+                                                fontWeight: notif.read ? 500 : 700,
+                                                lineHeight: 1.5,
+                                                mb: 0.5
+                                            }}>
                                                 {notif.message}
                                             </Typography>
-                                            <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", mt: 0.5 }}>
-                                                {notif.createdAt?.toDate ? notif.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                                            <Typography sx={{ fontSize: "0.78rem", color: "text.secondary", fontWeight: 500, display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                <AccessTimeIcon sx={{ fontSize: 14 }} />
+                                                {notif.createdAt?.toDate ? notif.createdAt.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                                             </Typography>
                                         </Box>
                                         {!notif.read && (
-                                            <Box sx={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#3b82f6", mt: 0.5 }} />
+                                            <Box sx={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "primary.main", mt: 1, boxShadow: "0 0 10px rgba(37,99,235,0.4)" }} />
                                         )}
                                     </Box>
                                 ))
                             )}
+                        </Box>
+
+                        {/* Footer */}
+                        <Box 
+                            sx={{ 
+                                p: 2, 
+                                borderTop: "1px solid", 
+                                borderColor: "divider", 
+                                textAlign: "center",
+                                bgcolor: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.01)"
+                            }}
+                        >
+                            <Typography 
+                                onClick={() => { navigate("/notifications"); handleNotifClose(); }}
+                                sx={{ 
+                                    fontSize: "0.85rem", 
+                                    fontWeight: 800, 
+                                    color: "primary.main", 
+                                    cursor: "pointer",
+                                    "&:hover": { opacity: 0.8 },
+                                    transition: "opacity 0.2s"
+                                }}
+                            >
+                                View all notifications
+                            </Typography>
                         </Box>
                     </Popover>
 
