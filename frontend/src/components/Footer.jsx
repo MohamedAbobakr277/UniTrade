@@ -76,8 +76,8 @@ const sectionTitleSx = {
 
 /* ─── Social Media Config ─── */
 const socials = [
-  { icon: <FacebookIcon />, label: "Facebook", color: "#1877F2", href: "#" },
-  { icon: <InstagramIcon />, label: "Instagram", color: "#E4405F", href: "#" },
+  { icon: <FacebookIcon />, label: "Facebook", color: "#1877F2", href: "https://www.facebook.com/rektbyAbu" },
+  { icon: <InstagramIcon />, label: "Instagram", color: "#E4405F", href: "https://www.instagram.com/muhhammed_ahmeed/" },
   { icon: <XIcon />, label: "X", color: "#ffffff", href: "#" },
   { icon: <LinkedInIcon />, label: "LinkedIn", color: "#0A66C2", href: "#" },
   { icon: <WhatsAppIcon />, label: "WhatsApp", color: "#25D366", href: "https://wa.me/201554104166" },
