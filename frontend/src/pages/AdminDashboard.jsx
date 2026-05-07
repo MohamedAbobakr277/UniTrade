@@ -16,7 +16,6 @@ import { useAdminUsers } from "../features/admin/hooks/useAdminUsers";
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
-  // sadas
   const {
     listings,
     editTarget, openEdit, closeEdit, saveEdit,
