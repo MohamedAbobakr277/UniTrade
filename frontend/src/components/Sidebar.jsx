@@ -3,6 +3,7 @@ import {
     Typography,
     Button,
     Slider,
+    TextField,
     FormControl,
     FormGroup,
     FormControlLabel,
@@ -16,6 +17,7 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import RefreshIcon from "@mui/icons-material/Refresh";
 // import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MultiSelectUniversitiesDropdown from "./MultiSelectUniversitiesDropdown";
@@ -145,17 +147,42 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         borderColor: "divider",
                     }}
                 >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-                        <PaidOutlinedIcon sx={{ color: "warning.main", fontSize: 20 }} />
-                        <Typography
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <PaidOutlinedIcon sx={{ color: "warning.main", fontSize: 20 }} />
+                            <Typography
+                                sx={{
+                                    fontWeight: 700,
+                                    color: "text.primary",
+                                    fontSize: "0.98rem",
+                                }}
+                            >
+                                Filter by Price
+                            </Typography>
+                        </Box>
+                        <Button
+                            size="small"
+                            onClick={() => setPriceRange([0, 100000])}
+                            startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
                             sx={{
-                                fontWeight: 700,
-                                color: "text.primary",
-                                fontSize: "0.98rem",
+                                minWidth: 'auto',
+                                px: 1,
+                                py: 0.5,
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                color: 'text.secondary',
+                                backgroundColor: 'background.subtle',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                '&:hover': {
+                                    backgroundColor: 'background.default',
+                                    color: 'primary.main',
+                                }
                             }}
                         >
-                            Filter by Price
-                        </Typography>
+                            Reset
+                        </Button>
                     </Box>
 
                     <Box
@@ -198,42 +225,68 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                                 gap: 1,
                             }}
                         >
-                            <Box
-                                sx={{
-                                    flex: 1,
-                                    px: 1,
-                                    py: 0.8,
-                                    borderRadius: "10px",
-                                    backgroundColor: "background.paper",
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                    textAlign: "center"
-                                }}
-                            >
-                                <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>From</Typography>
-                                <Typography sx={{ color: "text.primary", fontWeight: 800, fontSize: "0.85rem" }}>
-                                    EGP {priceRange[0]}
-                                </Typography>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", mb: 0.5, textAlign: "center" }}>From</Typography>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    value={priceRange[0]}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value) || 0;
+                                        const validValue = Math.max(0, Math.min(value, priceRange[1]));
+                                        setPriceRange([validValue, priceRange[1]]);
+                                    }}
+                                    placeholder="EGP 0"
+                                    inputProps={{
+                                        min: 0,
+                                        max: priceRange[1],
+                                        style: { textAlign: 'center', fontWeight: 800, fontSize: '0.85rem' }
+                                    }}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: 'background.paper',
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            '& fieldset': { border: 'none' },
+                                            '&:hover fieldset': { border: 'none' },
+                                            '&.Mui-focused fieldset': { border: 'none' },
+                                        }
+                                    }}
+                                />
                             </Box>
 
-                            <Typography sx={{ color: "text.secondary", fontSize: "0.8rem", fontWeight: 700 }}>—</Typography>
+                            <Typography sx={{ color: "text.secondary", fontSize: "0.8rem", fontWeight: 700 }}>-</Typography>
 
-                            <Box
-                                sx={{
-                                    flex: 1,
-                                    px: 1,
-                                    py: 0.8,
-                                    borderRadius: "10px",
-                                    backgroundColor: "background.paper",
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                    textAlign: "center"
-                                }}
-                            >
-                                <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", mb: 0.2 }}>To</Typography>
-                                <Typography sx={{ color: "text.primary", fontWeight: 800, fontSize: "0.85rem" }}>
-                                    EGP {priceRange[1]}
-                                </Typography>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 700, textTransform: "uppercase", mb: 0.5, textAlign: "center" }}>To</Typography>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    value={priceRange[1]}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value) || 0;
+                                        const validValue = Math.max(priceRange[0], Math.min(value, 100000));
+                                        setPriceRange([priceRange[0], validValue]);
+                                    }}
+                                    placeholder="EGP 100000"
+                                    inputProps={{
+                                        min: priceRange[0],
+                                        max: 100000,
+                                        style: { textAlign: 'center', fontWeight: 800, fontSize: '0.85rem' }
+                                    }}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: 'background.paper',
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            '& fieldset': { border: 'none' },
+                                            '&:hover fieldset': { border: 'none' },
+                                            '&.Mui-focused fieldset': { border: 'none' },
+                                        }
+                                    }}
+                                />
                             </Box>
                         </Box>
                     </Box>
