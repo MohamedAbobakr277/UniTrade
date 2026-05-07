@@ -1,35 +1,49 @@
-// src/components/ProtectedAdminRoute.jsx
 import { Navigate, Outlet } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { Box, CircularProgress } from "@mui/material";
 
 const ProtectedAdminRoute = () => {
     const [isAdmin, setIsAdmin] = useState(null);
-    const user = auth.currentUser;
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkAdmin = async () => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 setIsAdmin(false);
+                setLoading(false);
                 return;
             }
-            // Fetch the user role from Firestore
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists() && userDoc.data().role === "admin") {
-                setIsAdmin(true);
-            } else {
+
+            try {
+                // Fetch the user role from Firestore
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().role === "admin") {
+                    setIsAdmin(true);
+                } else {
+                    setIsAdmin(false);
+                }
+            } catch (error) {
+                console.error("Error verifying admin role:", error);
                 setIsAdmin(false);
+            } finally {
+                setLoading(false);
             }
-        };
-        checkAdmin();
-    }, [user]);
+        });
 
-    // Show nothing (or a spinner) while checking status
-    if (isAdmin === null) return null;
+        return () => unsubscribe();
+    }, []);
 
-    // If admin, show the dashboard (Outlet), otherwise redirect
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', bgcolor: 'background.default' }}>
+                <CircularProgress size={50} sx={{ color: '#2563eb' }} />
+            </Box>
+        );
+    }
+
     return isAdmin ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
