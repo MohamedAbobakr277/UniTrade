@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
-import logo from '../assets/logo.png';
+// import logo from '../assets/logo.png';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import EmptyState from '../components/EmptyState';
@@ -70,31 +70,31 @@ export default function MyListings() {
             // Auto-update status based on quantity
             const newStatus = qty === 0 ? "sold" : "available";
             const updatedItem = { ...currentEditItem, quantityAvailable: qty, status: newStatus };
-            
+
             const itemRef = doc(db, "products", currentEditItem.id);
-            
+
             // Check for price drop to notify favorited users
             const originalItem = userItems.find(i => i.id === currentEditItem.id);
             const oldPrice = originalItem?.price || 0;
             const newPrice = updatedItem.price || 0;
-            
+
             await setDoc(itemRef, updatedItem, { merge: true });
-            
+
             if (newPrice < oldPrice) {
                 notifyPriceDrop(currentEditItem.id, updatedItem.title, oldPrice, newPrice);
             }
             if (qty === 0) {
                 notifyItemSold(currentEditItem.id, updatedItem.title);
             }
-            
+
             setUserItems(prev => prev.map(item => item.id === currentEditItem.id ? updatedItem : item));
 
             setIsEditListingModalOpen(false);
-            
+
             let msg = "Listing updated successfully";
             if (newPrice < oldPrice) msg = "Listing updated & Price drop notification sent! 💸";
             if (qty === 0) msg = "Item marked as SOLD (0 quantity)";
-            
+
             setSnackbar({ open: true, message: msg, severity: "success" });
         } catch (error) {
             console.error(error);
@@ -126,7 +126,7 @@ export default function MyListings() {
         try {
             const itemRef = doc(db, "products", itemId);
             await updateDoc(itemRef, { status: "sold", quantityAvailable: 0 });
-            
+
             const item = userItems.find(i => i.id === itemId);
             if (item) {
                 notifyItemSold(itemId, item.title);
@@ -151,12 +151,17 @@ export default function MyListings() {
     });
 
     return (
-        <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
+        <Box sx={{ 
+            backgroundColor: 'background.default', 
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
             <Navbar items={userItems} search={searchQuery} onSearch={setSearchQuery} setSearch={setSearchQuery} />
 
             {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={500} gravity={0.15} />}
 
-            <Box sx={{ p: { xs: 2, md: 5 } }}>
+            <Box sx={{ p: { xs: 2, md: 5 }, flex: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
                     <Button
                         startIcon={<ArrowBackIcon />}
@@ -277,10 +282,10 @@ export default function MyListings() {
                                                 label={item.condition || "Condition not specified"}
                                                 size="small"
                                                 sx={{
-                                                    backgroundColor: (theme) => 
-                                                        item.condition === "New" ? "rgba(16, 185, 129, 0.1)" : 
-                                                        item.condition === "Like New" ? "rgba(37, 99, 235, 0.1)" : 
-                                                        "rgba(245, 158, 11, 0.1)",
+                                                    backgroundColor: () =>
+                                                        item.condition === "New" ? "rgba(16, 185, 129, 0.1)" :
+                                                            item.condition === "Like New" ? "rgba(37, 99, 235, 0.1)" :
+                                                                "rgba(245, 158, 11, 0.1)",
                                                     color: item.condition === "New" ? "success.main" : item.condition === "Like New" ? "primary.main" : "warning.main",
                                                     fontWeight: 800,
                                                     borderRadius: "10px",
@@ -302,18 +307,18 @@ export default function MyListings() {
                                                     fullWidth
                                                     variant="contained"
                                                     size="small"
-                                                    sx={{ 
-                                                        borderRadius: "12px", 
-                                                        textTransform: 'none', 
-                                                        bgcolor: 'success.main', 
-                                                        '&:hover': { bgcolor: 'success.dark' }, 
-                                                        height: '40px', 
-                                                        whiteSpace: 'nowrap', 
-                                                        minWidth: 0, 
-                                                        px: 2, 
-                                                        fontSize: '0.9rem', 
-                                                        fontWeight: 700, 
-                                                        boxShadow: 'none' 
+                                                    sx={{
+                                                        borderRadius: "12px",
+                                                        textTransform: 'none',
+                                                        bgcolor: 'success.main',
+                                                        '&:hover': { bgcolor: 'success.dark' },
+                                                        height: '40px',
+                                                        whiteSpace: 'nowrap',
+                                                        minWidth: 0,
+                                                        px: 2,
+                                                        fontSize: '0.9rem',
+                                                        fontWeight: 700,
+                                                        boxShadow: 'none'
                                                     }}
                                                     onClick={() => handleMarkAsSold(item.id)}
                                                 >
@@ -325,18 +330,18 @@ export default function MyListings() {
                                                 variant="outlined"
                                                 size="small"
                                                 startIcon={<EditIcon sx={{ fontSize: '1.1rem !important' }} />}
-                                                sx={{ 
-                                                    borderRadius: "12px", 
-                                                    textTransform: 'none', 
-                                                    height: '40px', 
-                                                    whiteSpace: 'nowrap', 
-                                                    minWidth: 0, 
-                                                    px: 2, 
-                                                    fontSize: '0.9rem', 
-                                                    fontWeight: 700, 
-                                                    borderColor: 'divider', 
-                                                    color: 'text.primary', 
-                                                    '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } 
+                                                sx={{
+                                                    borderRadius: "12px",
+                                                    textTransform: 'none',
+                                                    height: '40px',
+                                                    whiteSpace: 'nowrap',
+                                                    minWidth: 0,
+                                                    px: 2,
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: 700,
+                                                    borderColor: 'divider',
+                                                    color: 'text.primary',
+                                                    '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' }
                                                 }}
                                                 onClick={() => handleOpenEditListing(item)}
                                             >
@@ -344,14 +349,14 @@ export default function MyListings() {
                                             </Button>
                                             <IconButton
                                                 size="small"
-                                                sx={{ 
-                                                    bgcolor: 'background.subtle', 
-                                                    borderRadius: "12px", 
-                                                    color: 'text.secondary', 
-                                                    '&:hover': { bgcolor: 'error.light', color: 'error.main' }, 
-                                                    height: '40px', 
-                                                    width: '40px', 
-                                                    flexShrink: 0 
+                                                sx={{
+                                                    bgcolor: 'background.subtle',
+                                                    borderRadius: "12px",
+                                                    color: 'text.secondary',
+                                                    '&:hover': { bgcolor: 'error.light', color: 'error.main' },
+                                                    height: '40px',
+                                                    width: '40px',
+                                                    flexShrink: 0
                                                 }}
                                                 onClick={() => handleOpenDeleteConfirm(item.id)}
                                             >

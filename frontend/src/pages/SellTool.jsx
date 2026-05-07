@@ -42,7 +42,7 @@ export default function SellTool() {
 
     const [images, setImages] = useState([]);
     const [customUniversity, setCustomUniversity] = useState("");
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const [aiLoading, setAiLoading] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -84,7 +84,7 @@ export default function SellTool() {
         try {
             const file = images[0].file;
             const imageUrl = await uploadToCloudinary(file);
-            
+
             const prompt = `
                 You are an AI assistant for UNITRADE, a university student marketplace.
                 Analyze this product image and generate details in JSON format:
@@ -99,7 +99,7 @@ export default function SellTool() {
             `;
 
             const data = await analyzeWithAI(prompt, imageUrl);
-            
+
             if (data) {
                 setForm(prev => ({
                     ...prev,
@@ -165,17 +165,22 @@ export default function SellTool() {
 
     return (
         <>
-            <Box sx={{ backgroundColor: "background.default", minHeight: "100vh" }}>
+            <Box sx={{ 
+                backgroundColor: "background.default", 
+                minHeight: "100vh",
+                display: "flex",
+                flexDirection: "column"
+            }}>
                 <Navbar />
                 {showConfetti && <Confetti width={width} height={height} recycle={false} />}
-                <Box sx={{ p: 5 }}>
+                <Box sx={{ p: 5, flex: 1 }}>
                     <Box sx={{ maxWidth: 700, mx: "auto", backgroundColor: "background.paper", p: 5, borderRadius: 4, boxShadow: (theme) => theme.palette.mode === 'light' ? "0 10px 30px rgba(0,0,0,0.05)" : "none", border: "1px solid", borderColor: "divider" }}>
                         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 3 }}>Back</Button>
                         <Typography sx={{ fontSize: 26, fontWeight: 700, mb: 4 }}>Sell Your Item</Typography>
-                        
+
                         {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-                        <Box 
+                        <Box
                             onClick={() => fileInputRef.current.click()}
                             sx={{ border: "2px dashed", borderColor: "primary.main", borderRadius: 3, p: 4, textAlign: "center", cursor: "pointer", mb: 3, backgroundColor: "background.subtle" }}
                         >
@@ -211,10 +216,10 @@ export default function SellTool() {
                         {aiLoading && <LinearProgress sx={{ mb: 3 }} />}
 
                         {qualityFeedback && !aiLoading && (
-                            <Box sx={{ 
-                                mb: 4, 
-                                p: 2, 
-                                borderRadius: 3, 
+                            <Box sx={{
+                                mb: 4,
+                                p: 2,
+                                borderRadius: 3,
                                 bgcolor: qualityFeedback.score >= 70 ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)",
                                 border: "1px solid",
                                 borderColor: qualityFeedback.score >= 70 ? "success.main" : "warning.main"
@@ -242,15 +247,15 @@ export default function SellTool() {
                             </>
                         ) : (
                             <>
-                                <TextField fullWidth label="Title" name="title" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} sx={{ mb: 3 }} />
-                                <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} sx={{ mb: 3 }} />
-                                
+                                <TextField fullWidth label="Title" name="title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} sx={{ mb: 3 }} />
+                                <TextField fullWidth multiline rows={4} label="Description" name="description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} sx={{ mb: 3 }} />
+
                                 <FormControl fullWidth sx={{ mb: 3 }}>
                                     <InputLabel>University</InputLabel>
-                                    <Select 
-                                        value={form.university} 
-                                        label="University" 
-                                        onChange={(e) => setForm({...form, university: e.target.value})}
+                                    <Select
+                                        value={form.university}
+                                        label="University"
+                                        onChange={(e) => setForm({ ...form, university: e.target.value })}
                                     >
                                         {["Cairo University", "Ain Shams University", "Alexandria University", "Mansoura University", "Assiut University", "Helwan University", "Tanta University", "Zagazig University", "Suez Canal University", "Al-Azhar University", "German University in Cairo", "British University in Egypt", "October 6 University", "Future University in Egypt", "AASTMT", "Nile University", "Others"].map(uni => (
                                             <MenuItem key={uni} value={uni}>{uni}</MenuItem>
@@ -259,28 +264,28 @@ export default function SellTool() {
                                 </FormControl>
 
                                 {form.university === "Others" && (
-                                    <TextField 
-                                        fullWidth 
-                                        label="Enter University Name" 
-                                        value={customUniversity} 
-                                        onChange={(e) => setCustomUniversity(e.target.value)} 
-                                        sx={{ mb: 3 }} 
+                                    <TextField
+                                        fullWidth
+                                        label="Enter University Name"
+                                        value={customUniversity}
+                                        onChange={(e) => setCustomUniversity(e.target.value)}
+                                        sx={{ mb: 3 }}
                                     />
                                 )}
 
                                 <FormControl fullWidth sx={{ mb: 3 }}>
                                     <InputLabel>Category</InputLabel>
-                                    <Select value={form.category} label="Category" onChange={(e) => setForm({...form, category: e.target.value})}>
+                                    <Select value={form.category} label="Category" onChange={(e) => setForm({ ...form, category: e.target.value })}>
                                         {["Books & Notes", "Calculators", "Electronics", "Engineering Tools", "Medical Tools", "Lab Equipment", "Stationery", "Bags & Accessories"].map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
                                     </Select>
                                 </FormControl>
 
                                 <FormControl fullWidth sx={{ mb: 3 }}>
                                     <InputLabel>Condition</InputLabel>
-                                    <Select 
-                                        value={form.condition} 
-                                        label="Condition" 
-                                        onChange={(e) => setForm({...form, condition: e.target.value})}
+                                    <Select
+                                        value={form.condition}
+                                        label="Condition"
+                                        onChange={(e) => setForm({ ...form, condition: e.target.value })}
                                     >
                                         <MenuItem value="New">New</MenuItem>
                                         <MenuItem value="Like New">Like New</MenuItem>
@@ -292,19 +297,19 @@ export default function SellTool() {
                             </>
                         )}
 
-                        <TextField fullWidth type="number" label="Price (EGP)" value={form.price} onChange={(e) => setForm({...form, price: e.target.value})} sx={{ mb: 3 }} />
-                        <TextField fullWidth type="number" label="Available Quantity" value={form.quantityAvailable} onChange={(e) => setForm({...form, quantityAvailable: e.target.value})} sx={{ mb: 3 }} />
+                        <TextField fullWidth type="number" label="Price (EGP)" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} sx={{ mb: 3 }} />
+                        <TextField fullWidth type="number" label="Available Quantity" value={form.quantityAvailable} onChange={(e) => setForm({ ...form, quantityAvailable: e.target.value })} sx={{ mb: 3 }} />
 
-                        <Button 
-                            fullWidth 
-                            variant="contained" 
-                            onClick={handleSubmit} 
-                            sx={{ 
-                                py: 1.8, 
-                                borderRadius: 3, 
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={handleSubmit}
+                            sx={{
+                                py: 1.8,
+                                borderRadius: 3,
                                 fontWeight: 800,
                                 fontSize: '1.05rem',
-                                background: (theme) => theme.palette.mode === 'light' 
+                                background: (theme) => theme.palette.mode === 'light'
                                     ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
                                     : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
                                 boxShadow: "0 8px 20px rgba(37,99,235,0.2)",
@@ -312,7 +317,7 @@ export default function SellTool() {
                                 "&:hover": {
                                     transform: "translateY(-2px)",
                                     boxShadow: "0 12px 25px rgba(37,99,235,0.3)",
-                                    background: (theme) => theme.palette.mode === 'light' 
+                                    background: (theme) => theme.palette.mode === 'light'
                                         ? "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)"
                                         : "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
                                 }
@@ -323,7 +328,7 @@ export default function SellTool() {
                     </Box>
                 </Box>
                 <Footer />
-                <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({...snackbar, open: false})}>
+                <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                     <Alert severity="success" variant="filled">{snackbar.message}</Alert>
                 </Snackbar>
             </Box>

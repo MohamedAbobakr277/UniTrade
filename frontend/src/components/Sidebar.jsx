@@ -16,7 +16,7 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import { useState } from "react";
+// import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MultiSelectUniversitiesDropdown from "./MultiSelectUniversitiesDropdown";
 
@@ -84,12 +84,12 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         fontWeight: 800,
                         fontSize: "0.95rem",
                         letterSpacing: "0.2px",
-                        background: (theme) => theme.palette.mode === 'light' 
+                        background: (theme) => theme.palette.mode === 'light'
                             ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
                             : "linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)",
                         boxShadow: "0 10px 20px rgba(37,99,235,0.25)",
                         "&:hover": {
-                            background: (theme) => theme.palette.mode === 'light' 
+                            background: (theme) => theme.palette.mode === 'light'
                                 ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)"
                                 : "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
                             boxShadow: "0 12px 24px rgba(37,99,235,0.32)",
@@ -126,9 +126,9 @@ export default function Sidebar({ selectedUniversities, setSelectedUniversities,
                         </Typography>
                     </Box>
 
-                    <MultiSelectUniversitiesDropdown 
-                        selectedUniversities={selectedUniversities} 
-                        setSelectedUniversities={setSelectedUniversities} 
+                    <MultiSelectUniversitiesDropdown
+                        selectedUniversities={selectedUniversities}
+                        setSelectedUniversities={setSelectedUniversities}
                     />
                 </Box>
 

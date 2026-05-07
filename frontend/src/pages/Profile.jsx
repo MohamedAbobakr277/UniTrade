@@ -50,7 +50,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import logo from '../assets/logo.png';
+// import logo from '../assets/logo.png';
 import StarRatingDisplay from '../components/StarRatingDisplay';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
@@ -138,7 +138,7 @@ export default function Profile() {
                 id: doc.id,
                 ...doc.data()
             }));
-            
+
             items.sort((a, b) => {
                 const timeA = a.createdAt?.seconds || 0;
                 const timeB = b.createdAt?.seconds || 0;
@@ -215,9 +215,9 @@ export default function Profile() {
             // Auto-update status based on quantity
             const newStatus = qty === 0 ? "sold" : "available";
             const updatedItem = { ...currentEditItem, quantityAvailable: qty, status: newStatus };
-            
+
             const itemRef = doc(db, "products", currentEditItem.id);
-            
+
             // Check for price drop to notify favorited users
             const originalItem = userItems.find(i => i.id === currentEditItem.id);
             const oldPrice = originalItem?.price || 0;
@@ -340,16 +340,16 @@ export default function Profile() {
                 <Navbar />
                 <Box sx={{ display: 'flex' }}>
                     <Box sx={{ width: 280, borderRight: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', minHeight: 'calc(100vh - 93px)', p: 3 }}>
-                       <Skeleton variant="text" width="80%" height={40} sx={{ mb: 3 }} />
-                       <Skeleton variant="rectangular" width="100%" height={48} sx={{ mb: 1, borderRadius: 2 }} />
-                       <Skeleton variant="rectangular" width="100%" height={48} sx={{ borderRadius: 2 }} />
+                        <Skeleton variant="text" width="80%" height={40} sx={{ mb: 3 }} />
+                        <Skeleton variant="rectangular" width="100%" height={48} sx={{ mb: 1, borderRadius: 2 }} />
+                        <Skeleton variant="rectangular" width="100%" height={48} sx={{ borderRadius: 2 }} />
                     </Box>
                     <Box sx={{ flex: 1, p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                       <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 4 }} />
-                       <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
-                          <Skeleton variant="rectangular" width={350} height={400} sx={{ borderRadius: 4, flexShrink: 0 }} />
-                          <Skeleton variant="rectangular" sx={{ flex: 1, borderRadius: 4, height: 400 }} />
-                       </Box>
+                        <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 4 }} />
+                        <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
+                            <Skeleton variant="rectangular" width={350} height={400} sx={{ borderRadius: 4, flexShrink: 0 }} />
+                            <Skeleton variant="rectangular" sx={{ flex: 1, borderRadius: 4, height: 400 }} />
+                        </Box>
                     </Box>
                 </Box>
                 <Footer />
@@ -357,7 +357,12 @@ export default function Profile() {
         );
     }
     return (
-        <Box sx={{ backgroundColor: "background.default", minHeight: '100vh' }}>
+        <Box sx={{ 
+            backgroundColor: "background.default", 
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
             <Navbar />
 
             <Box sx={{ display: 'flex' }}>
@@ -366,15 +371,15 @@ export default function Profile() {
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>{user.firstName} {user.lastName}</Typography>
                         <List sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             <ListItem disablePadding>
-                                <ListItemButton 
-                                    selected 
-                                    sx={{ 
-                                        borderRadius: 2, 
-                                        '&.Mui-selected': { 
-                                            bgcolor: 'primary.main', 
-                                            color: 'white', 
-                                            '&:hover': { bgcolor: 'primary.dark' } 
-                                        } 
+                                <ListItemButton
+                                    selected
+                                    sx={{
+                                        borderRadius: 2,
+                                        '&.Mui-selected': {
+                                            bgcolor: 'primary.main',
+                                            color: 'white',
+                                            '&:hover': { bgcolor: 'primary.dark' }
+                                        }
                                     }}
                                 >
                                     <ListItemIcon><PersonIcon sx={{ color: 'inherit' }} /></ListItemIcon>
@@ -392,8 +397,8 @@ export default function Profile() {
                         <List>
                             <ListItem disablePadding>
                                 <ListItemButton
-                                    sx={{ 
-                                        borderRadius: 2, 
+                                    sx={{
+                                        borderRadius: 2,
                                         color: 'error.main',
                                         '&:hover': { bgcolor: (theme) => theme.palette.mode === 'light' ? '#fff1f2' : 'rgba(239, 68, 68, 0.1)' }
                                     }}
@@ -442,12 +447,12 @@ export default function Profile() {
                         </Button>
                         <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', m: 0 }}>My Profile</Typography>
                     </Box>
-                    <Card sx={{ 
-                        borderRadius: 4, 
+                    <Card sx={{
+                        borderRadius: 4,
                         boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 30px rgba(15,23,42,0.04)' : 'none',
                         border: '1px solid',
                         borderColor: 'divider',
-                        overflow: 'visible' 
+                        overflow: 'visible'
                     }}>
                         <CardContent sx={{ p: 4, display: 'flex', alignItems: 'center', gap: 4, flexDirection: { xs: 'column', md: 'row' }, textAlign: { xs: 'center', md: 'left' } }}>
                             <Box sx={{ position: 'relative' }}>
@@ -460,7 +465,7 @@ export default function Profile() {
                                     <BusinessIcon fontSize="small" />
                                     <Typography variant="body2" sx={{ fontWeight: 500 }}>{user.university}</Typography>
                                 </Box>
-                                
+
                                 <Box sx={{ mt: 1.5, display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' } }}>
                                     <StarRatingDisplay averageRating={user.averageRating} ratingsCount={user.ratingsCount} size="medium" />
                                 </Box>
@@ -482,27 +487,27 @@ export default function Profile() {
                                 </Box>
                             </Box>
                             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
-                                <Button 
-                                    variant="outlined" 
-                                    startIcon={<EditIcon />} 
-                                    sx={{ borderRadius: "14px", textTransform: 'none', px: 3, fontWeight: 700, py: 1.2 }} 
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<EditIcon />}
+                                    sx={{ borderRadius: "14px", textTransform: 'none', px: 3, fontWeight: 700, py: 1.2 }}
                                     onClick={handleOpenEditModal}
                                 >
                                     Edit Profile
                                 </Button>
-                                <Button 
-                                    variant="contained" 
-                                    startIcon={<LockResetIcon />} 
-                                    sx={{ 
-                                        borderRadius: "14px", 
-                                        textTransform: 'none', 
-                                        px: 3, 
-                                        fontWeight: 800, 
+                                <Button
+                                    variant="contained"
+                                    startIcon={<LockResetIcon />}
+                                    sx={{
+                                        borderRadius: "14px",
+                                        textTransform: 'none',
+                                        px: 3,
+                                        fontWeight: 800,
                                         py: 1.2,
-                                        background: (theme) => theme.palette.mode === 'light' 
+                                        background: (theme) => theme.palette.mode === 'light'
                                             ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
                                             : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
-                                    }} 
+                                    }}
                                     onClick={() => setIsResetModalOpen(true)}
                                 >
                                     Reset Password
@@ -513,9 +518,9 @@ export default function Profile() {
 
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'stretch' }}>
                         <Box sx={{ width: { xs: '100%', md: '350px' }, flexShrink: 0 }}>
-                            <Card sx={{ 
-                                borderRadius: 4, 
-                                height: '100%', 
+                            <Card sx={{
+                                borderRadius: 4,
+                                height: '100%',
                                 boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 30px rgba(15,23,42,0.04)' : 'none',
                                 border: '1px solid',
                                 borderColor: 'divider'
@@ -578,81 +583,81 @@ export default function Profile() {
                                                     position: 'relative'
                                                 }}
                                             >
-                                                    <Box sx={{ position: "relative", overflow: "hidden" }}>
-                                                        <Box sx={{
-                                                            position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
-                                                            fontSize: 12, fontWeight: 800, color: 'white', zIndex: 2,
-                                                            bgcolor: item.status === "sold" ? 'error.main' : 'success.main',
-                                                            boxShadow: "0 6px 18px rgba(0,0,0,0.2)"
-                                                        }}>
-                                                            {item.status === "sold" ? "SOLD" : "AVAILABLE"}
-                                                        </Box>
-                                                        <CardMedia
-                                                            component="img"
-                                                            height="220"
-                                                            image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
+                                                <Box sx={{ position: "relative", overflow: "hidden" }}>
+                                                    <Box sx={{
+                                                        position: 'absolute', top: 14, left: 14, px: 1.5, py: 0.5, borderRadius: '10px',
+                                                        fontSize: 12, fontWeight: 800, color: 'white', zIndex: 2,
+                                                        bgcolor: item.status === "sold" ? 'error.main' : 'success.main',
+                                                        boxShadow: "0 6px 18px rgba(0,0,0,0.2)"
+                                                    }}>
+                                                        {item.status === "sold" ? "SOLD" : "AVAILABLE"}
+                                                    </Box>
+                                                    <CardMedia
+                                                        component="img"
+                                                        height="220"
+                                                        image={item.images?.[0] || item.image || "https://via.placeholder.com/400x250?text=No+Image"}
+                                                        sx={{
+                                                            width: "100%",
+                                                            objectFit: "cover",
+                                                            display: "block",
+                                                            transition: "transform 0.4s ease",
+                                                            "&:hover": {
+                                                                transform: "scale(1.05)",
+                                                            },
+                                                        }}
+                                                    />
+                                                </Box>
+
+                                                <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                                                    <Typography
+                                                        variant="h6"
+                                                        sx={{
+                                                            fontWeight: 800,
+                                                            fontSize: "1.05rem",
+                                                            color: "text.primary",
+                                                            lineHeight: 1.4,
+                                                            height: "54px",
+                                                            display: "-webkit-box",
+                                                            WebkitLineClamp: 2,
+                                                            WebkitBoxOrient: "vertical",
+                                                            overflow: "hidden"
+                                                        }}
+                                                    >
+                                                        {item.title || "Untitled Item"}
+                                                    </Typography>
+
+                                                    <Typography variant="h6" sx={{ color: "primary.main", fontWeight: 900, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
+                                                        {item.price ? `${item.price} EGP` : "Price not available"}
+                                                    </Typography>
+
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
+                                                        <LocationOnIcon sx={{ fontSize: 17, color: "text.secondary" }} />
+                                                        <Typography component="span" sx={{ fontSize: "0.92rem", color: "text.secondary", fontWeight: 600, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                                            {item.university || "University not specified"}
+                                                        </Typography>
+                                                    </Box>
+
+                                                    <Box sx={{ mt: 1.2, height: "32px" }}>
+                                                        <Chip
+                                                            icon={<VerifiedOutlinedIcon />}
+                                                            label={item.condition || "Condition not specified"}
+                                                            size="small"
                                                             sx={{
-                                                                width: "100%",
-                                                                objectFit: "cover",
-                                                                display: "block",
-                                                                transition: "transform 0.4s ease",
-                                                                "&:hover": {
-                                                                    transform: "scale(1.05)",
-                                                                },
+                                                                backgroundColor: () =>
+                                                                    item.condition === "New" ? "rgba(16, 185, 129, 0.1)" :
+                                                                        item.condition === "Like New" ? "rgba(37, 99, 235, 0.1)" :
+                                                                            "rgba(245, 158, 11, 0.1)",
+                                                                color: item.condition === "New" ? "success.main" : item.condition === "Like New" ? "primary.main" : "warning.main",
+                                                                fontWeight: 800,
+                                                                borderRadius: "10px",
+                                                                "& .MuiChip-icon": { color: 'inherit' },
                                                             }}
                                                         />
                                                     </Box>
 
-                                                    <CardContent sx={{ p: 2.2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                                                        <Typography
-                                                            variant="h6"
-                                                            sx={{
-                                                                fontWeight: 800,
-                                                                fontSize: "1.05rem",
-                                                                color: "text.primary",
-                                                                lineHeight: 1.4,
-                                                                height: "54px",
-                                                                display: "-webkit-box",
-                                                                WebkitLineClamp: 2,
-                                                                WebkitBoxOrient: "vertical",
-                                                                overflow: "hidden"
-                                                            }}
-                                                        >
-                                                            {item.title || "Untitled Item"}
-                                                        </Typography>
-
-                                                        <Typography variant="h6" sx={{ color: "primary.main", fontWeight: 900, mt: 1.2, fontSize: "1.25rem", height: "38px" }}>
-                                                            {item.price ? `${item.price} EGP` : "Price not available"}
-                                                        </Typography>
-
-                                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.2, height: "28px" }}>
-                                                            <LocationOnIcon sx={{ fontSize: 17, color: "text.secondary" }} />
-                                                            <Typography component="span" sx={{ fontSize: "0.92rem", color: "text.secondary", fontWeight: 600, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                                                                {item.university || "University not specified"}
-                                                            </Typography>
-                                                        </Box>
-
-                                                        <Box sx={{ mt: 1.2, height: "32px" }}>
-                                                            <Chip
-                                                                icon={<VerifiedOutlinedIcon />}
-                                                                label={item.condition || "Condition not specified"}
-                                                                size="small"
-                                                                sx={{
-                                                                    backgroundColor: (theme) => 
-                                                                        item.condition === "New" ? "rgba(16, 185, 129, 0.1)" : 
-                                                                        item.condition === "Like New" ? "rgba(37, 99, 235, 0.1)" : 
-                                                                        "rgba(245, 158, 11, 0.1)",
-                                                                    color: item.condition === "New" ? "success.main" : item.condition === "Like New" ? "primary.main" : "warning.main",
-                                                                    fontWeight: 800,
-                                                                    borderRadius: "10px",
-                                                                    "& .MuiChip-icon": { color: 'inherit' },
-                                                                }}
-                                                            />
-                                                        </Box>
-
-                                                        <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px", fontWeight: 500 }}>
-                                                            {item.description || "No description available"}
-                                                        </Typography>
+                                                    <Typography sx={{ mt: 1.4, fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", height: "48px", fontWeight: 500 }}>
+                                                        {item.description || "No description available"}
+                                                    </Typography>
 
                                                     <Box sx={{ flexGrow: 1 }} />
                                                     <Divider sx={{ my: 2 }} />
@@ -663,18 +668,18 @@ export default function Profile() {
                                                                 fullWidth
                                                                 variant="contained"
                                                                 size="small"
-                                                                sx={{ 
-                                                                    borderRadius: "12px", 
-                                                                    textTransform: 'none', 
-                                                                    bgcolor: 'success.main', 
-                                                                    '&:hover': { bgcolor: 'success.dark' }, 
-                                                                    height: '40px', 
-                                                                    whiteSpace: 'nowrap', 
-                                                                    minWidth: 0, 
-                                                                    px: 2, 
-                                                                    fontSize: '0.9rem', 
-                                                                    fontWeight: 700, 
-                                                                    boxShadow: 'none' 
+                                                                sx={{
+                                                                    borderRadius: "12px",
+                                                                    textTransform: 'none',
+                                                                    bgcolor: 'success.main',
+                                                                    '&:hover': { bgcolor: 'success.dark' },
+                                                                    height: '40px',
+                                                                    whiteSpace: 'nowrap',
+                                                                    minWidth: 0,
+                                                                    px: 2,
+                                                                    fontSize: '0.9rem',
+                                                                    fontWeight: 700,
+                                                                    boxShadow: 'none'
                                                                 }}
                                                                 onClick={() => handleMarkAsSold(item.id)}
                                                             >
@@ -686,18 +691,18 @@ export default function Profile() {
                                                             variant="outlined"
                                                             size="small"
                                                             startIcon={<EditIcon sx={{ fontSize: '1.1rem !important' }} />}
-                                                            sx={{ 
-                                                                borderRadius: "12px", 
-                                                                textTransform: 'none', 
-                                                                height: '40px', 
-                                                                whiteSpace: 'nowrap', 
-                                                                minWidth: 0, 
-                                                                px: 2, 
-                                                                fontSize: '0.9rem', 
-                                                                fontWeight: 700, 
-                                                                borderColor: 'divider', 
-                                                                color: 'text.primary', 
-                                                                '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' } 
+                                                            sx={{
+                                                                borderRadius: "12px",
+                                                                textTransform: 'none',
+                                                                height: '40px',
+                                                                whiteSpace: 'nowrap',
+                                                                minWidth: 0,
+                                                                px: 2,
+                                                                fontSize: '0.9rem',
+                                                                fontWeight: 700,
+                                                                borderColor: 'divider',
+                                                                color: 'text.primary',
+                                                                '&:hover': { borderColor: 'text.secondary', bgcolor: 'background.subtle' }
                                                             }}
                                                             onClick={() => handleOpenEditListing(item)}
                                                         >
@@ -705,14 +710,14 @@ export default function Profile() {
                                                         </Button>
                                                         <IconButton
                                                             size="small"
-                                                            sx={{ 
-                                                                bgcolor: 'background.subtle', 
-                                                                borderRadius: "12px", 
-                                                                color: 'text.secondary', 
-                                                                '&:hover': { bgcolor: 'error.light', color: 'error.main' }, 
-                                                                height: '40px', 
-                                                                width: '40px', 
-                                                                flexShrink: 0 
+                                                            sx={{
+                                                                bgcolor: 'background.subtle',
+                                                                borderRadius: "12px",
+                                                                color: 'text.secondary',
+                                                                '&:hover': { bgcolor: 'error.light', color: 'error.main' },
+                                                                height: '40px',
+                                                                width: '40px',
+                                                                flexShrink: 0
                                                             }}
                                                             onClick={() => handleOpenDeleteConfirm(item.id)}
                                                         >
@@ -902,6 +907,7 @@ export default function Profile() {
             <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
                 <Alert severity={snackbar.severity} sx={{ width: '100%', borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontWeight: 600 }}>{snackbar.message}</Alert>
             </Snackbar>
+            <Footer />
         </Box>
     );
 }
