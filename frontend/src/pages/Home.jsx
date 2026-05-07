@@ -126,6 +126,16 @@ export default function Home() {
   }).sort((a, b) => {
     if (sortBy === "price_low_high") return a.price - b.price;
     if (sortBy === "price_high_low") return b.price - a.price;
+    if (sortBy === "oldest") {
+      const getTime = (val) => {
+        if (!val) return 0;
+        if (val.seconds) return val.seconds * 1000;
+        if (val instanceof Date) return val.getTime();
+        if (typeof val.getTime === "function") return val.getTime();
+        return 0;
+      };
+      return getTime(a.createdAt) - getTime(b.createdAt);
+    }
 
     // sort by newest by default
     const getTime = (val) => {
@@ -233,6 +243,7 @@ export default function Home() {
                         }}
                       >
                         <MenuItem value="newest">Newest First</MenuItem>
+                        <MenuItem value="oldest">Oldest First</MenuItem>
                         <MenuItem value="price_low_high">Price: Low to High</MenuItem>
                         <MenuItem value="price_high_low">Price: High to Low</MenuItem>
                       </Select>
