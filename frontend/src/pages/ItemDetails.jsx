@@ -58,7 +58,7 @@ export default function ItemDetails() {
     const [item, setItem] = useState(null);
     const [sellerData, setSellerData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [fetchError, setFetchError] = useState(null);
+    const [setFetchError] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isZoomOpen, setIsZoomOpen] = useState(false);
     const [isContactOpen, setIsContactOpen] = useState(false);
@@ -182,7 +182,7 @@ export default function ItemDetails() {
                     const products = snap.docs
                         .map(doc => ({ id: doc.id, ...doc.data() }))
                         .filter(p => p.id !== id);
-                    
+
                     if (products.length > 0) {
                         if (products.length > 4) {
                             const titles = products.map(p => p.title);
@@ -194,7 +194,7 @@ export default function ItemDetails() {
                                     const ranked = aiResult
                                         .map(title => products.find(p => p.title === title))
                                         .filter(Boolean); // Remove nulls if AI hallucinated a title
-                                    
+
                                     if (ranked.length > 0) {
                                         // Fill up to 4 if AI returned fewer
                                         const finalItems = [...ranked];
@@ -286,7 +286,7 @@ export default function ItemDetails() {
                             py: 1.5,
                             textTransform: "none",
                             fontWeight: 800,
-                            background: (theme) => theme.palette.mode === 'light' 
+                            background: (theme) => theme.palette.mode === 'light'
                                 ? "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)"
                                 : "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
                             boxShadow: "0 8px 20px rgba(37,99,235,0.2)",
@@ -320,13 +320,13 @@ export default function ItemDetails() {
         : "Just now";
 
     return (
-        <Box sx={{ 
-            minHeight: "100vh", 
+        <Box sx={{
+            minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
-            background: (theme) => theme.palette.mode === 'light' 
+            background: (theme) => theme.palette.mode === 'light'
                 ? "linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%)"
-                : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)" 
+                : "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)"
         }}>
             <Navbar />
 
@@ -596,10 +596,10 @@ export default function ItemDetails() {
                                                         icon={<InventoryIcon sx={{ fontSize: "18px !important", color: 'inherit' }} />}
                                                         label={isOutOfStock ? "Out of stock" : `In stock: ${stock} item${stock !== 1 ? 's' : ''}`}
                                                         sx={{
-                                                            bgcolor: isOutOfStock 
-                                                                ? (theme => theme.palette.mode === 'light' ? "rgba(239, 68, 68, 0.08)" : "rgba(239, 68, 68, 0.15)") 
-                                                                : isLowStock 
-                                                                    ? (theme => theme.palette.mode === 'light' ? "rgba(245, 158, 11, 0.08)" : "rgba(245, 158, 11, 0.15)") 
+                                                            bgcolor: isOutOfStock
+                                                                ? (theme => theme.palette.mode === 'light' ? "rgba(239, 68, 68, 0.08)" : "rgba(239, 68, 68, 0.15)")
+                                                                : isLowStock
+                                                                    ? (theme => theme.palette.mode === 'light' ? "rgba(245, 158, 11, 0.08)" : "rgba(245, 158, 11, 0.15)")
                                                                     : (theme => theme.palette.mode === 'light' ? "rgba(16, 185, 129, 0.08)" : "rgba(16, 185, 129, 0.15)"),
                                                             color: isOutOfStock ? "error.main" : isLowStock ? "warning.main" : "success.main",
                                                             fontWeight: 800,
@@ -724,23 +724,23 @@ export default function ItemDetails() {
                                         textTransform: "none",
                                         fontWeight: 900,
                                         fontSize: 19,
-                                        background: item.status === "sold" || item.quantityAvailable === 0 
-                                            ? "text.disabled" 
-                                            : (theme) => theme.palette.mode === 'light' 
+                                        background: item.status === "sold" || item.quantityAvailable === 0
+                                            ? "text.disabled"
+                                            : (theme) => theme.palette.mode === 'light'
                                                 ? "linear-gradient(135deg, #2563eb, #3b82f6)"
                                                 : "linear-gradient(135deg, #3b82f6, #60a5fa)",
-                                        boxShadow: item.status === "sold" || item.quantityAvailable === 0 
-                                            ? "none" 
+                                        boxShadow: item.status === "sold" || item.quantityAvailable === 0
+                                            ? "none"
                                             : "0 10px 30px rgba(37,99,235,0.25)",
                                         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                         "&:hover": {
                                             transform: item.status === "sold" || item.quantityAvailable === 0 ? "none" : "translateY(-4px)",
-                                            boxShadow: item.status === "sold" || item.quantityAvailable === 0 
-                                                ? "none" 
+                                            boxShadow: item.status === "sold" || item.quantityAvailable === 0
+                                                ? "none"
                                                 : "0 15px 40px rgba(37,99,235,0.35)",
-                                            background: item.status === "sold" || item.quantityAvailable === 0 
-                                                ? "text.disabled" 
-                                                : (theme) => theme.palette.mode === 'light' 
+                                            background: item.status === "sold" || item.quantityAvailable === 0
+                                                ? "text.disabled"
+                                                : (theme) => theme.palette.mode === 'light'
                                                     ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
                                                     : "linear-gradient(135deg, #2563eb, #3b82f6)",
                                         },
