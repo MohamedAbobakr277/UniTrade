@@ -42,7 +42,7 @@ export default function SellTool() {
 
     const [images, setImages] = useState([]);
     const [customUniversity, setCustomUniversity] = useState("");
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const [aiLoading, setAiLoading] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);

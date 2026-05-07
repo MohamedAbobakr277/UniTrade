@@ -32,21 +32,9 @@ export default function AdminDashboard() {
     confirmDeleteUser
   } = useAdminUsers();
 
-  // Temporary migration to fix old database records:
-  // If a user in the database doesn't have the explicit emailVerified boolean, Set it to true.
-  useEffect(() => {
-    users.forEach(async (u) => {
-      if (u.emailVerified === undefined) {
-        try {
-          // Import updateUser directly from service to avoid hook circular deps
-          const { updateUser } = await import("../features/admin/services/admin.service");
-          await updateUser(u.id, { emailVerified: true });
-        } catch (e) {
-          console.log("Migration skip:", e);
-        }
-      }
-    });
-  }, [users]);
+  // Remove the problematic migration loop that was causing a white screen/crash.
+  // Database migrations should be done via a script or on-demand to avoid infinite render loops.
+
 
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden", bgcolor: "background.default" }}>

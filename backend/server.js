@@ -149,3 +149,5 @@ app.post('/generate', authenticateUser, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`UniTrade Backend Securely running on port ${PORT}`);
 });
+
+module.exports = app;

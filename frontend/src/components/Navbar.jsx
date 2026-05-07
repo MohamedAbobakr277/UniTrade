@@ -123,7 +123,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                 const userSnap = await getDoc(userRef);
                 const data = userSnap.exists() ? userSnap.data() : {};
                 setEditData(data);
-                
+
                 // If displayName is missing, update it from Firestore data
                 if (!user.displayName && data.firstName) {
                     const { updateProfile } = await import("firebase/auth");
@@ -639,12 +639,12 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 Notifications
                             </Typography>
                             {unreadCount > 0 && (
-                                <Typography 
+                                <Typography
                                     onClick={handleMarkAllRead}
-                                    sx={{ 
-                                        fontSize: "0.82rem", 
-                                        fontWeight: 700, 
-                                        color: "primary.main", 
+                                    sx={{
+                                        fontSize: "0.82rem",
+                                        fontWeight: 700,
+                                        color: "primary.main",
                                         cursor: "pointer",
                                         "&:hover": { textDecoration: "underline", opacity: 0.8 },
                                         transition: "opacity 0.2s"
@@ -667,7 +667,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                     </Typography>
                                 </Box>
                             ) : (
-                                notifications.map((notif, idx) => (
+                                notifications.map((notif) => (
                                     <Box
                                         key={notif.id}
                                         onClick={() => handleNotifItemClick(notif)}
@@ -683,9 +683,9 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                         }}
                                     >
                                         <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ 
-                                                fontSize: "0.92rem", 
-                                                color: "text.primary", 
+                                            <Typography sx={{
+                                                fontSize: "0.92rem",
+                                                color: "text.primary",
                                                 fontWeight: notif.read ? 500 : 700,
                                                 lineHeight: 1.5,
                                                 mb: 0.5
@@ -706,21 +706,21 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         </Box>
 
                         {/* Footer */}
-                        <Box 
-                            sx={{ 
-                                p: 2, 
-                                borderTop: "1px solid", 
-                                borderColor: "divider", 
+                        <Box
+                            sx={{
+                                p: 2,
+                                borderTop: "1px solid",
+                                borderColor: "divider",
                                 textAlign: "center",
                                 bgcolor: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.01)"
                             }}
                         >
-                            <Typography 
+                            <Typography
                                 onClick={() => { navigate("/notifications"); handleNotifClose(); }}
-                                sx={{ 
-                                    fontSize: "0.85rem", 
-                                    fontWeight: 800, 
-                                    color: "primary.main", 
+                                sx={{
+                                    fontSize: "0.85rem",
+                                    fontWeight: 800,
+                                    color: "primary.main",
                                     cursor: "pointer",
                                     "&:hover": { opacity: 0.8 },
                                     transition: "opacity 0.2s"
