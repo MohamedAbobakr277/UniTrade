@@ -58,6 +58,7 @@ export default function ItemDetails() {
     const [item, setItem] = useState(null);
     const [sellerData, setSellerData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isZoomOpen, setIsZoomOpen] = useState(false);
     const [isContactOpen, setIsContactOpen] = useState(false);
@@ -103,11 +104,12 @@ export default function ItemDetails() {
                 // Notify seller about the favorite
                 if (item && item.userId && item.userId !== currentUser.uid) {
                     const likerName = currentUser.displayName || "A user";
+                    const itemId = item.id || id;
                     createNotification(item.userId, {
                         type: "favorite",
-                        message: `${likerName} favorited your item: ${item.title}`,
-                        productId: item.id,
-                        link: `/item/${item.id}`
+                        message: `${likerName} added your item '${item.title}' to their favorites! ❤️`,
+                        productId: itemId,
+                        link: `/item/${itemId}`
                     });
                 }
             }
@@ -137,6 +139,7 @@ export default function ItemDetails() {
                 }
             } catch (error) {
                 console.error(error);
+                setFetchError(error.message);
                 setItem(null);
             } finally {
                 setLoading(false);
