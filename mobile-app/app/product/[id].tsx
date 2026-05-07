@@ -269,7 +269,7 @@ export default function ProductDetails() {
         const aiRanked = await getAISimilarItems(product, cappedCandidates);
         setRecommended(aiRanked);
       } catch (e) {
-        console.log("AI recommended error:", e);
+        console.log("", e);
       } finally {
         setAiLoading(false);
       }
