@@ -23,7 +23,7 @@ import { Feather } from "@expo/vector-icons";
 // ─── Settings ───
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
-const BACKEND_URL = "http://192.168.1.9:3000";
+const BACKEND_URL = "https://unitrade-backend-five.vercel.app";
 
 const CATEGORIES = [
   { name: "Books & Notes", icon: "book" },
