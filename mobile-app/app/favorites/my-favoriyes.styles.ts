@@ -81,24 +81,24 @@ const styles = StyleSheet.create({
   favBtnActive: { 
     backgroundColor: "rgba(255,255,255,0.85)" 
   },
-  cardContent: { 
-    padding: 10 
+  cardBody: {
+    padding: 10
   },
-  title: { 
-    fontSize: 14, 
-    fontWeight: "600", 
-    marginBottom: 2 
+  itemTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 2
   },
-  price: { 
-    fontSize: 15, 
-    fontWeight: "700", 
-    color: "#2563eb", 
-    marginBottom: 2 
+  price: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#2563eb",
+    marginBottom: 2
   },
-  meta: { 
-    fontSize: 12, 
-    color: "#94a3b8", 
-    marginBottom: 6 
+  university: {
+    fontSize: 12,
+    color: "#94a3b8",
+    marginBottom: 6
   },
   sellerRow: {
     flexDirection: "row",
