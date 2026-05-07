@@ -103,7 +103,23 @@ export default function ItemDetails() {
                 await updateDoc(userRef, { favourites: arrayUnion(id) });
                 // Notify seller about the favorite
                 if (item && item.userId && item.userId !== currentUser.uid) {
-                    const likerName = currentUser.displayName || "A user";
+                    let likerName = currentUser.displayName;
+
+                    if (!likerName) {
+                        try {
+                            const currentUserRef = doc(db, "users", currentUser.uid);
+                            const currentUserSnap = await getDoc(currentUserRef);
+                            if (currentUserSnap.exists()) {
+                                const userData = currentUserSnap.data();
+                                likerName = `${userData.firstName} ${userData.lastName || ""}`.trim();
+                            }
+                        } catch (err) {
+                            console.error("Error fetching liker name:", err);
+                        }
+                    }
+
+                    if (!likerName) likerName = "A user";
+
                     const itemId = item.id || id;
                     createNotification(item.userId, {
                         type: "favorite",
