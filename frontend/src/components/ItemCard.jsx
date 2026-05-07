@@ -76,7 +76,23 @@ export default function ItemCard({ item }) {
         await updateDoc(userRef, { favourites: arrayUnion(item.id) });
         // Notify seller about the favorite
         if (item.userId && currentUser && item.userId !== currentUser.uid) {
-          const likerName = currentUser.displayName || "A user";
+          let likerName = currentUser.displayName;
+          
+          if (!likerName) {
+            try {
+              const userRef = doc(db, "users", currentUser.uid);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                const userData = userSnap.data();
+                likerName = `${userData.firstName} ${userData.lastName || ""}`.trim();
+              }
+            } catch (err) {
+              console.error("Error fetching liker name:", err);
+            }
+          }
+          
+          if (!likerName) likerName = "A user";
+
           createNotification(item.userId, {
             type: "favorite",
             message: `${likerName} added your item '${item.title}' to their favorites! ❤️`,

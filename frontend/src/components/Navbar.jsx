@@ -121,8 +121,17 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
             try {
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
-                setEditData(userSnap.exists() ? userSnap.data() : {});
-            } catch {
+                const data = userSnap.exists() ? userSnap.data() : {};
+                setEditData(data);
+                
+                // If displayName is missing, update it from Firestore data
+                if (!user.displayName && data.firstName) {
+                    const { updateProfile } = await import("firebase/auth");
+                    const fullName = `${data.firstName} ${data.lastName || ""}`.trim();
+                    await updateProfile(user, { displayName: fullName });
+                }
+            } catch (err) {
+                console.error("Error fetching/updating user profile:", err);
                 setEditData({});
             }
         };
