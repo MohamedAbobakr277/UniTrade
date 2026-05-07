@@ -97,8 +97,10 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
             await markNotificationAsRead(auth.currentUser.uid, notif.id);
         }
         setNotifAnchorEl(null);
-        if (notif.link) {
-            navigate(notif.link);
+        const link = notif.link || (notif.productId ? `/item/${notif.productId}` : null);
+        if (link) {
+            const targetLink = link.startsWith('/') ? link.trim() : `/${link.trim()}`;
+            navigate(targetLink);
         }
     };
 

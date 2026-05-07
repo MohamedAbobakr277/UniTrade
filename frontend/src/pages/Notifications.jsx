@@ -76,8 +76,11 @@ export default function Notifications() {
     if (!notif.read && auth.currentUser) {
       await markNotificationAsRead(auth.currentUser.uid, notif.id);
     }
-    if (notif.link) {
-      navigate(notif.link);
+    const link = notif.link || (notif.productId ? `/item/${notif.productId}` : null);
+    if (link) {
+      // Ensure the link is absolute and trimmed
+      const targetLink = link.startsWith('/') ? link.trim() : `/${link.trim()}`;
+      navigate(targetLink);
     }
   };
 
