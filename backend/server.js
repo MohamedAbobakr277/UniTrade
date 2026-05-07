@@ -10,6 +10,15 @@ dotenv.config();
 // Initialize Firebase Admin
 // If you have a service account JSON, you can initialize it properly here.
 // For now, it will use default credentials or project ID.
+// Add fetch polyfill for older node versions just in case
+if (!globalThis.fetch) {
+    const nodeFetch = require('node-fetch');
+    globalThis.fetch = nodeFetch;
+    globalThis.Headers = nodeFetch.Headers;
+    globalThis.Request = nodeFetch.Request;
+    globalThis.Response = nodeFetch.Response;
+}
+
 admin.initializeApp({
     projectId: process.env.FIREBASE_PROJECT_ID || 'unitrade-cc943'
 });
@@ -94,7 +103,12 @@ app.post('/chat', authenticateUser, chatLimiter, async (req, res) => {
         // Return the response object (the SDK response is compatible with what the frontend expects)
         res.json(response);
     } catch (error) {
-        console.error("Chat Error:", error);
+        console.error("Chat Error Detail:", {
+            message: error.message,
+            stack: error.stack,
+            status: error.status,
+            name: error.name
+        });
         res.status(500).json({ error: "Failed to connect to AI service", message: error.message });
     }
 });
@@ -138,7 +152,12 @@ app.post('/generate', authenticateUser, async (req, res) => {
 
         res.json(aiResponse);
     } catch (error) {
-        console.error("AI Error:", error);
+        console.error("AI Error Detail:", {
+            message: error.message,
+            stack: error.stack,
+            status: error.status,
+            name: error.name
+        });
         res.status(500).json({
             error: "AI analysis failed",
             message: error.message
