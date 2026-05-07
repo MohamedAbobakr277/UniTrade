@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IconButton } from "@mui/material";
+import { createNotification } from "../services/notifications";
 
 export default function ItemCard({ item }) {
   const [editData, setEditData] = useState(null);
@@ -73,6 +74,16 @@ export default function ItemCard({ item }) {
         await updateDoc(userRef, { favourites: arrayRemove(item.id) });
       } else {
         await updateDoc(userRef, { favourites: arrayUnion(item.id) });
+        // Notify seller about the favorite
+        if (item.userId && currentUser && item.userId !== currentUser.uid) {
+          const likerName = currentUser.displayName || "A user";
+          createNotification(item.userId, {
+            type: "favorite",
+            message: `${likerName} added your item '${item.title}' to their favorites! ❤️`,
+            productId: item.id,
+            link: `/item/${item.id}`
+          });
+        }
       }
     } catch (err) {
       console.error("Error toggling favorite:", err);

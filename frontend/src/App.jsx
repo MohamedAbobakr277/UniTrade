@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
@@ -12,7 +12,13 @@ import ItemDetails from "./pages/ItemDetails";
 import MyListings from "./pages/MyListings";
 import Favourites from "./pages/Favourites";
 import SellerProfile from "./pages/SellerProfile";
+import Notifications from "./pages/Notifications";
 import AIChatbot from "./components/AIChatbot";
+
+const ProductFallback = () => {
+  const { id } = useParams();
+  return <Navigate to={`/item/${id}`} replace />;
+};
 
 export default function App() {
   const location = useLocation();
@@ -93,13 +99,26 @@ export default function App() {
         }
       />
 
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Admin routes */}
       <Route element={<ProtectedAdminRoute />}>
         <Route path="/admindashboard" element={<AdminDashboard />} />
       </Route>
 
+      {/* Fallback for old notification links */}
+      <Route path="/product/:id" element={<ProductFallback />} />
+      <Route path="/items/:id" element={<ProductFallback />} />
+
       {/* Catch all */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
     {!isAdminPath && <AIChatbot />}
     </>

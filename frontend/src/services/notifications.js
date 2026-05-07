@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, updateDoc, doc, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, updateDoc, doc, where, getDocs, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Create a notification for a specific user
@@ -40,6 +40,35 @@ export const markNotificationAsRead = async (userId, notificationId) => {
         await updateDoc(notifRef, { read: true });
     } catch (error) {
         console.error("Error marking notification as read:", error);
+    }
+};
+
+// Mark all notifications as read
+export const markAllNotificationsAsRead = async (userId) => {
+    try {
+        if (!userId) return;
+        const notifsRef = collection(db, "users", userId, "notifications");
+        const q = query(notifsRef, where("read", "==", false));
+        const querySnapshot = await getDocs(q);
+        
+        const updates = querySnapshot.docs.map(doc => 
+            updateDoc(doc.ref, { read: true })
+        );
+        
+        await Promise.all(updates);
+    } catch (error) {
+        console.error("Error marking all notifications as read:", error);
+    }
+};
+
+// Delete a single notification
+export const deleteNotification = async (userId, notificationId) => {
+    try {
+        if (!userId || !notificationId) return;
+        const notifRef = doc(db, "users", userId, "notifications", notificationId);
+        await deleteDoc(notifRef);
+    } catch (error) {
+        console.error("Error deleting notification:", error);
     }
 };
 

@@ -10,35 +10,35 @@ import {
   Button,
   useTheme,
 } from "@mui/material";
-import CloseIcon          from "@mui/icons-material/Close";
-import CalendarTodayIcon  from "@mui/icons-material/CalendarToday";
-import CategoryIcon       from "@mui/icons-material/Category";
-import LocalOfferIcon     from "@mui/icons-material/LocalOffer";
-import SchoolIcon         from "@mui/icons-material/School";
-import WhatsAppIcon       from "@mui/icons-material/WhatsApp";
-import DeleteIcon         from "@mui/icons-material/Delete";
-import InventoryIcon      from "@mui/icons-material/Inventory";
+import CloseIcon from "@mui/icons-material/Close";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CategoryIcon from "@mui/icons-material/Category";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import SchoolIcon from "@mui/icons-material/School";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import DeleteIcon from "@mui/icons-material/Delete";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import { useState } from "react";
 
 const STATUS_CHIP = (isDark) => ({
-  available: { 
-    label: "Available", 
-    bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5", 
-    color: isDark ? "#34d399" : "#10b981" 
+  available: {
+    label: "Available",
+    bgcolor: isDark ? "rgba(16, 185, 129, 0.15)" : "#ecfdf5",
+    color: isDark ? "#34d399" : "#10b981"
   },
-  sold: { 
-    label: "Sold",      
-    bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2", 
-    color: isDark ? "#f87171" : "#ef4444" 
+  sold: {
+    label: "Sold",
+    bgcolor: isDark ? "rgba(239, 68, 68, 0.15)" : "#fef2f2",
+    color: isDark ? "#f87171" : "#ef4444"
   },
 });
 
 const CONDITION_COLOR = {
-  "New":       "#10b981",
-  "Like New":  "#2563eb",
-  "Good":      "#f59e0b",
-  "Fair":      "#f97316",
-  "Poor":      "#ef4444",
+  "New": "#10b981",
+  "Like New": "#2563eb",
+  "Good": "#f59e0b",
+  "Fair": "#f97316",
+  "Poor": "#ef4444",
 };
 
 export default function ItemDetailModal({ item, onClose, onDelete }) {
@@ -48,13 +48,13 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
 
   if (!item) return null;
 
-  const images   = item.images ?? (item.imageUrls ?? []);
-  const chips    = STATUS_CHIP(isDark);
-  const chip     = chips[item.status] ?? chips.available;
-  const date     = item.createdAt?.seconds
+  const images = item.images ?? (item.imageUrls ?? []);
+  const chips = STATUS_CHIP(isDark);
+  const chip = chips[item.status] ?? chips.available;
+  const date = item.createdAt?.seconds
     ? new Date(item.createdAt.seconds * 1000).toLocaleDateString("en-EG", {
-        year: "numeric", month: "short", day: "numeric",
-      })
+      year: "numeric", month: "short", day: "numeric",
+    })
     : "—";
   const condColor = CONDITION_COLOR[item.condition] ?? "#64748b";
 
@@ -66,7 +66,7 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
       maxWidth="sm"
       PaperProps={{
         sx: {
-          borderRadius: 4,
+          borderRadius: "6px",
           overflow: "hidden",
           fontFamily: "'Outfit', sans-serif",
           bgcolor: "background.paper",

@@ -46,7 +46,7 @@ function StatCard({ label, value, Icon, iconBg, iconColor }) {
         flex: 1,
         minWidth: 0,
         p: "22px 24px",
-        borderRadius: 3,
+        borderRadius: "6px",
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
@@ -156,7 +156,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           elevation={0}
           sx={{
             flex: "2 1 0",
-            borderRadius: 3,
+            borderRadius: "6px",
             border: "1px solid",
             borderColor: "divider",
             bgcolor: "background.paper",
@@ -283,7 +283,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           {/* Status Breakdown */}
           <Paper
             elevation={0}
-            sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
+            sx={{ p: "20px 24px", borderRadius: "6px", border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
           >
             <Typography sx={{ fontWeight: 700, color: "text.primary", mb: 2, fontSize: "1rem" }}>
               Status Breakdown
@@ -297,7 +297,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           {/* Category Breakdown */}
           <Paper
             elevation={0}
-            sx={{ p: "20px 24px", borderRadius: 3, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
+            sx={{ p: "20px 24px", borderRadius: "6px", border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}
           >
             <Typography sx={{ fontWeight: 700, color: "text.primary", mb: 2, fontSize: "1rem" }}>
               Category Breakdown (Item Count)
