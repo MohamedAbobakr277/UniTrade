@@ -18,6 +18,7 @@ import BlockIcon          from "@mui/icons-material/Block";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import DeleteIcon         from "@mui/icons-material/Delete";
 import PersonIcon         from "@mui/icons-material/Person";
+import StarIcon           from "@mui/icons-material/Star";
 
 export default function UserDetailModal({ 
   user,
@@ -89,6 +90,15 @@ export default function UserDetailModal({
               color={user.emailVerified ? "success" : "default"} 
               sx={{ fontWeight: 700, fontSize: "0.7rem", bgcolor: user.emailVerified ? (isDark ? "rgba(16, 185, 129, 0.15)" : "success.main") : "divider" }} 
             />
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, ml: 1 }}>
+              <StarIcon sx={{ color: "#f59e0b", fontSize: "1rem" }} />
+              <Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: "text.primary" }}>
+                {user.averageRating ? user.averageRating.toFixed(1) : "0.0"}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                ({user.ratingsCount || 0})
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
@@ -146,7 +156,7 @@ export default function UserDetailModal({
             ) : (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 180, overflowY: "auto", pr: 1 }}>
                 {userListings.map(item => (
-                  <Box key={item.id} sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc" }}>
+                  <Box key={item.id} sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1, borderRadius: "14px", border: "1px solid", borderColor: "divider", bgcolor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc" }}>
                     <Avatar src={item.images?.[0]} variant="rounded" sx={{ width: 36, height: 36 }} />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "text.primary", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -188,7 +198,7 @@ export default function UserDetailModal({
               color={isBanned ? "success" : "warning"}
               startIcon={<BlockIcon />}
               onClick={() => onToggleBan(user)}
-              sx={{ flex: 1, textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+              sx={{ flex: 1, textTransform: "none", fontWeight: 700, borderRadius: "12px" }}
             >
               {isBanned ? "Unban" : "Ban User"}
             </Button>
@@ -198,7 +208,7 @@ export default function UserDetailModal({
               color="primary"
               startIcon={isAdmin ? <PersonIcon /> : <AdminPanelSettingsIcon />}
               onClick={() => onToggleRole(user)}
-              sx={{ flex: 1, bgcolor: isAdmin ? "transparent" : "primary.main", textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+              sx={{ flex: 1, bgcolor: isAdmin ? "transparent" : "primary.main", textTransform: "none", fontWeight: 700, borderRadius: "12px" }}
             >
               {isAdmin ? "Demote" : "Make Admin"}
             </Button>
@@ -208,7 +218,7 @@ export default function UserDetailModal({
               color="error"
               startIcon={<DeleteIcon />}
               onClick={() => onDelete(user)}
-              sx={{ flex: 1, textTransform: "none", fontWeight: 700, borderRadius: 2 }}
+              sx={{ flex: 1, textTransform: "none", fontWeight: 700, borderRadius: "12px" }}
             >
               Delete
             </Button>

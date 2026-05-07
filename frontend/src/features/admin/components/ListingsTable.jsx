@@ -132,6 +132,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
                 <TableCell sx={{ fontWeight: 600, py: 1.5 }}>ITEM</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>PRICE</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>CATEGORY</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>STOCK</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>SELLER</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>STATUS</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>ACTIONS</TableCell>
@@ -167,6 +168,9 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
                       size="small"
                       sx={{ bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9", fontWeight: 600 }}
                     />
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>
+                    {item.quantityAvailable ?? 1}
                   </TableCell>
                   {/* ✅ Bug fix: was item.user — now item.sellerName */}
                   <TableCell>{item.sellerName ?? "—"}</TableCell>

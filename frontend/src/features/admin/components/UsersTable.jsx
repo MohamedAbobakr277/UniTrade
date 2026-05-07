@@ -16,10 +16,12 @@ import {
   useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import StarIcon from "@mui/icons-material/Star";
 import { useState } from "react";
 
 export default function UsersTable({ 
   users, 
+  listings = [],
   onViewUser 
 }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +62,7 @@ export default function UsersTable({
 
       <Paper
         sx={{
-          borderRadius: 4,
+          borderRadius: "16px",
           overflow: "hidden",
           boxShadow: isDark ? "none" : "0 4px 20px rgba(0,0,0,0.05)",
           border: "1px solid",
@@ -74,7 +76,8 @@ export default function UsersTable({
               <TableRow>
                 <TableCell sx={{ fontWeight: 600, py: 1.5 }}>NAME</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>UNIVERSITY</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>FACULTY</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>RATING</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>LISTINGS</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>EMAIL VERIFIED</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>ACTION</TableCell>
               </TableRow>
@@ -124,7 +127,24 @@ export default function UsersTable({
                     </Box>
                   </TableCell>
                   <TableCell>{user.university ?? "—"}</TableCell>
-                  <TableCell>{user.faculty ?? "—"}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <StarIcon sx={{ color: "#f59e0b", fontSize: "1.1rem" }} />
+                      <Typography sx={{ fontWeight: 700, fontSize: "0.9rem" }}>
+                        {user.averageRating ? user.averageRating.toFixed(1) : "0.0"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        ({user.ratingsCount || 0})
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={listings.filter(l => l.userId === user.id).length} 
+                      size="small" 
+                      sx={{ fontWeight: 700, bgcolor: "background.subtle" }} 
+                    />
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={user.emailVerified ? "Verified" : "Pending"}

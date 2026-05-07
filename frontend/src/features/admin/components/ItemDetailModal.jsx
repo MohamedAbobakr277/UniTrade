@@ -17,6 +17,7 @@ import LocalOfferIcon     from "@mui/icons-material/LocalOffer";
 import SchoolIcon         from "@mui/icons-material/School";
 import WhatsAppIcon       from "@mui/icons-material/WhatsApp";
 import DeleteIcon         from "@mui/icons-material/Delete";
+import InventoryIcon      from "@mui/icons-material/Inventory";
 import { useState } from "react";
 
 const STATUS_CHIP = (isDark) => ({
@@ -224,6 +225,14 @@ export default function ItemDetailModal({ item, onClose, onDelete }) {
                 {date}
               </Typography>
             </Box>
+            {item.quantityAvailable !== undefined && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, bgcolor: "background.subtle", borderRadius: 2, px: 1.5, py: 0.5 }}>
+                <InventoryIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "text.secondary" }}>
+                  Stock: {item.quantityAvailable}
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           {/* Description */}
