@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   View, Text, Image, FlatList, TouchableOpacity,
   StyleSheet, ActivityIndicator, Dimensions, Modal,
-  TextInput, Animated, Pressable, KeyboardAvoidingView, Platform,
+  TextInput, Animated, Pressable, KeyboardAvoidingView, Platform, ScrollView,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -110,55 +110,78 @@ const RatingModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={s.modalOverlay} onPress={onClose}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ width: "100%" }}>
+    <Modal 
+      visible={visible} 
+      transparent 
+      animationType="fade" 
+      onRequestClose={onClose}
+      statusBarTranslucent
+    >
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"} 
+        style={{ flex: 1 }}
+      >
+        <Pressable style={s.modalOverlay} onPress={onClose}>
           <Animated.View
-            style={[s.modalSheet, { backgroundColor: theme.card, transform: [{ translateY: slideAnim }] }]}
+            style={[
+              s.modalSheet, 
+              { 
+                backgroundColor: theme.card, 
+                transform: [{ translateY: slideAnim }],
+                maxHeight: "80%" 
+              }
+            ]}
           >
             <Pressable onPress={(e) => e.stopPropagation()}>
-              <View style={s.sheetHandle} />
-              <Text style={[s.modalTitle, { color: theme.text }]}>
-                {existingRating ? "Update your rating" : "Rate this seller"}
-              </Text>
-              <Text style={s.modalSub}>How was your experience with {sellerName}?</Text>
-
-              <View style={{ alignItems: "center", marginVertical: 20 }}>
-                <Stars value={selected} size={44} interactive onSelect={setSelected} />
-                <Text style={[s.starLabel, { opacity: selected ? 1 : 0 }]}>
-                  {STAR_LABELS[selected]}
+              <ScrollView 
+                bounces={false} 
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={s.sheetHandle} />
+                <Text style={[s.modalTitle, { color: theme.text }]}>
+                  {existingRating ? "Update your rating" : "Rate this seller"}
                 </Text>
-              </View>
+                <Text style={s.modalSub}>How was your experience with {sellerName}?</Text>
 
-              <TextInput
-                style={[s.commentInput, { color: theme.text, borderColor: "#e2e8f0", backgroundColor: theme.background }]}
-                placeholder="Leave a comment (optional)..."
-                placeholderTextColor="#94a3b8"
-                multiline numberOfLines={3}
-                value={comment}
-                onChangeText={setComment}
-              />
+                <View style={{ alignItems: "center", marginVertical: 20 }}>
+                  <Stars value={selected} size={44} interactive onSelect={setSelected} />
+                  <Text style={[s.starLabel, { opacity: selected ? 1 : 0 }]}>
+                    {STAR_LABELS[selected]}
+                  </Text>
+                </View>
 
-              <View style={s.modalBtns}>
-                <TouchableOpacity style={s.btnCancel} onPress={onClose}>
-                  <Text style={{ color: "#64748b", fontSize: 14, fontWeight: "600" }}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[s.btnSubmit, { opacity: selected ? 1 : 0.45 }]}
-                  onPress={handleSubmit}
-                  disabled={!selected || submitting}
-                >
-                  {submitting
-                    ? <ActivityIndicator color="#fff" size="small" />
-                    : <Text style={{ color: "#fff", fontSize: 14, fontWeight: "700" }}>
-                      {existingRating ? "Update" : "Submit"}
-                    </Text>}
-                </TouchableOpacity>
-              </View>
+                <TextInput
+                  style={[s.commentInput, { color: theme.text, borderColor: "#e2e8f0", backgroundColor: theme.background }]}
+                  placeholder="Leave a comment (optional)..."
+                  placeholderTextColor="#94a3b8"
+                  multiline 
+                  numberOfLines={3}
+                  value={comment}
+                  onChangeText={setComment}
+                />
+
+                <View style={s.modalBtns}>
+                  <TouchableOpacity style={s.btnCancel} onPress={onClose}>
+                    <Text style={{ color: "#64748b", fontSize: 14, fontWeight: "600" }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[s.btnSubmit, { opacity: selected ? 1 : 0.45 }]}
+                    onPress={handleSubmit}
+                    disabled={!selected || submitting}
+                  >
+                    {submitting
+                      ? <ActivityIndicator color="#fff" size="small" />
+                      : <Text style={{ color: "#fff", fontSize: 14, fontWeight: "700" }}>
+                        {existingRating ? "Update" : "Submit"}
+                      </Text>}
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
             </Pressable>
           </Animated.View>
-        </KeyboardAvoidingView>
-      </Pressable>
+        </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -339,7 +362,7 @@ export default function SellerProfile() {
               myRating,
               myComment,
             });
-            
+
             // Self-healing: Update user doc if it's out of sync (only if current user is the seller or we just submitted)
             // Actually, any user can trigger this to fix the public display
             const updateAggregated = async () => {
@@ -543,7 +566,7 @@ export default function SellerProfile() {
         item={item}
         theme={theme}
         isFavorite={false}
-        onToggleFavorite={() => {}}
+        onToggleFavorite={() => { }}
         sellerName={seller?.firstName}
         sellerPhoto={seller?.profilePhoto}
       />

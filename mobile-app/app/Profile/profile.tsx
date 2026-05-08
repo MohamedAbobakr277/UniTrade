@@ -9,6 +9,8 @@ import {
   TextInput,
   Alert,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
@@ -160,11 +162,16 @@ export default function Profile() {
   const border = darkMode ? "#1e293b" : "#f1f5f9";
 
   return (
-    <ScrollView
-      style={[s.container, { backgroundColor: theme.background }]}
-      contentContainerStyle={{ paddingBottom: 120 }}
-      showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
+      <ScrollView
+        style={[s.container, { backgroundColor: theme.background }]}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
       {/* ── Hero card ── */}
       <View style={[s.heroCard, { backgroundColor: theme.card }]}>
 
@@ -285,17 +292,18 @@ export default function Profile() {
 
       <View style={s.grid}>
         {items.map((item: any) => (
-          <ProductCard
-            key={item.id}
-            item={item}
-            theme={theme}
-            isFavorite={false}
-            onToggleFavorite={() => {}}
-            showManagement={true}
-            onEdit={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
-            onDelete={() => deleteProduct(item.id)}
-            onToggleStatus={toggleStatus}
-          />
+          <View key={item.id} style={{ width: "48.2%" }}>
+            <ProductCard
+              item={item}
+              theme={theme}
+              isFavorite={false}
+              onToggleFavorite={() => {}}
+              showManagement={true}
+              onEdit={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
+              onDelete={() => deleteProduct(item.id)}
+              onToggleStatus={toggleStatus}
+            />
+          </View>
         ))}
       </View>
 
@@ -313,12 +321,20 @@ export default function Profile() {
       </TouchableOpacity>
 
       {/* ── Edit Modal ── */}
-      <Modal visible={editVisible} animationType="slide">
-        <ScrollView
-          style={{ backgroundColor: theme.background }}
-          contentContainerStyle={s.modal}
-          keyboardShouldPersistTaps="handled"
+      <Modal 
+        visible={editVisible} 
+        animationType="slide"
+        statusBarTranslucent
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
+          <ScrollView
+            style={{ backgroundColor: theme.background }}
+            contentContainerStyle={s.modal}
+            keyboardShouldPersistTaps="handled"
+          >
           <View style={s.modalHeader}>
             <Text style={[s.modalTitle, { color: theme.text }]}>Edit Profile</Text>
             <TouchableOpacity onPress={() => setEditVisible(false)}>
@@ -404,9 +420,11 @@ export default function Profile() {
               <Text style={s.saveText}>Save Changes</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </Modal>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -538,6 +556,7 @@ const s = StyleSheet.create({
     flexWrap: "wrap",
     gap: 12,
     marginBottom: 8,
+    paddingHorizontal: 2, // Minor adjustment for card alignment
   },
   productCard: {
     width: "47%",

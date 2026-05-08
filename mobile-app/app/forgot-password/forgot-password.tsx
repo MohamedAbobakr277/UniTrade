@@ -10,6 +10,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -58,64 +59,70 @@ export default function ForgotPassword() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: theme.background }}
     >
-      <View style={s.container}>
-        <StatusBar barStyle={darkMode ? "light-content" : "dark-content"} />
+      <ScrollView 
+        contentContainerStyle={{ flexGrow: 1 }} 
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={s.container}>
+          <StatusBar barStyle={darkMode ? "light-content" : "dark-content"} />
 
-        {/* Header */}
-        <View style={s.header}>
-          <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-            <Feather name="arrow-left" size={20} color={textColor} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={s.content}>
-          <Image
-            source={require("../../assets/images/logo.png")}
-            style={s.logo}
-          />
-
-          <Text style={[s.title, { color: textColor }]}>Forgot Password?</Text>
-          <Text style={[s.subtitle, { color: labelColor }]}>
-            Enter your university email address and we'll send you a link to reset your password.
-          </Text>
-
-          {/* Email Input */}
-          <View style={s.inputGroup}>
-            <View style={[s.inputWrap, { backgroundColor: inputBg }]}>
-              <Feather name="mail" size={18} color="#2563eb" />
-              <TextInput
-                placeholder="Email Address"
-                placeholderTextColor="#9ca3af"
-                value={email}
-                onChangeText={(t) => { setEmail(t); setError(""); }}
-                style={[s.input, { color: textColor }]}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
+          {/* Header */}
+          <View style={s.header}>
+            <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
+              <Feather name="arrow-left" size={20} color={textColor} />
+            </TouchableOpacity>
           </View>
 
-          {error ? <Text style={s.errorText}>{error}</Text> : null}
+          <View style={s.content}>
+            <Image
+              source={require("../../assets/images/logo.png")}
+              style={s.logo}
+            />
 
-          {/* Submit Button */}
-          <TouchableOpacity
-            style={[s.submitBtn, { opacity: loading ? 0.7 : 1 }]}
-            onPress={handleSend}
-            disabled={loading}
-          >
-            <LinearGradient
-              colors={["#3b82f6", "#2563eb"]}
-              style={s.gradient}
+            <Text style={[s.title, { color: textColor }]}>Forgot Password?</Text>
+            <Text style={[s.subtitle, { color: labelColor }]}>
+              Enter your university email address and we'll send you a link to reset your password.
+            </Text>
+
+            {/* Email Input */}
+            <View style={s.inputGroup}>
+              <View style={[s.inputWrap, { backgroundColor: inputBg }]}>
+                <Feather name="mail" size={18} color="#2563eb" />
+                <TextInput
+                  placeholder="Email Address"
+                  placeholderTextColor="#9ca3af"
+                  value={email}
+                  onChangeText={(t) => { setEmail(t); setError(""); }}
+                  style={[s.input, { color: textColor }]}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            {error ? <Text style={s.errorText}>{error}</Text> : null}
+
+            {/* Submit Button */}
+            <TouchableOpacity
+              style={[s.submitBtn, { opacity: loading ? 0.7 : 1 }]}
+              onPress={handleSend}
+              disabled={loading}
             >
-              <Text style={s.submitText}>{loading ? "Sending..." : "Send Reset Link"}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={["#3b82f6", "#2563eb"]}
+                style={s.gradient}
+              >
+                <Text style={s.submitText}>{loading ? "Sending..." : "Send Reset Link"}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={s.cancelBtn} onPress={() => router.back()}>
-            <Text style={[s.cancelText, { color: "#2563eb" }]}>Back to Login</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={s.cancelBtn} onPress={() => router.back()}>
+              <Text style={[s.cancelText, { color: "#2563eb" }]}>Back to Login</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

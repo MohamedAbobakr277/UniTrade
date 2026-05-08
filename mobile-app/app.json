@@ -14,7 +14,7 @@
     "android": {
       "softwareKeyboardLayoutMode": "adjustResize",
       "adaptiveIcon": {
-        "backgroundColor": "#2563eb",
+        "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/logo.png"
       },
       "edgeToEdgeEnabled": true,

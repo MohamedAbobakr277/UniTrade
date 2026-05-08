@@ -14,6 +14,8 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -364,7 +366,11 @@ export default function ProductDetails() {
     <View style={[s.screen, { backgroundColor: theme.background }]}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
         {/* ── Image carousel ── */}
         <View style={s.imageWrap}>
@@ -735,6 +741,7 @@ export default function ProductDetails() {
           </View>
         </TouchableOpacity>
       </Modal>
+      </KeyboardAvoidingView>
     </View>
   );
 }

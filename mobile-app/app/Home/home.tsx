@@ -13,6 +13,8 @@ import {
   PanResponder,
   StyleSheet,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -700,7 +702,16 @@ export default function HomeScreen() {
       )}
 
       {/* Filter bottom sheet */}
-      <Modal visible={filterVisible} transparent animationType="fade">
+      <Modal 
+        visible={filterVisible} 
+        transparent 
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
         <View style={s.backdrop}>
           <Animated.View
             style={[
@@ -720,6 +731,12 @@ export default function HomeScreen() {
             ]}
             {...panResponder.panHandlers}
           >
+            <ScrollView
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: 20 }}
+            >
             <View style={[s.sheetHandle, { backgroundColor: "#e2e8f0" }]} />
 
             <View style={s.sheetHeader}>
@@ -879,9 +896,11 @@ export default function HomeScreen() {
                 <Text style={s.applyText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
+            </ScrollView>
           </Animated.View>
         </View>
-      </Modal>
+      </KeyboardAvoidingView>
+    </Modal>
 
       <BottomNav />
     </SafeAreaView>
