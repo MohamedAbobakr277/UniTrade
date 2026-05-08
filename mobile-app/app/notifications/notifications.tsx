@@ -17,6 +17,7 @@ import {
   onSnapshot,
   doc,
   writeBatch,
+  deleteDoc,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
 import { useTheme } from "../../constants/ThemeContext";
@@ -71,17 +72,20 @@ function timeAgo(date: Date): string {
 function NotifCard({
   item,
   onPress,
+  onDelete,
   theme,
   darkMode,
   index,
 }: {
   item: Notification;
   onPress: () => void;
+  onDelete: () => void;
   theme: any;
   darkMode: boolean;
   index: number;
 }) {
   const anim = useRef(new Animated.Value(0)).current;
+  const slideOut = useRef(new Animated.Value(1)).current;
   const meta = getTypeMeta(item.type);
 
   useEffect(() => {
@@ -92,6 +96,22 @@ function NotifCard({
       useNativeDriver: true,
     }).start();
   }, []);
+
+  /** Animate out then call the parent delete handler */
+  const handleDelete = () => {
+    Animated.parallel([
+      Animated.timing(slideOut, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(anim, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+    ]).start(() => onDelete());
+  };
 
   // _isRead = what it was when the screen first loaded (frozen snapshot)
   const isUnread = !item._isRead;
@@ -113,6 +133,7 @@ function NotifCard({
               outputRange: [14, 0],
             }),
           },
+          { scaleY: slideOut },
         ],
       }}
     >
@@ -164,6 +185,16 @@ function NotifCard({
 
         {/* Blue dot — only on unread */}
         {isUnread && <View style={s.unreadDot} />}
+
+        {/* ✕ Delete button — top-right corner */}
+        <TouchableOpacity
+          style={s.deleteBtn}
+          onPress={handleDelete}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          activeOpacity={0.6}
+        >
+          <Feather name="x" size={13} color="#94a3b8" />
+        </TouchableOpacity>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -239,11 +270,41 @@ export default function NotificationsScreen() {
   const handlePress = (item: Notification) => {
     if (!item.link) return;
     if (item.link.startsWith("/item/") || item.link.startsWith("/product/")) {
-      const id = item.link.split("/").pop();
+      const id = item.link.split("/").pop() ?? "";
       router.push({ pathname: "/product/[id]", params: { id } });
     } else if (item.link.startsWith("/seller/")) {
       const sellerId = item.link.split("/seller/")[1];
       router.push({ pathname: "/seller/[sellerId]", params: { sellerId } });
+    }
+  };
+
+  /**
+   * Optimistically removes the notification from local state, then deletes
+   * the Firestore document. Rolls back if the delete fails.
+   */
+  const deleteNotification = async (notif: Notification) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+
+    // 1️⃣  Optimistic remove from local state
+    setNotifications((prev) => prev.filter((n) => n.id !== notif.id));
+    // Also remove from the frozen unread set so counts stay accurate
+    initialUnreadIds.current.delete(notif.id);
+
+    try {
+      // 2️⃣  Delete from Firestore
+      await deleteDoc(doc(db, "users", uid, "notifications", notif.id));
+    } catch (err) {
+      console.error("Failed to delete notification:", err);
+      // 3️⃣  Rollback: put it back in the correct sorted position
+      setNotifications((prev) => {
+        const restored = [...prev, notif].sort((a, b) => {
+          const tA = a.createdAt?.toDate?.()?.getTime() ?? 0;
+          const tB = b.createdAt?.toDate?.()?.getTime() ?? 0;
+          return tB - tA;
+        });
+        return restored;
+      });
     }
   };
 
@@ -357,6 +418,7 @@ export default function NotificationsScreen() {
             <NotifCard
               item={item}
               onPress={() => handlePress(item)}
+              onDelete={() => deleteNotification(item)}
               theme={theme}
               darkMode={darkMode}
               index={index}
@@ -413,6 +475,8 @@ const s = StyleSheet.create({
   card: {
     flexDirection: "row",
     padding: 14,
+    paddingTop: 16,
+    paddingRight: 36,  // reserve space for the X button
     borderRadius: 14,
     marginBottom: 10,
     alignItems: "flex-start",
@@ -464,6 +528,19 @@ const s = StyleSheet.create({
     marginLeft: 10,
     marginTop: 5,
     flexShrink: 0,
+  },
+
+  /* Delete (X) button */
+  deleteBtn: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "rgba(0,0,0,0.07)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   /* Empty state */
