@@ -247,6 +247,34 @@ export default function NotificationsScreen() {
     }
   };
 
+  /** Mark all currently-unread notifications as read instantly. */
+  const markAllRead = () => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+
+    // 1️⃣  Get the IDs we're about to clear (currently shown as unread)
+    const unreadIds = [...initialUnreadIds.current];
+    if (unreadIds.length === 0) return;
+
+    // 2️⃣  Clear the frozen set → UI re-renders immediately to read state
+    initialUnreadIds.current = new Set();
+
+    // 3️⃣  Re-derive notifications with _isRead = true for all
+    setNotifications((prev) =>
+      prev.map((n) => ({ ...n, _isRead: true }))
+    );
+
+    // 4️⃣  Persist to Firestore via batch (efficient single round-trip)
+    const batch = writeBatch(db);
+    unreadIds.forEach((id) => {
+      batch.update(doc(db, "users", uid, "notifications", id), {
+        read: true,
+        isRead: true,
+      });
+    });
+    batch.commit().catch(console.error);
+  };
+
   const unreadCount = notifications.filter((n) => !n._isRead).length;
   const border = darkMode ? "#1e293b" : "#e2e8f0";
 
@@ -269,7 +297,19 @@ export default function NotificationsScreen() {
           )}
         </View>
 
-        <View style={{ width: 40 }} />
+        {/* Mark all read — only visible when there are unread items */}
+        {unreadCount > 0 ? (
+          <TouchableOpacity
+            style={s.markAllBtn}
+            onPress={markAllRead}
+            activeOpacity={0.7}
+          >
+            <Feather name="check-circle" size={13} color="#2563eb" />
+            <Text style={s.markAllText}>Mark all read</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 90 }} />
+        )}
       </View>
 
       {/* ── Body ── */}
@@ -446,5 +486,23 @@ const s = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     lineHeight: 22,
+  },
+
+  /* Mark all read button */
+  markAllBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: "#bfdbfe",
+    backgroundColor: "#eff6ff",
+  },
+  markAllText: {
+    color: "#2563eb",
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
