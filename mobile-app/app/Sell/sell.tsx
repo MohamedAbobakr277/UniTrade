@@ -11,6 +11,8 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -244,10 +246,11 @@ export default function Sell() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: theme.background }}
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-        <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+          <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
           <Text style={[s.pageTitle, { color: theme.text }]}>Sell Your Item</Text>
 
           <View style={[s.imageSection, { backgroundColor: theme.card, borderColor: border }]}>
@@ -342,6 +345,7 @@ export default function Sell() {
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }

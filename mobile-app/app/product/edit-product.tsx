@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert, KeyboardAvoidingView, Platform
+  View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -85,13 +85,15 @@ export default function EditProduct() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: theme.background }}
     >
-      <ScrollView 
-        style={[styles.container, { backgroundColor: theme.background }]}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ flex: 1 }}>
+          <ScrollView 
+            style={[styles.container, { backgroundColor: theme.background }]}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 40 }}
+          >
         <Text style={[styles.title, { color: theme.text }]}>Edit Product</Text>
 
         {/* Title */}
@@ -212,7 +214,9 @@ export default function EditProduct() {
         <TouchableOpacity style={styles.button} onPress={updateProduct}>
           <Text style={styles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
-      </ScrollView>
+          </ScrollView>
+        </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
