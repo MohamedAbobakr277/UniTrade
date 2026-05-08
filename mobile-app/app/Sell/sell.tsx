@@ -22,6 +22,7 @@ import { db, auth } from "../services/firebase";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../constants/ThemeContext";
 import { Feather } from "@expo/vector-icons";
+import BottomNav from "../../components/BottomNav";
 
 // ─── Settings ───
 const CLOUD_NAME = "dstfo8pxq";
@@ -261,7 +262,7 @@ export default function Sell() {
         >
           <ScrollView 
             style={{ flex: 1, backgroundColor: theme.background }}
-            contentContainerStyle={[s.scroll, { backgroundColor: theme.background }]} 
+            contentContainerStyle={[s.scroll, { backgroundColor: theme.background, paddingBottom: 100 }]} 
             keyboardShouldPersistTaps="handled"
           >
           <Text style={[s.pageTitle, { color: theme.text }]}>Sell Your Item</Text>
@@ -357,6 +358,7 @@ export default function Sell() {
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.postBtnText}>Post Item</Text>}
           </TouchableOpacity>
         </ScrollView>
+        <BottomNav />
       </SafeAreaView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

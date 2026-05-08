@@ -9,6 +9,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 import * as NavigationBar from 'expo-navigation-bar';
 import { useTheme } from "../../constants/ThemeContext";
+import BottomNav from "../../components/BottomNav";
 import styles from "./edit-product.style";
 
 const CATEGORIES = [
@@ -98,7 +99,7 @@ export default function EditProduct() {
           <ScrollView 
             style={[styles.container, { backgroundColor: theme.background, flex: 1 }]}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 40, backgroundColor: theme.background }}
+            contentContainerStyle={{ paddingBottom: 100, backgroundColor: theme.background }}
           >
         <Text style={[styles.title, { color: theme.text }]}>Edit Product</Text>
 
@@ -221,6 +222,7 @@ export default function EditProduct() {
           <Text style={styles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
           </ScrollView>
+          <BottomNav />
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
