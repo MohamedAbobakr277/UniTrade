@@ -106,6 +106,7 @@ function PulseRing({ color }: { color: string }) {
 export default function FloatingChatbot() {
   const { theme, darkMode } = useTheme();
   const flatListRef = useRef<FlatList>(null);
+  const inputRef = useRef<TextInput>(null);
 
   // Draggable position
   const pan = useRef(new Animated.ValueXY({ x: SCREEN_WIDTH - BUTTON_SIZE - BUTTON_RIGHT_MARGIN, y: SCREEN_HEIGHT / 2 - 100 })).current;
@@ -212,6 +213,12 @@ export default function FloatingChatbot() {
   const openChat = () => {
     setIsOpen(true);
     Animated.spring(slideAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 11 }).start();
+    
+    // Focus the input to trigger the keyboard
+    // 100ms timeout ensures Modal is fully mounted before calling focus()
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   const closeChat = () => {
@@ -428,6 +435,7 @@ export default function FloatingChatbot() {
               {/* Input Area */}
               <View style={[s.inputArea, { backgroundColor: theme.card, borderTopColor: border }]}>
                 <TextInput
+                  ref={inputRef}
                   style={[s.input, { backgroundColor: inputBg, color: theme.text, borderColor: border }]}
                   placeholder="Message UniTrade AI..."
                   placeholderTextColor={darkMode ? "#475569" : "#94a3b8"}
