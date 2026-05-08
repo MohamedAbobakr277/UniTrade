@@ -58,7 +58,7 @@ export const ProductCard = ({
   const router = useRouter();
   const { rating: sellerRating } = useSellerRating(item.userId);
 
-  const imageUri = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : PLACEHOLDER;
+  const imageUri = (Array.isArray(item.images) && item.images[0]) ? item.images[0] : PLACEHOLDER;
   const isSoldOut = item.status === "sold" || item.quantityAvailable === 0;
 
   return (

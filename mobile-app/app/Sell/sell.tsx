@@ -258,11 +258,11 @@ export default function Sell() {
               </TouchableOpacity>
             ) : (
               <>
-                <Image source={{ uri: images[0] }} style={s.mainPreview} />
+                <Image source={{ uri: images[0] || "https://via.placeholder.com/150" }} style={s.mainPreview} />
                 <ScrollView horizontal contentContainerStyle={s.thumbRow}>
                   {images.map((img, i) => (
                     <View key={i} style={s.thumbWrap}>
-                      <Image source={{ uri: img }} style={s.thumb} />
+                      <Image source={{ uri: img || "https://via.placeholder.com/150" }} style={s.thumb} />
                       <TouchableOpacity style={s.removeBtn} onPress={() => setImages(images.filter((_, idx) => idx !== i))}>
                         <Feather name="x" size={10} color="#fff" />
                       </TouchableOpacity>

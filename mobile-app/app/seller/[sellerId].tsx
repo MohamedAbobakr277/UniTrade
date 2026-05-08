@@ -438,7 +438,7 @@ export default function SellerProfile() {
       {/* ── Seller info card ── */}
       <View style={[s.profileCard, { backgroundColor: theme.card }]}>
         <Image
-          source={{ uri: seller?.profilePhoto || "https://cdn-icons-png.flaticon.com/512/149/149071.png" }}
+          source={{ uri: seller?.profilePhoto || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&q=80" }}
           style={s.avatar}
         />
 

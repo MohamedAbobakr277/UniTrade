@@ -189,7 +189,7 @@ export default function EditProduct() {
       <View style={styles.imagesContainer}>
         {images.map((img, index) => (
           <View key={index} style={styles.imageBox}>
-            <Image source={{ uri: img }} style={styles.image} />
+            <Image source={{ uri: img || "https://via.placeholder.com/150" }} style={styles.image} />
             <TouchableOpacity style={styles.deleteImage} onPress={() => removeImage(index)}>
               <Feather name="x" size={12} color="#fff" />
             </TouchableOpacity>

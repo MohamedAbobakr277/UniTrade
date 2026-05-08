@@ -564,7 +564,7 @@ export default function ProductDetails() {
             }
             activeOpacity={0.8}
           >
-            <Image source={{ uri: sellerPhoto }} style={s.sellerAvatar} />
+            <Image source={{ uri: sellerPhoto || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&q=80" }} style={s.sellerAvatar} />
 
             <View style={{ flex: 1 }}>
               <Text style={[s.sellerName, { color: theme.text }]}>
@@ -664,7 +664,7 @@ export default function ProductDetails() {
                         }
                         activeOpacity={0.85}
                       >
-                        <Image source={{ uri: img }} style={s.recImage} />
+                        <Image source={{ uri: img || "https://via.placeholder.com/150" }} style={s.recImage} />
                         {item.condition && (
                           <View style={[s.recBadge, { backgroundColor: condS.bg }]}>
                             <Text style={[s.recBadgeText, { color: condS.text }]}>
