@@ -43,9 +43,9 @@ function StatCard({ label, value, Icon, iconBg, iconColor }) {
     <Paper
       elevation={0}
       sx={{
-        flex: 1,
+        flex: { xs: "1 1 100%", sm: "1 1 calc(50% - 20px)", lg: "1" },
         minWidth: 0,
-        p: "22px 24px",
+        p: { xs: "18px 20px", md: "22px 24px" },
         borderRadius: "6px",
         border: "1px solid",
         borderColor: "divider",
@@ -144,7 +144,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
       </Box>
 
       {/* ── 4 Stat cards — flex row, each stretches equally ── */}
-      <Box sx={{ display: "flex", gap: 2.5 }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2.5 }}>
         {stats.map((s) => <StatCard key={s.label} {...s} />)}
       </Box>
 
@@ -155,7 +155,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
         <Paper
           elevation={0}
           sx={{
-            flex: "2 1 0",
+            flex: { xs: "1 1 100%", lg: "2 1 0" },
             borderRadius: "6px",
             border: "1px solid",
             borderColor: "divider",
@@ -166,7 +166,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
           {/* Panel header */}
           <Box
             sx={{
-              px: 3,
+              px: { xs: 2, md: 3 },
               py: 2.2,
               display: "flex",
               justifyContent: "space-between",
@@ -206,11 +206,11 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                 <Box key={item.id}>
                   <Box
                     sx={{
-                      px: 3,
+                      px: { xs: 2, md: 3 },
                       py: 1.6,
                       display: "flex",
                       alignItems: "center",
-                      gap: 2,
+                      gap: { xs: 1, sm: 2 },
                       transition: "background 0.15s",
                       "&:hover": { bgcolor: "background.subtle" },
                     }}
@@ -236,14 +236,14 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                       >
                         {item.title}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.78rem", color: "text.secondary", mt: 0.25 }}>
+                      <Typography sx={{ fontSize: { xs: "0.72rem", sm: "0.78rem" }, color: "text.secondary", mt: 0.25, display: { xs: "none", sm: "block" } }}>
                         {item.sellerName ?? "—"}
                       </Typography>
                     </Box>
 
                     {/* Price */}
                     <Typography
-                      sx={{ fontWeight: 700, fontSize: "0.93rem", color: "#2563eb", whiteSpace: "nowrap" }}
+                      sx={{ fontWeight: 700, fontSize: { xs: "0.85rem", sm: "0.93rem" }, color: "#2563eb", whiteSpace: "nowrap" }}
                     >
                       {Number(item.price ?? 0).toLocaleString()} EGP
                     </Typography>
@@ -252,7 +252,15 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
                     <Chip
                       label={chip.label}
                       size="small"
-                      sx={{ bgcolor: chip.bgcolor, color: chip.color, fontWeight: 700, fontSize: "0.72rem", height: 26, minWidth: 72 }}
+                      sx={{ 
+                        bgcolor: chip.bgcolor, 
+                        color: chip.color, 
+                        fontWeight: 700, 
+                        fontSize: "0.72rem", 
+                        height: 26, 
+                        minWidth: { xs: 60, sm: 72 },
+                        display: { xs: "none", sm: "inline-flex" }
+                      }}
                     />
 
                     {/* View icon */}
@@ -278,7 +286,7 @@ export default function DashboardOverview({ listings, users, onViewAll }) {
         </Paper>
 
         {/* Right panel */}
-        <Box sx={{ flex: "1 1 0", display: "flex", flexDirection: "column", gap: 2.5, minWidth: 220 }}>
+        <Box sx={{ flex: { xs: "1 1 100%", lg: "1 1 0" }, display: "flex", flexDirection: "column", gap: 2.5, minWidth: { xs: "100%", lg: 220 } }}>
 
           {/* Status Breakdown */}
           <Paper

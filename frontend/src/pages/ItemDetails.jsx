@@ -360,9 +360,9 @@ export default function ItemDetails() {
                         Back to Listings
                     </Button>
 
-                    <Grid container spacing={{ xs: 1.5, sm: 4 }} alignItems="flex-start" wrap="nowrap">
-                        {/* Left Column: Image Gallery - Locked at 5/12 (~41%) */}
-                        <Grid item xs={5} sm={5} md={5} lg={5} sx={{ minWidth: 0, width: "41.6%", flexBasis: "41.6%" }}>
+                    <Grid container spacing={{ xs: 1.5, sm: 4 }} alignItems="flex-start">
+                        {/* Left Column: Image Gallery */}
+                        <Grid item xs={12} md={5} lg={5} sx={{ minWidth: 0 }}>
                             <Box sx={{ position: { xs: "static", md: "sticky" }, top: "100px", minWidth: 0, width: "100%" }}>
                                 <Paper
                                     elevation={0}
@@ -375,13 +375,14 @@ export default function ItemDetails() {
                                         border: "1px solid",
                                         borderColor: "divider",
                                         boxShadow: (theme) => theme.palette.mode === 'light' ? "0 12px 30px rgba(15,23,42,0.04)" : "none",
-                                        height: { xs: "180px", sm: "300px", md: "350px", lg: "400px" },
+                                        height: { xs: "350px", sm: "400px", md: "450px" },
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
                                         mb: 1.5,
-                                        p: { xs: 1, sm: 3, md: 4 },
+                                        p: { xs: 0, sm: 2 },
                                         width: "100%",
+                                        bgcolor: (theme) => theme.palette.mode === 'light' ? "#ffffff" : "rgba(255,255,255,0.02)",
                                     }}
                                 >
                                     <Box
@@ -512,27 +513,26 @@ export default function ItemDetails() {
                             </Box>
                         </Grid>
 
-                        {/* Right Column: Details - Locked at 7/12 (~58%) */}
-                        <Grid item xs={7} sm={7} md={7} lg={7} sx={{ minWidth: 0, width: "58.3%", flexBasis: "58.3%" }}>
+                        {/* Right Column: Details */}
+                        <Grid item xs={12} md={7} lg={7} sx={{ minWidth: 0 }}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
                                 {/* Title and Price */}
                                 <Box>
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: 16, sm: 22, md: 32 },
+                                            fontSize: { xs: 20, sm: 26, md: 32 },
                                             fontWeight: 900,
                                             color: "text.primary",
                                             lineHeight: 1.2,
                                             mb: 0.5,
                                             wordBreak: "break-word",
-                                            overflowWrap: "anywhere",
                                         }}
                                     >
                                         {item.title}
                                     </Typography>
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: 20, sm: 26, md: 36 },
+                                            fontSize: { xs: 22, sm: 28, md: 36 },
                                             fontWeight: 900,
                                             color: "primary.main",
                                             letterSpacing: "-1px",
@@ -547,22 +547,22 @@ export default function ItemDetails() {
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 0.5 }}>
                                     {item.category && (
                                         <Chip
-                                            icon={<CategoryIcon sx={{ fontSize: "16px !important", color: "text.secondary !important" }} />}
+                                            icon={<CategoryIcon sx={{ fontSize: "16px !important" }} />}
                                             label={item.category}
-                                            sx={{ bgcolor: "background.subtle", color: "text.primary", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid', borderColor: 'divider' }}
+                                            sx={{ bgcolor: "background.paper", fontWeight: 700, borderRadius: "10px", py: 2, border: '1px solid', borderColor: 'divider' }}
                                         />
                                     )}
                                     {item.university && (
                                         <Chip
-                                            icon={<LocationOnIcon sx={{ fontSize: "18px !important", color: "text.secondary !important" }} />}
+                                            icon={<LocationOnIcon sx={{ fontSize: "16px !important" }} />}
                                             label={item.university}
-                                            sx={{ bgcolor: "background.subtle", color: "text.primary", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid', borderColor: 'divider' }}
+                                            sx={{ bgcolor: "background.paper", fontWeight: 700, borderRadius: "10px", py: 2, border: '1px solid', borderColor: 'divider' }}
                                         />
                                     )}
                                     <Chip
-                                        icon={<AccessTimeIcon sx={{ fontSize: "18px !important", color: "text.secondary !important" }} />}
-                                        label={`Posted ${formattedDate}`}
-                                        sx={{ bgcolor: "background.subtle", color: "text.primary", fontWeight: 700, borderRadius: "10px", py: 2.2, px: 0.5, border: '1px solid', borderColor: 'divider' }}
+                                        icon={<AccessTimeIcon sx={{ fontSize: "16px !important" }} />}
+                                        label={formattedDate}
+                                        sx={{ bgcolor: "background.paper", fontWeight: 700, borderRadius: "10px", py: 2, border: '1px solid', borderColor: 'divider' }}
                                     />
                                 </Box>
 

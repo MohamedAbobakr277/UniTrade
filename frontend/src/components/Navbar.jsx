@@ -264,39 +264,47 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                 boxShadow: isDark ? "0 4px 20px rgba(0,0,0,0.4)" : "0 2px 16px rgba(15,23,42,0.05)",
             }}
         >
-            <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: { xs: 1.5, md: 3 },
-                    px: { xs: 2, md: 5 },
-                    py: 1.4,
-                    minHeight: "72px",
-                }}
-            >
-                {/* LOGO */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        px: { xs: 1.5, md: 5 },
+                        py: { xs: 1, md: 1.4 },
+                    }}
+                >
+                    {/* Top Row: Logo and Actions */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "100%",
+                            gap: { xs: 1, sm: 1.5, md: 3 },
+                            minHeight: { xs: "56px", sm: "72px" },
+                        }}
+                    >
                 <Box
                     onClick={handleLogoClick}
-                    sx={{ display: "flex", alignItems: "center", gap: 1.5, cursor: "pointer", flexShrink: 0 }}
+                    sx={{ display: "flex", alignItems: "center", gap: 1.2, cursor: "pointer", flexShrink: 0 }}
                 >
                     <Box
                         component="img"
                         src={logo}
                         alt="UniTrade"
-                        sx={{ height: { xs: 44, md: 52 }, width: "auto", objectFit: "contain" }}
+                        sx={{ height: { xs: 36, sm: 44, md: 52 }, width: "auto", objectFit: "contain" }}
                     />
-                    <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 800, color: theme.palette.text.primary, lineHeight: 1.1 }}>
+                    <Box sx={{ display: { xs: "none", md: "block" } }}>
+                        <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: theme.palette.text.primary, lineHeight: 1.1 }}>
                             UniTrade
                         </Typography>
-                        <Typography sx={{ fontSize: "0.78rem", color: theme.palette.text.secondary, fontWeight: 500, mt: 0.2 }}>
+                        <Typography sx={{ fontSize: "0.72rem", color: theme.palette.text.secondary, fontWeight: 500, mt: 0.1 }}>
                             Campus Marketplace
                         </Typography>
                     </Box>
                 </Box>
 
-                {/* ─── SEARCH WRAPPER (relative for dropdown) ─── */}
-                <Box sx={{ flex: 1, position: "relative" }}>
+                {/* ─── SEARCH WRAPPER (Desktop only in this row) ─── */}
+                <Box sx={{ flex: 1, position: "relative", display: { xs: "none", sm: "block" } }}>
                     {/* Search Input Bar */}
                     <Box
                         sx={{
@@ -315,8 +323,8 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     >
 
                         {/* Left search icon — decorative only */}
-                        <Box sx={{ pl: 2.5, pr: 1, display: "flex", alignItems: "center", pointerEvents: "none", flexShrink: 0 }}>
-                            <SearchIcon sx={{ color: open ? "primary.main" : "text.secondary", fontSize: "1.6rem", transition: "color 0.25s" }} />
+                        <Box sx={{ pl: { xs: 1.5, sm: 2.5 }, pr: 1, display: "flex", alignItems: "center", pointerEvents: "none", flexShrink: 0 }}>
+                            <SearchIcon sx={{ color: open ? "primary.main" : "text.secondary", fontSize: { xs: "1.3rem", sm: "1.6rem" }, transition: "color 0.25s" }} />
                         </Box>
 
                         <InputBase
@@ -535,7 +543,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                 </Box>
 
                 {/* ─── RIGHT ACTIONS ─── */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 1.5 }, flexShrink: 0 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1, md: 1.5 }, flexShrink: 0 }}>
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}
@@ -745,6 +753,83 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             "&:hover": { transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(37,99,235,0.20)" },
                         }}
                     />
+                </Box>
+                </Box>
+
+                {/* ─── MOBILE SEARCH ROW ─── */}
+                <Box sx={{ display: { xs: "block", sm: "none" }, px: 1.5, pb: 1.5, mt: -0.5 }}>
+                    <Box sx={{ position: "relative" }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                borderRadius: "12px",
+                                border: open ? `1.5px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
+                                backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "#ffffff",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Box sx={{ pl: 1.5, pr: 1, display: "flex", alignItems: "center" }}>
+                                <SearchIcon sx={{ color: "text.secondary", fontSize: "1.2rem" }} />
+                            </Box>
+                            <InputBase
+                                inputRef={inputRef}
+                                fullWidth
+                                value={inputValue}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setInputValue(val);
+                                    if (isHome) setSearch?.(val);
+                                    setActiveIndex(-1);
+                                    if (!open) setOpen(true);
+                                }}
+                                onFocus={handleFocus}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") { handleSubmit(); }
+                                    else if (e.key === "Escape") { setOpen(false); setActiveIndex(-1); }
+                                }}
+                                placeholder="Search for anything..."
+                                sx={{ py: 0.8, fontSize: "0.9rem", fontWeight: 500 }}
+                            />
+                            {inputValue && (
+                                <IconButton size="small" onClick={handleClear} sx={{ mr: 1 }}>
+                                    <ClearIcon sx={{ fontSize: "1.1rem" }} />
+                                </IconButton>
+                            )}
+                        </Box>
+
+                        {/* MOBILE DROPDOWN (duplicate logic but simplified for mobile row) */}
+                        {open && (
+                            <Paper
+                                sx={{
+                                    position: "absolute",
+                                    top: "100%",
+                                    left: 0,
+                                    right: 0,
+                                    zIndex: 1300,
+                                    borderRadius: "0 0 12px 12px",
+                                    border: `1px solid ${theme.palette.primary.main}`,
+                                    borderTop: "none",
+                                    backgroundColor: "background.paper",
+                                    maxHeight: "350px",
+                                    overflowY: "auto",
+                                }}
+                            >
+                                {showSuggestions && suggestions.map((item) => (
+                                    <Box key={item.id} onClick={() => handleSelect(item.title)} sx={{ px: 2, py: 1.5, borderBottom: "1px solid", borderColor: "divider" }}>
+                                        <Typography sx={{ fontSize: "0.9rem", fontWeight: 600 }}>{item.title}</Typography>
+                                    </Box>
+                                ))}
+                                {showEmpty && recentSearches.map(term => (
+                                    <Box key={term} onClick={() => handleSelect(term)} sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+                                        <AccessTimeIcon sx={{ fontSize: "1rem", color: "text.secondary" }} />
+                                        <Typography sx={{ fontSize: "0.9rem" }}>{term}</Typography>
+                                    </Box>
+                                ))}
+                            </Paper>
+                        )}
+                    </Box>
                 </Box>
             </Box>
         </Box>

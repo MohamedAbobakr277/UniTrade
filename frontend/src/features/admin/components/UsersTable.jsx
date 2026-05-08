@@ -39,7 +39,7 @@ export default function UsersTable({
 
   return (
     <Box sx={{ animation: "fadeIn 0.5s ease" }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, gap: 2, mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 800 }}>
           Registered Students
         </Typography>
@@ -51,7 +51,7 @@ export default function UsersTable({
           onChange={(e) => setSearchQuery(e.target.value)}
           sx={{
             bgcolor: "background.paper",
-            width: 300,
+            width: { xs: "100%", sm: 300 },
             overflow: "hidden",
             "& .MuiOutlinedInput-root": {
               borderRadius: "6px",

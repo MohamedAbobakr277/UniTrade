@@ -7,6 +7,7 @@ import {
   ListItemText,
   Tooltip,
   Typography,
+  Drawer,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ListAltIcon from "@mui/icons-material/ListAlt";
@@ -28,7 +29,7 @@ const NAV_ITEMS = [
 const FULL_WIDTH = 240;
 const COLLAPSED_WIDTH = 72;
 
-export default function AdminSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse }) {
+export default function AdminSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse, mobileOpen, onMobileClose }) {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -123,19 +124,16 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
     ) : btn;
   };
 
-  return (
+  const sidebarContent = (
     <Box
       sx={{
-        width,
+        width: collapsed ? COLLAPSED_WIDTH : FULL_WIDTH,
         minHeight: "100vh",
         bgcolor: "background.paper",
-        borderRight: "1px solid",
-        borderColor: "divider",
         display: "flex",
         flexDirection: "column",
         transition: "width 0.25s ease",
         overflow: "hidden",
-        flexShrink: 0,
       }}
     >
       {/* ── Logo ── */}
@@ -210,5 +208,40 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
         />
       </Box>
     </Box>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "block" },
+          width: collapsed ? COLLAPSED_WIDTH : FULL_WIDTH,
+          borderRight: "1px solid",
+          borderColor: "divider",
+          flexShrink: 0,
+          transition: "width 0.25s ease",
+        }}
+      >
+        {sidebarContent}
+      </Box>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onMobileClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: FULL_WIDTH,
+          },
+        }}
+      >
+        {sidebarContent}
+      </Drawer>
+    </>
   );
 }

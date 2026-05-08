@@ -41,10 +41,10 @@ export default function CategoryBar({
         >
             <Box
                 sx={{
-                    display: "flex",
-                    alignItems: { xs: "flex-start", sm: "center" },
+                    display: { xs: "none", sm: "flex" },
+                    alignItems: "center",
                     justifyContent: "space-between",
-                    flexDirection: { xs: "column", sm: "row" },
+                    flexDirection: "row",
                     gap: 1.5,
                     mb: 2.5,
                 }}
@@ -76,7 +76,12 @@ export default function CategoryBar({
                 sx={{
                     display: "flex",
                     gap: 1.5,
-                    flexWrap: "wrap",
+                    overflowX: "auto",
+                    pb: { xs: 1, sm: 0 },
+                    "&::-webkit-scrollbar": { display: "none" },
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                    flexWrap: { xs: "nowrap", sm: "wrap" },
                 }}
             >
                 {categories.map((cat) => {
@@ -104,12 +109,13 @@ export default function CategoryBar({
                             onClick={handleToggle}
                             sx={{
                                 px: 1.8,
-                                py: 2.7,
+                                py: { xs: 1.2, sm: 2.7 },
                                 fontWeight: 800,
                                 fontSize: "0.95rem",
                                 borderRadius: "14px",
                                 border: '1px solid',
                                 borderColor: isSelected ? 'primary.main' : 'divider',
+                                flexShrink: 0,
                                 background: isSelected
                                     ? (theme) => theme.palette.mode === 'light' 
                                         ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"

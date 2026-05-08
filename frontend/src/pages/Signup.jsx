@@ -97,7 +97,12 @@ const GlassCard = styled(Box)(({ theme }) => ({
             ? "0 30px 70px -12px rgba(37,99,235,0.12), 0 0 0 1px rgba(255,255,255,0.6) inset"
             : "0 30px 70px -12px rgba(59,130,246,0.2), 0 0 0 1px rgba(255,255,255,0.08) inset",
     },
+    [theme.breakpoints.down('sm')]: {
+        padding: "30px 20px",
+        margin: "12px",
+    },
 }));
+
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {

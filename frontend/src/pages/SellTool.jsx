@@ -173,8 +173,8 @@ export default function SellTool() {
             }}>
                 <Navbar />
                 {showConfetti && <Confetti width={width} height={height} recycle={false} />}
-                <Box sx={{ p: 5, flex: 1 }}>
-                    <Box sx={{ maxWidth: 700, mx: "auto", backgroundColor: "background.paper", p: 5, borderRadius: 4, boxShadow: (theme) => theme.palette.mode === 'light' ? "0 10px 30px rgba(0,0,0,0.05)" : "none", border: "1px solid", borderColor: "divider" }}>
+                <Box sx={{ p: { xs: 2, sm: 5 }, flex: 1 }}>
+                    <Box sx={{ maxWidth: 700, mx: "auto", backgroundColor: "background.paper", p: { xs: 2.5, sm: 5 }, borderRadius: 4, boxShadow: (theme) => theme.palette.mode === 'light' ? "0 10px 30px rgba(0,0,0,0.05)" : "none", border: "1px solid", borderColor: "divider" }}>
                         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 3 }}>Back</Button>
                         <Typography sx={{ fontSize: 26, fontWeight: 700, mb: 4 }}>Sell Your Item</Typography>
 
