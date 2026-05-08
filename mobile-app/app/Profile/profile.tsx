@@ -27,6 +27,7 @@ import {
 import { signOut } from "firebase/auth";
 import { Stars } from "../../components/Stars";
 import { useSellerRating } from "../services/rating";
+import { ProductCard } from "@/components/ProductCard";
 
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
@@ -283,12 +284,6 @@ export default function Profile() {
       </View>
 
       <View style={s.grid}>
-        {items.map((item: any) => {
-          const img =
-            Array.isArray(item.images) && item.images.length > 0
-              ? item.images[0]
-              : "https://via.placeholder.com/150";
-
         {items.map((item: any) => (
           <ProductCard
             key={item.id}
