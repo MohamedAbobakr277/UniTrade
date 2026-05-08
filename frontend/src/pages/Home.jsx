@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Chip, Fab, FormControl, Select, MenuItem, Button } from "@mui/material";
+import { Box, Typography, Paper, Chip, Fab, FormControl, Select, MenuItem, Button, IconButton } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SortIcon from "@mui/icons-material/Sort";
 import Navbar from "../components/Navbar";
@@ -24,6 +24,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("newest");
   const [visibleCount, setVisibleCount] = useState(50);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Read search term passed from other pages via navigate state
   useEffect(() => {
@@ -184,14 +185,18 @@ export default function Home() {
               mt: { xs: 2, md: 1 },
             }}
           >
-            <Sidebar
-              selectedUniversities={selectedUniversities}
-              setSelectedUniversities={setSelectedUniversities}
-              priceRange={priceRange}
-              setPriceRange={setPriceRange}
-              selectedConditions={selectedConditions}
-              setSelectedConditions={setSelectedConditions}
-            />
+            {/* Mobile Filter Toggle - Hidden here, moved inside the header Paper */}
+
+            <Box sx={{ display: { xs: showMobileFilters ? "block" : "none", md: "block" }, width: { xs: "100%", md: "auto" } }}>
+              <Sidebar
+                selectedUniversities={selectedUniversities}
+                setSelectedUniversities={setSelectedUniversities}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                selectedConditions={selectedConditions}
+                setSelectedConditions={setSelectedConditions}
+              />
+            </Box>
 
             <Box sx={{ flex: 1, width: "100%" }}>
               <Paper
@@ -215,17 +220,35 @@ export default function Home() {
                     gap: 1.5,
                   }}
                 >
-                  <Box>
-                    <Typography sx={{ fontSize: { xs: 24, md: 28 }, fontWeight: 800, color: "text.primary", mb: 0.5 }}>
-                      All Listings
-                    </Typography>
-                    <Typography sx={{ fontSize: "0.95rem", color: "text.secondary", lineHeight: 1.7 }}>
-                      Explore campus deals and discover useful student items in one place.
-                    </Typography>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", mb: { xs: 1, md: 0 } }}>
+                    <Box>
+                      <Typography sx={{ fontSize: { xs: 20, md: 28 }, fontWeight: 800, color: "text.primary", mb: 0.5 }}>
+                        All Listings
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.85rem", color: "text.secondary", lineHeight: 1.4, display: { xs: "none", sm: "block" } }}>
+                        Explore campus deals and discover useful student items in one place.
+                      </Typography>
+                    </Box>
+                    
+                    {/* Mobile Filter Toggle */}
+                    <IconButton
+                      onClick={() => setShowMobileFilters(!showMobileFilters)}
+                      sx={{
+                        display: { xs: "flex", md: "none" },
+                        bgcolor: showMobileFilters ? "primary.main" : "background.default",
+                        color: showMobileFilters ? "white" : "text.primary",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        borderRadius: "12px",
+                        "&:hover": { bgcolor: "primary.light", color: "white" }
+                      }}
+                    >
+                      <SortIcon />
+                    </IconButton>
                   </Box>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: { xs: "100%", md: "auto" }, justifyContent: "space-between" }}>
+                    <FormControl size="small" sx={{ minWidth: { xs: "calc(100% - 100px)", md: 160 } }}>
                       <Select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
@@ -250,13 +273,13 @@ export default function Home() {
                     </FormControl>
 
                     <Chip
-                      label={`${filteredItems.length} item${filteredItems.length !== 1 ? "s" : ""} found`}
+                      label={`${filteredItems.length} items`}
                       sx={{
                         fontWeight: 800,
                         borderRadius: "10px",
                         backgroundColor: (theme) => theme.palette.mode === 'light' ? "rgba(37, 99, 235, 0.1)" : "rgba(96, 165, 250, 0.1)",
                         color: (theme) => theme.palette.mode === 'light' ? "primary.main" : "#60a5fa",
-                        display: { xs: "none", sm: "flex" },
+                        fontSize: "0.75rem",
                       }}
                     />
                   </Box>
@@ -268,8 +291,8 @@ export default function Home() {
                   <Box
                     sx={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                      gap: 3,
+                      gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(auto-fill, minmax(280px, 1fr))" },
+                      gap: { xs: 1.5, sm: 3 },
                       width: "100%",
                     }}
                   >

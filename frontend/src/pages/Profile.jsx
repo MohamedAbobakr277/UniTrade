@@ -365,8 +365,15 @@ export default function Profile() {
         }}>
             <Navbar />
 
-            <Box sx={{ display: 'flex' }}>
-                <Box sx={{ width: 280, borderRight: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', minHeight: 'calc(100vh - 93px)' }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+                <Box sx={{ 
+                    width: { xs: '100%', md: 280 }, 
+                    borderRight: { xs: 'none', md: '1px solid' },
+                    borderBottom: { xs: '1px solid', md: 'none' },
+                    borderColor: 'divider', 
+                    bgcolor: 'background.paper', 
+                    minHeight: { xs: 'auto', md: 'calc(100vh - 93px)' } 
+                }}>
                     <Box sx={{ p: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>{user.firstName} {user.lastName}</Typography>
                         <List sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

@@ -5,15 +5,16 @@ import { doc, getDoc } from "firebase/firestore";
 import { IconButton, Tooltip } from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useColorMode } from "../../../context/ThemeContext";
 
 const TAB_LABELS = {
   dashboard: "Dashboard Overview",
-  listings:  "Listings Management",
-  users:     "Users Management",
+  listings: "Listings Management",
+  users: "Users Management",
 };
 
-export default function AdminHeader({ activeTab }) {
+export default function AdminHeader({ activeTab, onMenuClick }) {
   const [adminName, setAdminName] = useState("Admin");
   const theme = useTheme();
   const colorMode = useColorMode();
@@ -48,33 +49,44 @@ export default function AdminHeader({ activeTab }) {
         bgcolor: "background.paper",
         borderBottom: "1px solid",
         borderColor: "divider",
-        px: 4,
+        px: { xs: 2, md: 4 },
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         flexShrink: 0,
       }}
     >
-      {/* Breadcrumb */}
-      <Box>
-        <Typography
-          sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 500, lineHeight: 1 }}
+      {/* Mobile Menu Toggle & Breadcrumb */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={onMenuClick}
+          sx={{ display: { md: "none" } }}
         >
-          Admin Dashboard
-        </Typography>
-        <Typography
-          sx={{ fontWeight: 700, color: "text.primary", fontSize: "1rem", lineHeight: 1.4 }}
-        >
-          {TAB_LABELS[activeTab] ?? ""}
-        </Typography>
+          <MenuIcon />
+        </IconButton>
+        <Box>
+          <Typography
+            sx={{ fontSize: "0.75rem", color: "text.secondary", fontWeight: 500, lineHeight: 1 }}
+          >
+            Admin Dashboard
+          </Typography>
+          <Typography
+            sx={{ fontWeight: 700, color: "text.primary", fontSize: { xs: "0.85rem", md: "1rem" }, lineHeight: 1.4 }}
+          >
+            {TAB_LABELS[activeTab] ?? ""}
+          </Typography>
+        </Box>
       </Box>
 
       {/* Controls & User info */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 3 } }}>
         <Tooltip title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}>
-          <IconButton 
-            onClick={colorMode.toggleColorMode} 
-            sx={{ 
+          <IconButton
+            onClick={colorMode.toggleColorMode}
+            sx={{
               bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)",
               "&:hover": { bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.06)" }
             }}
@@ -84,7 +96,7 @@ export default function AdminHeader({ activeTab }) {
         </Tooltip>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Box sx={{ textAlign: "right" }}>
+          <Box sx={{ textAlign: "right", display: { xs: "none", sm: "block" } }}>
             <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: "text.primary", lineHeight: 1.2 }}>
               {adminName}
             </Typography>

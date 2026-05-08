@@ -8,7 +8,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { useTheme } from "../../constants/ThemeContext";
-import * as api from "../services/api";
 import styles from "./edit-product.style";
 
 const CATEGORIES = [
@@ -66,30 +65,13 @@ export default function EditProduct() {
   const updateProduct = async () => {
     if (!title || !price) { Alert.alert("Error", "Please fill all fields"); return; }
     try {
-      // 1. Upload local images to Cloudinary via backend
-      const uploadedUrls = [];
-      for (const uri of images) {
-        if (uri.startsWith("http")) {
-          uploadedUrls.push(uri);
-        } else {
-          const { secure_url } = await api.uploadImage(uri);
-          uploadedUrls.push(secure_url);
-        }
-      }
-
-      // 2. Update via backend
-      await api.updateProduct(id as string, {
-        title, 
-        price: Number(price), 
-        condition, 
-        category, 
-        images: uploadedUrls,
+      await updateDoc(doc(db, "products", id as string), {
+        title, price: Number(price), condition, category, images,
         quantityAvailable: Number(quantityAvailable)
       });
       Alert.alert("Success", "Product updated");
       router.back();
-    } catch (e) {
-      console.error("Update error:", e);
+    } catch {
       Alert.alert("Error", "Failed to update");
     }
   };

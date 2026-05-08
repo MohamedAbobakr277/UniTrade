@@ -40,7 +40,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "./withAndroidQueries.js"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -67,14 +67,14 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
 
   return (
     <Box sx={{ animation: "fadeIn 0.5s ease" }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, gap: 2, mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary" }}>
           Listings Management
         </Typography>
       </Box>
 
       {/* ── Filters Bar ── */}
-      <Box sx={{ display: "flex", gap: 2, mb: 3, overflow: "hidden" }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, mb: 3, overflow: "hidden" }}>
         <TextField
           size="small"
           placeholder="Search items or sellers..."
@@ -107,7 +107,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
           sx={{
-            width: 220,
+            width: { xs: "100%", sm: 220 },
             bgcolor: "background.subtle",
             overflow: "hidden",
             "& .MuiOutlinedInput-root": {
@@ -130,7 +130,7 @@ export default function ListingsTable({ listings, onEdit, onDelete }) {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
           sx={{
-            width: 160,
+            width: { xs: "100%", sm: 160 },
             bgcolor: "background.subtle",
             overflow: "hidden",
             "& .MuiOutlinedInput-root": {

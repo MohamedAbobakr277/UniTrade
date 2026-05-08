@@ -16,6 +16,8 @@ import { useAdminUsers } from "../features/admin/hooks/useAdminUsers";
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const {
     listings,
     editTarget, openEdit, closeEdit, saveEdit,
@@ -32,23 +34,29 @@ export default function AdminDashboard() {
     confirmDeleteUser
   } = useAdminUsers();
 
-  // Remove the problematic migration loop that was causing a white screen/crash.
-  // Database migrations should be done via a script or on-demand to avoid infinite render loops.
-
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden", bgcolor: "background.default" }}>
       {/* ── Sidebar ── */}
       <AdminSidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setMobileOpen(false); // Close drawer on selection
+        }}
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed((c) => !c)}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
       />
 
       {/* ── Content column ── */}
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
-        <AdminHeader activeTab={activeTab} />
+        <AdminHeader activeTab={activeTab} onMenuClick={handleDrawerToggle} />
+
 
         <Box sx={{ flex: 1, p: { xs: 2, md: 3 }, overflow: "auto" }}>
           {activeTab === "dashboard" && (

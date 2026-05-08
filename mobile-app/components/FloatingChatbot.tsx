@@ -19,7 +19,7 @@ import { useTheme } from "../constants/ThemeContext";
 import { auth, db } from "../app/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-const BACKEND_URL = "http://192.168.1.9:3000";
+const BACKEND_URL = "https://unitrade-backend-five.vercel.app";
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 const BUTTON_SIZE = 60;
 const BUTTON_RIGHT_MARGIN = 16;

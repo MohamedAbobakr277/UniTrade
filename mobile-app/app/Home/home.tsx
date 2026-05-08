@@ -31,7 +31,6 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
-import * as api from "../services/api";
 import BottomNav from "../../components/BottomNav";
 
 interface Product {
@@ -274,20 +273,22 @@ export default function HomeScreen() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
     try {
-      const isFav = favorites.includes(productId);
-      if (isFav) {
-        await api.toggleFavorite(productId, "remove");
+      const userRef = doc(db, "users", uid);
+      if (favorites.includes(productId)) {
+        await updateDoc(userRef, { favourites: arrayRemove(productId) });
       } else {
-        await api.toggleFavorite(productId, "add");
+        await updateDoc(userRef, { favourites: arrayUnion(productId) });
         // Send notification
         const item = items.find((i) => i.id === productId);
         if (item && item.userId !== uid) {
-          await api.sendNotification(
-            item.userId,
-            "favorite",
-            `${auth.currentUser?.displayName || "Someone"} liked your product: ${item.title}`,
-            `/product/${item.id}`
-          );
+          const myName = users[uid]?.firstName || "A user";
+          await addDoc(collection(db, "users", item.userId, "notifications"), {
+            type: "favorite",
+            message: `${myName} added your item '${item.title}' to their favorites! ❤️`,
+            link: `/product/${productId}`,
+            read: false,
+            createdAt: serverTimestamp(),
+          });
         }
       }
     } catch (err) {

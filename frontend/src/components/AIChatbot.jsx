@@ -205,11 +205,11 @@ export default function AIChatbot() {
                         onClick={() => { setIsOpen(true); setShowWelcome(false); }}
                         sx={{
                             position: 'fixed',
-                            bottom: 24,
-                            left: 24,
+                            bottom: { xs: 16, sm: 24 },
+                            right: { xs: 16, sm: 24 },
                             zIndex: 9999,
-                            width: 60,
-                            height: 60,
+                            width: { xs: 50, sm: 60 },
+                            height: { xs: 50, sm: 60 },
                             background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)',
                             color: 'white',
                             '&:hover': { background: 'linear-gradient(135deg, #1e3a8a, #1d4ed8)', transform: 'scale(1.08) translateY(-4px)' },
@@ -229,8 +229,8 @@ export default function AIChatbot() {
                     elevation={12}
                     sx={{
                         position: 'fixed',
-                        bottom: 34,
-                        left: 100,
+                        bottom: { xs: 24, sm: 34 },
+                        right: { xs: 76, sm: 100 },
                         zIndex: 9998,
                         maxWidth: 260,
                         p: 2,
@@ -272,9 +272,9 @@ export default function AIChatbot() {
                     elevation={12}
                     sx={{
                         position: 'fixed',
-                        bottom: 24,
-                        left: 24,
-                        width: { xs: 'calc(100% - 48px)', sm: 400 },
+                        bottom: { xs: 16, sm: 24 },
+                        right: { xs: 16, sm: 24 },
+                        width: { xs: 'calc(100% - 32px)', sm: 400 },
                         height: 650,
                         maxHeight: 'calc(100vh - 48px)',
                         zIndex: 9999,

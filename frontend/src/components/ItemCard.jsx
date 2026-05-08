@@ -160,7 +160,7 @@ export default function ItemCard({ item }) {
           alt={item.title || "Product image"}
           sx={{
             width: "100%",
-            height: 220,
+            height: { xs: 160, sm: 220 },
             objectFit: "cover",
             display: "block",
             transition: "transform 0.35s ease",
@@ -278,12 +278,13 @@ export default function ItemCard({ item }) {
             fontSize: "1.1rem",
             color: "text.primary",
             lineHeight: 1.35,
-            height: "58px",
+            height: { xs: "42px", sm: "58px" },
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             mb: 0.5,
+            fontSize: { xs: "0.85rem", sm: "1.1rem" },
           }}
         >
           {item.title || "Untitled Item"}
@@ -296,8 +297,8 @@ export default function ItemCard({ item }) {
             color: "#2563eb",
             fontWeight: 900,
             mt: 0.5,
-            fontSize: "1.35rem",
-            height: "40px",
+            fontSize: { xs: "1.15rem", sm: "1.35rem" },
+            height: { xs: "32px", sm: "40px" },
             letterSpacing: "-0.5px",
           }}
         >
@@ -324,6 +325,7 @@ export default function ItemCard({ item }) {
           </Box>
           <Box
             sx={{
+              display: { xs: "none", sm: "flex" },
               px: 1,
               py: 0.4,
               borderRadius: "8px",
@@ -346,7 +348,7 @@ export default function ItemCard({ item }) {
             fontSize: "0.9rem",
             color: "text.secondary",
             lineHeight: 1.6,
-            display: "-webkit-box",
+            display: { xs: "none", sm: "-webkit-box" },
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
@@ -372,35 +374,32 @@ export default function ItemCard({ item }) {
             gap: 2,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Avatar
               src={editData?.profilePhoto || "/default-avatar.png"}
-              sx={{ width: 42, height: 42, border: "2px solid", borderColor: "divider", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+              sx={{ width: { xs: 28, sm: 42 }, height: { xs: 28, sm: 42 }, border: "2px solid", borderColor: "divider" }}
             />
             <Box sx={{ minWidth: 0 }}>
               <Typography
                 sx={{
-                  fontSize: 14.5,
+                  fontSize: { xs: 12, sm: 14.5 },
                   fontWeight: 800,
                   color: "text.primary",
                   lineHeight: 1.2,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  maxWidth: { xs: "70px", sm: "110px" }
+                  maxWidth: { xs: "75px", sm: "110px" }
                 }}
               >
                 {sellerName}
-              </Typography>
-              <Typography sx={{ fontSize: 12, color: "text.secondary", fontWeight: 500, mt: 0.2 }}>
-                Student Seller
               </Typography>
             </Box>
           </Box>
 
           <Box
             sx={{
-              display: "flex",
+              display: { xs: "none", sm: "flex" },
               alignItems: "center",
               gap: 0.8,
               bgcolor: "background.subtle",
@@ -410,7 +409,6 @@ export default function ItemCard({ item }) {
               px: 1.5,
               py: 0.8,
               flexShrink: 0,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.02)"
             }}
           >
             <AccessTimeIcon sx={{ fontSize: 15, color: "#94a3b8" }} />
