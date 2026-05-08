@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../constants/ThemeContext";
-import { forgotPassword } from "../services/auth";
+import { forgotPassword, getFriendlyAuthError } from "../services/auth";
 
 export default function ForgotPassword() {
   const { theme, darkMode } = useTheme();
@@ -44,7 +44,8 @@ export default function ForgotPassword() {
         [{ text: "OK", onPress: () => router.back() }]
       );
     } catch (err: any) {
-      setError(err.message || "Failed to send reset email");
+      const errorMsg = err.code ? getFriendlyAuthError(err.code) : (err.message || "Failed to send reset email");
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

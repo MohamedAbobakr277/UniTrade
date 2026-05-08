@@ -39,7 +39,8 @@
           }
         }
       ],
-      "./withAndroidQueries.js"
+      "./withAndroidQueries.js",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

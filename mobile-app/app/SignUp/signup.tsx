@@ -19,7 +19,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./signup.styles";
-import { signUp } from "../services/auth";
+import { signUp, getFriendlyAuthError } from "../services/auth";
 import PasswordRequirements, { validatePassword } from "../../components/PasswordRequirements";
 
 const SignUpScreen: React.FC = () => {
@@ -118,7 +118,8 @@ const SignUpScreen: React.FC = () => {
      router.replace("/");
 
     } catch (err: any) {
-      Alert.alert("Sign Up Failed", err.message || "Something went wrong.");
+      const errorMsg = err.code ? getFriendlyAuthError(err.code) : (err.message || "Something went wrong.");
+      Alert.alert("Sign Up Failed", errorMsg);
     } finally {
       setLoading(false);
     }

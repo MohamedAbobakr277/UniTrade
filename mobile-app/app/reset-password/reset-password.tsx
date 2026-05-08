@@ -17,6 +17,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { confirmPasswordReset } from "firebase/auth";
 import { auth } from "../services/firebase";
+import { getFriendlyAuthError } from "../services/auth";
 import PasswordRequirements, { validatePassword } from "../../components/PasswordRequirements";
 import { useTheme } from "../../constants/ThemeContext";
 
@@ -66,13 +67,8 @@ export default function ResetPassword() {
       ]);
     } catch (err: any) {
       console.log("RESET ERROR:", err);
-      if (err.code === "auth/expired-action-code") {
-        setError("The reset link has expired. Please request a new one.");
-      } else if (err.code === "auth/invalid-action-code") {
-        setError("Invalid reset link. Please check your email again.");
-      } else {
-        setError(err.message || "Password reset failed. Please try again.");
-      }
+      const errorMsg = err.code ? getFriendlyAuthError(err.code) : (err.message || "Password reset failed. Please try again.");
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

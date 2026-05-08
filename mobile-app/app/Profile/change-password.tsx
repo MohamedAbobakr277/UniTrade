@@ -18,6 +18,7 @@ import {
   updatePassword 
 } from "firebase/auth";
 import { auth } from "../services/firebase";
+import { getFriendlyAuthError } from "../services/auth";
 import { useTheme } from "../../constants/ThemeContext";
 import PasswordRequirements, { validatePassword } from "../../components/PasswordRequirements";
 import { LinearGradient } from "expo-linear-gradient";
@@ -71,11 +72,8 @@ export default function ChangePassword() {
       ]);
     } catch (err: any) {
       console.log(err);
-      if (err.code === "auth/wrong-password") {
-        Alert.alert("Error", "Current password is incorrect");
-      } else {
-        Alert.alert("Error", err.message || "Failed to update password");
-      }
+      const errorMsg = err.code ? getFriendlyAuthError(err.code) : (err.message || "Failed to update password");
+      Alert.alert("Error", errorMsg);
     } finally {
       setLoading(false);
     }

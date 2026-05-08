@@ -58,17 +58,7 @@ export async function signUp(
     return user.uid;
 
   } catch (error) {
-
-    if (error.code === "auth/email-already-in-use")
-      throw new Error("Email already used");
-
-    if (error.code === "auth/invalid-email")
-      throw new Error("Invalid email");
-
-    if (error.code === "auth/weak-password")
-      throw new Error("Weak password");
-
-    throw new Error(error.message);
+    throw error;
   }
 }
 
@@ -119,14 +109,7 @@ export async function login(email, password) {
     return user;
 
   } catch (error) {
-
-    if (error.code === "auth/user-not-found")
-      throw new Error("User not found");
-
-    if (error.code === "auth/wrong-password")
-      throw new Error("Wrong password");
-
-    throw new Error(error.message);
+    throw error;
   }
 }
 
@@ -153,12 +136,7 @@ export async function forgotPassword(email) {
 
   } catch (error) {
     console.log("FORGOT ERROR:", error);
-    if (error.code === "auth/invalid-email")
-      throw new Error("Invalid email");
-    if (error.code === "auth/user-not-found")
-      throw new Error("User not found");
-
-    throw new Error("Cannot send reset email. Please try again later.");
+    throw error;
   }
 }
 
@@ -175,14 +153,7 @@ export async function resetPasswordWithCode(
     await confirmPasswordReset(auth, oobCode, newPassword);
 
   } catch (error) {
-
-    if (error.code === "auth/expired-action-code")
-      throw new Error("Link expired");
-
-    if (error.code === "auth/weak-password")
-      throw new Error("Weak password");
-
-    throw new Error("Reset failed");
+    throw error;
   }
 }
 
@@ -196,7 +167,40 @@ export async function logout() {
     await signOut(auth);
 
   } catch (error) {
+    throw error;
+  }
+}
 
-    throw new Error("Logout failed");
+/* ================= ERROR HANDLING ================= */
+
+export function getFriendlyAuthError(errorCode) {
+  switch (errorCode) {
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+      return "Invalid email or password";
+
+    case "auth/user-not-found":
+      return "Account not found";
+
+    case "auth/email-already-in-use":
+      return "This email is already registered";
+
+    case "auth/invalid-email":
+      return "Please enter a valid email address";
+
+    case "auth/weak-password":
+      return "Password is too weak";
+
+    case "auth/network-request-failed":
+      return "Network error. Please check your connection";
+      
+    case "auth/expired-action-code":
+      return "The reset link has expired";
+
+    case "auth/invalid-action-code":
+      return "Invalid reset link. Please check your email again.";
+
+    default:
+      return "Something went wrong. Please try again later.";
   }
 }

@@ -20,7 +20,7 @@ import { useRouter } from "expo-router";
 
 import styles from "./styles";
 
-import { login } from "./services/auth";
+import { login, getFriendlyAuthError } from "./services/auth";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
@@ -84,7 +84,8 @@ const LoginScreen: React.FC = () => {
 
     }catch(err:any){
 
-      Alert.alert("Login Failed",err.message);
+      const errorMsg = err.code ? getFriendlyAuthError(err.code) : err.message;
+      Alert.alert("Login Failed", errorMsg);
 
     }finally{
 
