@@ -7,6 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
+import * as NavigationBar from 'expo-navigation-bar';
 import { useTheme } from "../../constants/ThemeContext";
 import styles from "./edit-product.style";
 
@@ -24,7 +25,7 @@ const CATEGORIES = [
 const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor"];
 
 export default function EditProduct() {
-  const { theme } = useTheme();
+  const { theme, darkMode } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams();
 
@@ -34,6 +35,11 @@ export default function EditProduct() {
   const [category, setCategory] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [quantityAvailable, setQuantityAvailable] = useState("1");
+
+  useEffect(() => {
+    NavigationBar.setBackgroundColorAsync(theme.background);
+    NavigationBar.setButtonStyleAsync(darkMode ? "light" : "dark");
+  }, [theme, darkMode]);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -90,9 +96,9 @@ export default function EditProduct() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{ flex: 1 }}>
           <ScrollView 
-            style={[styles.container, { backgroundColor: theme.background }]}
+            style={[styles.container, { backgroundColor: theme.background, flex: 1 }]}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 40 }}
+            contentContainerStyle={{ paddingBottom: 40, backgroundColor: theme.background }}
           >
         <Text style={[styles.title, { color: theme.text }]}>Edit Product</Text>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as NavigationBar from 'expo-navigation-bar';
 import { useRouter } from "expo-router";
 import { db, auth } from "../services/firebase";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
@@ -95,6 +96,11 @@ async function uploadToCloudinary(uri: string): Promise<string> {
 export default function Sell() {
   const router = useRouter();
   const { theme, darkMode } = useTheme();
+
+  useEffect(() => {
+    NavigationBar.setBackgroundColorAsync(theme.background);
+    NavigationBar.setButtonStyleAsync(darkMode ? "light" : "dark");
+  }, [theme, darkMode]);
 
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -249,8 +255,15 @@ export default function Sell() {
       style={{ flex: 1, backgroundColor: theme.background }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-          <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+        <SafeAreaView 
+          style={{ flex: 1, backgroundColor: theme.background }}
+          edges={["top", "bottom"]}
+        >
+          <ScrollView 
+            style={{ flex: 1, backgroundColor: theme.background }}
+            contentContainerStyle={[s.scroll, { backgroundColor: theme.background }]} 
+            keyboardShouldPersistTaps="handled"
+          >
           <Text style={[s.pageTitle, { color: theme.text }]}>Sell Your Item</Text>
 
           <View style={[s.imageSection, { backgroundColor: theme.card, borderColor: border }]}>
