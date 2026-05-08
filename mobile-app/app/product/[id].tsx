@@ -326,7 +326,7 @@ export default function ProductDetails() {
 
   const phone = sellerPhone || product?.phone || "";
 
-  const openWhatsApp = () => {
+  const openWhatsApp = async () => {
     if (!product) return;
     let cleaned = phone.replace(/\D/g, "");
     if (cleaned.startsWith("0")) {
@@ -337,13 +337,17 @@ export default function ProductDetails() {
     const message = `Hello! 👋\n\nI want to buy ${selectedQuantity} item${selectedQuantity > 1 ? 's' : ''} of this product on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
     
     const waUrl = `whatsapp://send?phone=${cleaned}&text=${encodeURIComponent(message)}`;
-    const webUrl = `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
+    const webUrl = `https://api.whatsapp.com/send?phone=${cleaned}&text=${encodeURIComponent(message)}`;
 
-    Linking.openURL(waUrl).catch(() => {
-      Linking.openURL(webUrl).catch(() => {
+    try {
+      await Linking.openURL(waUrl);
+    } catch (err) {
+      try {
+        await Linking.openURL(webUrl);
+      } catch (err2) {
         Alert.alert("Error", "Could not open WhatsApp. Please make sure it is installed.");
-      });
-    });
+      }
+    }
   };
 
 
