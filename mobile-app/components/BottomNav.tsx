@@ -7,12 +7,21 @@ import {
   Platform
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, usePathname } from "expo-router";
 import { useTheme } from "../constants/ThemeContext";
 
 export default function BottomNav() {
   const router = useRouter();
+  const pathname = usePathname();
   const { theme } = useTheme();
+
+  const navigateTo = (route: string) => {
+    // Prevent pushing the same screen if we are already there
+    if (pathname === route) return;
+    
+    // Use navigate for tab-like behavior
+    router.navigate(route as any);
+  };
 
   return (
     <View
@@ -20,42 +29,58 @@ export default function BottomNav() {
         styles.container,
         {
           backgroundColor: theme.card,
-          borderTopWidth: 0, // إخفاء الخط الأبيض تماماً
-          elevation: 0,      // إلغاء الظل في أندرويد لمنع أي خطوط
-          shadowOpacity: 0   // إلغاء الظل في iOS
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0
         }
       ]}
     >
       <TouchableOpacity
         style={styles.item}
-        onPress={() => router.push("/Home/home")}
+        onPress={() => navigateTo("/Home/home")}
       >
-        <Feather name="home" size={22} color="#2563EB" />
-        <Text style={[styles.text, { color: theme.text }]}>Home</Text>
+        <Feather 
+          name="home" 
+          size={22} 
+          color={pathname === "/Home/home" ? "#2563EB" : "#94a3b8"} 
+        />
+        <Text style={[styles.text, { color: pathname === "/Home/home" ? "#2563EB" : theme.text }]}>Home</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.item}
-        onPress={() => router.push("/Sell/sell")}
+        onPress={() => navigateTo("/Sell/sell")}
       >
-        <Feather name="plus-circle" size={22} color="#2563EB" />
-        <Text style={[styles.text, { color: theme.text }]}>Sell</Text>
+        <Feather 
+          name="plus-circle" 
+          size={22} 
+          color={pathname === "/Sell/sell" ? "#2563EB" : "#94a3b8"} 
+        />
+        <Text style={[styles.text, { color: pathname === "/Sell/sell" ? "#2563EB" : theme.text }]}>Sell</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.item}
-        onPress={() => router.push("/favorites/my-favorites")}
+        onPress={() => navigateTo("/favorites/my-favorites")}
       >
-        <Feather name="heart" size={22} color="#2563EB" />
-        <Text style={[styles.text, { color: theme.text }]}>Favorites</Text>
+        <Feather 
+          name="heart" 
+          size={22} 
+          color={pathname === "/favorites/my-favorites" ? "#2563EB" : "#94a3b8"} 
+        />
+        <Text style={[styles.text, { color: pathname === "/favorites/my-favorites" ? "#2563EB" : theme.text }]}>Favorites</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.item}
-        onPress={() => router.push("/Profile/profile")}
+        onPress={() => navigateTo("/Profile/profile")}
       >
-        <Feather name="user" size={22} color="#2563EB" />
-        <Text style={[styles.text, { color: theme.text }]}>Account</Text>
+        <Feather 
+          name="user" 
+          size={22} 
+          color={pathname === "/Profile/profile" ? "#2563EB" : "#94a3b8"} 
+        />
+        <Text style={[styles.text, { color: pathname === "/Profile/profile" ? "#2563EB" : theme.text }]}>Account</Text>
       </TouchableOpacity>
     </View>
   );

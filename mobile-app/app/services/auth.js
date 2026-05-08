@@ -134,17 +134,31 @@ export async function login(email, password) {
 /* ================= FORGOT PASSWORD ================= */
 
 export async function forgotPassword(email) {
-
   try {
+    // Configure action code settings to redirect back to the app
+    // Note: The URL must be an authorized domain in the Firebase Console
+    const actionCodeSettings = {
+      url: `https://unitrade-app.firebaseapp.com/reset-password?email=${email}`,
+      handleCodeInApp: true,
+      android: {
+        packageName: "com.ahmed21299.UniTrade",
+        installApp: true,
+      },
+      iOS: {
+        bundleId: "com.ahmed21299.UniTrade",
+      },
+    };
 
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(auth, email, actionCodeSettings);
 
   } catch (error) {
-
+    console.log("FORGOT ERROR:", error);
     if (error.code === "auth/invalid-email")
       throw new Error("Invalid email");
+    if (error.code === "auth/user-not-found")
+      throw new Error("User not found");
 
-    throw new Error("Cannot send reset email");
+    throw new Error("Cannot send reset email. Please try again later.");
   }
 }
 

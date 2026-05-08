@@ -64,6 +64,10 @@ export default function EditProduct() {
 
   const updateProduct = async () => {
     if (!title || !price) { Alert.alert("Error", "Please fill all fields"); return; }
+    if (!quantityAvailable || Number(quantityAvailable) <= 0) {
+      Alert.alert("Error", "Quantity must be greater than 0");
+      return;
+    }
     try {
       await updateDoc(doc(db, "products", id as string), {
         title, price: Number(price), condition, category, images,
@@ -97,11 +101,36 @@ export default function EditProduct() {
       />
 
       {/* Quantity */}
-      <TextInput
-        placeholder="Available Quantity" placeholderTextColor="#9ca3af"
-        value={quantityAvailable} onChangeText={(t) => setQuantityAvailable(t.replace(/[^0-9]/g, ""))} keyboardType="numeric"
-        style={[styles.input, { color: theme.text, backgroundColor: theme.card }]}
-      />
+      <View style={{ marginBottom: 4 }}>
+        <Text style={[styles.section, { color: theme.text, marginBottom: 5 }]}>Available Quantity</Text>
+        <TextInput
+          placeholder="Available Quantity" 
+          placeholderTextColor="#9ca3af"
+          value={quantityAvailable} 
+          onChangeText={(t) => {
+            const clean = t.replace(/[^0-9]/g, "");
+            setQuantityAvailable(clean);
+          }} 
+          onBlur={() => {
+            if (!quantityAvailable || Number(quantityAvailable) <= 0) {
+              setQuantityAvailable("1");
+              Alert.alert("Invalid Quantity", "Product quantity must be at least 1.");
+            }
+          }}
+          keyboardType="numeric"
+          style={[styles.input, { 
+            color: theme.text, 
+            backgroundColor: theme.card,
+            borderColor: (Number(quantityAvailable) <= 0 && quantityAvailable !== "") ? "#ef4444" : border,
+            borderWidth: (Number(quantityAvailable) <= 0 && quantityAvailable !== "") ? 1.5 : 1
+          }]}
+        />
+        {(Number(quantityAvailable) <= 0 && quantityAvailable !== "") && (
+          <Text style={{ color: "#ef4444", fontSize: 12, marginLeft: 12, marginTop: -10, marginBottom: 10 }}>
+            Quantity must be 1 or more
+          </Text>
+        )}
+      </View>
 
       {/* Category */}
       <Text style={[styles.section, { color: theme.text }]}>Category</Text>

@@ -11,8 +11,12 @@ import {
   doc, getDoc, collection, query, where, getDocs,
   setDoc, serverTimestamp, onSnapshot, addDoc,
   QuerySnapshot, DocumentData,
+  updateDoc,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
+import { Stars } from "../../components/Stars";
+import { useSellerRating } from "../services/rating";
+import { ProductCard } from "../../components/ProductCard";
 
 const { width } = Dimensions.get("window");
 
@@ -52,20 +56,6 @@ const CONDITION_COLOR: Record<string, { bg: string; text: string }> = {
 
 const STAR_LABELS = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
 
-/* ─── Stars display ──────────────────────────────────────────────────── */
-const Stars = ({
-  value, size = 14, interactive = false, onSelect,
-}: {
-  value: number; size?: number; interactive?: boolean; onSelect?: (v: number) => void;
-}) => (
-  <View style={{ flexDirection: "row", gap: 2 }}>
-    {[1, 2, 3, 4, 5].map((i) => (
-      <TouchableOpacity key={i} disabled={!interactive} onPress={() => onSelect?.(i)} activeOpacity={0.7}>
-        <Text style={{ fontSize: size, color: i <= Math.round(value) ? "#f59e0b" : "#d1d5db" }}>★</Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-);
 
 /* ─── Breakdown bars ─────────────────────────────────────────────────── */
 const BreakdownBars = ({ breakdown, count }: { breakdown: RatingData["breakdown"]; count: number }) => (
@@ -161,8 +151,8 @@ const RatingModal = ({
                   {submitting
                     ? <ActivityIndicator color="#fff" size="small" />
                     : <Text style={{ color: "#fff", fontSize: 14, fontWeight: "700" }}>
-                        {existingRating ? "Update" : "Submit"}
-                      </Text>}
+                      {existingRating ? "Update" : "Submit"}
+                    </Text>}
                 </TouchableOpacity>
               </View>
             </Pressable>
@@ -265,6 +255,7 @@ export default function SellerProfile() {
     myRating: null, myComment: "",
   });
   const [showModal, setShowModal] = useState(false);
+  const { rating: aggregatedRating } = useSellerRating(uid);
 
   const loadRatings = async () => {
     const snap = await getDocs(collection(db, "ratings", uid, "userRatings"));
@@ -284,87 +275,133 @@ export default function SellerProfile() {
   };
 
   useEffect(() => {
-  let unsubscribeRatings: any;
+    let unsubscribeRatings: any;
+    let unsubscribeSeller: any;
 
-  const load = async () => {
-    try {
-      const uSnap = await getDoc(doc(db, "users", uid));
+    const load = async () => {
+      try {
+        // Real-time seller info listener
+        unsubscribeSeller = onSnapshot(doc(db, "users", uid), (uSnap) => {
+          if (uSnap.exists()) {
+            setSeller(uSnap.data() as SellerUser);
+          }
+        });
 
-      if (uSnap.exists()) {
-        setSeller(uSnap.data() as SellerUser);
+        const snap = await getDocs(
+          query(collection(db, "products"), where("userId", "==", uid))
+        );
+
+        setProducts(
+          snap.docs.map((d) => ({
+            id: d.id,
+            ...(d.data() as Omit<Product, "id">),
+          }))
+        );
+
+        // realtime ratings listener
+        unsubscribeRatings = onSnapshot(
+          collection(db, "ratings", uid, "userRatings"),
+          (snapshot) => {
+            const breakdown: Record<number, number> = {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            };
+
+            let total = 0;
+            let validCount = 0;
+            let myRating: number | null = null;
+            let myComment = "";
+
+            snapshot.forEach((d) => {
+              const data = d.data();
+              const r = data.rating as number;
+
+              if (r >= 1 && r <= 5) {
+                breakdown[r] = (breakdown[r] || 0) + 1;
+                total += r;
+                validCount++;
+              }
+
+              if (d.id === currentUid) {
+                myRating = r;
+                myComment = data.comment || "";
+              }
+            });
+
+            const newAverage = validCount > 0 ? total / validCount : 0;
+            setRatingData({
+              average: newAverage,
+              count: validCount,
+              breakdown: breakdown as RatingData["breakdown"],
+              myRating,
+              myComment,
+            });
+            
+            // Self-healing: Update user doc if it's out of sync (only if current user is the seller or we just submitted)
+            // Actually, any user can trigger this to fix the public display
+            const updateAggregated = async () => {
+              const userRef = doc(db, "users", uid);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                const userData = userSnap.data();
+                if (userData.averageRating !== newAverage || userData.ratingsCount !== validCount) {
+                  await updateDoc(userRef, {
+                    averageRating: newAverage,
+                    ratingsCount: validCount
+                  });
+                }
+              }
+            };
+            updateAggregated();
+          }
+        );
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const snap = await getDocs(
-        query(collection(db, "products"), where("userId", "==", uid))
-      );
+    load();
 
-      setProducts(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as Omit<Product, "id">),
-        }))
-      );
-
-      // realtime ratings listener
-      unsubscribeRatings = onSnapshot(
-        collection(db, "ratings", uid, "userRatings"),
-        (snapshot) => {
-          const breakdown: Record<number, number> = {
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-            5: 0,
-          };
-
-          let total = 0;
-          let myRating: number | null = null;
-          let myComment = "";
-
-          snapshot.forEach((d) => {
-            const data = d.data();
-            const r = data.rating as number;
-
-            if (r >= 1 && r <= 5) {
-              breakdown[r] = (breakdown[r] || 0) + 1;
-              total += r;
-            }
-
-            if (d.id === currentUid) {
-              myRating = r;
-              myComment = data.comment || "";
-            }
-          });
-
-          setRatingData({
-            average: snapshot.size > 0 ? total / snapshot.size : 0,
-            count: snapshot.size,
-            breakdown: breakdown as RatingData["breakdown"],
-            myRating,
-            myComment,
-          });
-        }
-      );
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  load();
-
-  return () => {
-    if (unsubscribeRatings) unsubscribeRatings();
-  };
-}, [uid]);
+    return () => {
+      if (unsubscribeRatings) unsubscribeRatings();
+      if (unsubscribeSeller) unsubscribeSeller();
+    };
+  }, [uid]);
 
   const handleSubmitRating = async (rating: number, comment: string) => {
     if (!currentUid) return;
-    await setDoc(doc(db, "ratings", uid, "userRatings", currentUid), {
+    const ratingRef = doc(db, "ratings", uid, "userRatings", currentUid);
+    await setDoc(ratingRef, {
       rating, comment, createdAt: serverTimestamp(),
     });
-    
+
+    // Update aggregated rating in user document
+    try {
+      const ratingsSnap = await getDocs(collection(db, "ratings", uid, "userRatings"));
+      let total = 0;
+      let validCount = 0;
+      ratingsSnap.forEach((d) => {
+        const r = d.data().rating as number;
+        if (r >= 1 && r <= 5) {
+          total += r;
+          validCount++;
+        }
+      });
+      const average = validCount > 0 ? total / validCount : 0;
+
+      await updateDoc(doc(db, "users", uid), {
+        averageRating: average,
+        ratingsCount: validCount,
+      });
+    } catch (e) {
+      console.error("Error updating aggregated rating:", e);
+    }
+
     // Send notification to seller
     try {
       const userSnap = await getDoc(doc(db, "users", currentUid));
@@ -379,7 +416,7 @@ export default function SellerProfile() {
     } catch (e) {
       console.error("Error sending rating notification:", e);
     }
-    
+
     await loadRatings();
   };
 
@@ -430,13 +467,13 @@ export default function SellerProfile() {
         )}
 
         {/* Rating summary */}
-        {ratingData.count > 0 && (
+        {aggregatedRating.count > 0 && (
           <View style={s.ratingPreviewRow}>
-            <Stars value={ratingData.average} size={15} />
+            <Stars value={aggregatedRating.average} size={15} />
             <Text style={[s.ratingAvgBig, { color: theme.text }]}>
-              {ratingData.average.toFixed(1)}
+              {aggregatedRating.average.toFixed(1)}
             </Text>
-            <Text style={s.ratingCountSmall}>({ratingData.count} ratings)</Text>
+            <Text style={s.ratingCountSmall}>({aggregatedRating.count} ratings)</Text>
           </View>
         )}
 
@@ -467,10 +504,10 @@ export default function SellerProfile() {
             {/* Big number */}
             <View style={s.ratingDisplayLeft}>
               <Text style={[s.ratingBigNum, { color: theme.text }]}>
-                {ratingData.average.toFixed(1)}
+                {aggregatedRating.average.toFixed(1)}
               </Text>
-              <Stars value={ratingData.average} size={16} />
-              <Text style={s.ratingTotalTxt}>{ratingData.count} reviews</Text>
+              <Stars value={aggregatedRating.average} size={16} />
+              <Text style={s.ratingTotalTxt}>{aggregatedRating.count} reviews</Text>
             </View>
             {/* Bars */}
             <View style={{ flex: 1 }}>
@@ -484,11 +521,11 @@ export default function SellerProfile() {
       {!isSelf && currentUid && (
         <RatingInputCard
           ratingData={ratingData}
-          sellerName={sellerName} 
+          sellerName={sellerName}
           onOpenModal={() => setShowModal(true)}
         />
       )}
-      
+
       {/* Listings header */}
       <View style={s.listingsHeader}>
         <Text style={[s.listingsTitle, { color: theme.text }]}>Seller Listings</Text>
@@ -500,41 +537,16 @@ export default function SellerProfile() {
   );
 
   /* ── Product card ── */
-  const renderProduct = ({ item }: { item: Product }) => {
-    const img = Array.isArray(item.images) && item.images.length > 0
-      ? item.images[0] : "https://via.placeholder.com/150";
-    const condS = CONDITION_COLOR[item.condition || ""] || CONDITION_COLOR["Used"];
-
+  const renderProduct = ({ item }: { item: any }) => {
     return (
-      <TouchableOpacity
-        style={[s.card, { backgroundColor: theme.card }]}
-        onPress={() => router.push({ pathname: "/product/[id]", params: { id: item.id } })}
-        activeOpacity={0.85}
-      >
-        <View>
-          <Image source={{ uri: img }} style={[s.cardImage, item.status === "sold" && { opacity: 0.5 }]} />
-          {item.status === "sold" && (
-            <View style={s.soldBadge}><Text style={s.soldText}>Sold</Text></View>
-          )}
-          {item.condition && item.status !== "sold" && (
-            <View style={[s.condBadge, { backgroundColor: condS.bg }]}>
-              <Text style={[s.condText, { color: condS.text }]}>{item.condition}</Text>
-            </View>
-          )}
-        </View>
-        <View style={s.cardBody}>
-          <Text
-            style={[s.cardTitle, { color: theme.text },
-              item.status === "sold" && { textDecorationLine: "line-through", color: "#94a3b8" }]}
-            numberOfLines={1}
-          >
-            {item.title}
-          </Text>
-          <Text style={[s.cardPrice, item.status === "sold" && { color: "#94a3b8" }]}>
-            EGP {Number(item.price).toLocaleString()}
-          </Text>
-        </View>
-      </TouchableOpacity>
+      <ProductCard
+        item={item}
+        theme={theme}
+        isFavorite={false}
+        onToggleFavorite={() => {}}
+        sellerName={seller?.firstName}
+        sellerPhoto={seller?.profilePhoto}
+      />
     );
   };
 

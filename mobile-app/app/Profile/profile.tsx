@@ -25,6 +25,8 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
+import { Stars } from "../../components/Stars";
+import { useSellerRating } from "../services/rating";
 
 const CLOUD_NAME = "dstfo8pxq";
 const UPLOAD_PRESET = "unitrade_upload";
@@ -57,6 +59,8 @@ export default function Profile() {
   const [university, setUniversity] = useState("");
   const [showUniversityList, setShowUniversityList] = useState(false);
   const [showFacultyList, setShowFacultyList] = useState(false);
+  
+  const { rating: sellerRating } = useSellerRating(auth.currentUser?.uid);
 
   /* ─── Load user (real-time) ─── */
   useEffect(() => {
@@ -193,7 +197,7 @@ export default function Profile() {
             <Text style={[s.outlineBtnText, { color: "#2563eb" }]}>Edit Profile</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={s.solidBtn} onPress={() => router.push("/forgot-password/forgot-password")}>
+          <TouchableOpacity style={s.solidBtn} onPress={() => router.push("/Profile/change-password")}>
             <Feather name="lock" size={14} color="#fff" />
             <Text style={s.solidBtnText}>Password</Text>
           </TouchableOpacity>
@@ -240,33 +244,20 @@ export default function Profile() {
           <Text style={[s.sectionTitle, { color: theme.text, marginBottom: 0 }]}>Seller Rating</Text>
         </View>
 
-        {(user?.ratingsCount ?? 0) > 0 ? (
+        {sellerRating.count > 0 ? (
           <View style={{ alignItems: "center", gap: 6 }}>
             <Text style={{ fontSize: 40, fontWeight: "800", color: theme.text, lineHeight: 44 }}>
-              {(user?.averageRating ?? 0).toFixed(1)}
+              {sellerRating.average.toFixed(1)}
             </Text>
             {/* Stars row */}
-            <View style={{ flexDirection: "row", gap: 4 }}>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Text
-                  key={i}
-                  style={{ fontSize: 26, color: i <= Math.round(user?.averageRating ?? 0) ? "#f59e0b" : "#e2e8f0" }}
-                >
-                  ★
-                </Text>
-              ))}
-            </View>
+            <Stars value={sellerRating.average} size={26} gap={4} />
             <Text style={{ fontSize: 13, color: "#94a3b8", marginTop: 2 }}>
-              Based on {user?.ratingsCount} {user?.ratingsCount === 1 ? "review" : "reviews"}
+              Based on {sellerRating.count} {sellerRating.count === 1 ? "review" : "reviews"}
             </Text>
           </View>
         ) : (
           <View style={{ alignItems: "center", paddingVertical: 12, gap: 6 }}>
-            <View style={{ flexDirection: "row", gap: 4 }}>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Text key={i} style={{ fontSize: 26, color: "#e2e8f0" }}>★</Text>
-              ))}
-            </View>
+            <Stars value={0} size={26} gap={4} />
             <Text style={{ fontSize: 13, color: "#94a3b8" }}>No ratings yet</Text>
           </View>
         )}
@@ -281,8 +272,8 @@ export default function Profile() {
             <Text style={s.countText}>{items.length}</Text>
           </View>
         </View>
-        <TouchableOpacity 
-          style={s.sellHeaderBtn} 
+        <TouchableOpacity
+          style={s.sellHeaderBtn}
           onPress={() => router.push("/Sell/sell")}
           activeOpacity={0.8}
         >
@@ -298,73 +289,19 @@ export default function Profile() {
               ? item.images[0]
               : "https://via.placeholder.com/150";
 
-          return (
-            <View key={item.id} style={[s.productCard, { backgroundColor: theme.card }]}>
-              <View>
-                {item.status === "sold" && (
-                  <View style={s.soldBadge}>
-                    <Text style={s.soldBadgeText}>SOLD</Text>
-                  </View>
-                )}
-                {item.condition && (
-                  <View style={[s.condBadge, { 
-                    backgroundColor: item.condition === "New" ? "#dcfce7" : 
-                                    item.condition === "Like New" ? "#dbeafe" :
-                                    item.condition === "Good" ? "#fef9c3" :
-                                    item.condition === "Fair" ? "#fee2e2" : "#fce7f3"
-                  }]}>
-                    <Text style={[s.condBadgeText, { 
-                      color: item.condition === "New" ? "#166534" : 
-                             item.condition === "Like New" ? "#1e40af" :
-                             item.condition === "Good" ? "#854d0e" :
-                             item.condition === "Fair" ? "#991b1b" : "#9d174d"
-                    }]}>{item.condition}</Text>
-                  </View>
-                )}
-                <Image source={{ uri: img }} style={s.productImg} />
-              </View>
-
-              <View style={s.productBody}>
-                <Text style={[s.productTitle, { color: theme.text }]} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                <Text style={s.productPrice}>{item.price} EGP</Text>
-
-                  <View style={s.productActions}>
-                    <TouchableOpacity
-                      style={[s.actionBtn, { backgroundColor: "#eff6ff", borderColor: "#bfdbfe" }]}
-                      onPress={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
-                    >
-                      <Feather name="edit-3" size={12} color="#2563eb" />
-                      <Text style={[s.actionBtnText, { color: "#2563eb" }]}>Edit</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                      style={[s.actionBtn, { backgroundColor: "#fef2f2", borderColor: "#fecaca" }]} 
-                      onPress={() => deleteProduct(item.id)}
-                    >
-                      <Feather name="trash-2" size={12} color="#ef4444" />
-                      <Text style={[s.actionBtnText, { color: "#ef4444" }]}>Delete</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                <TouchableOpacity
-                  style={[s.soldToggle, item.status === "sold" ? s.soldToggleActive : { borderColor: border }]}
-                  onPress={() => toggleStatus(item)}
-                >
-                  <Feather 
-                    name={item.status === "sold" ? "check-circle" : "circle"} 
-                    size={13} 
-                    color={item.status === "sold" ? "#fff" : "#94a3b8"} 
-                  />
-                  <Text style={[s.soldToggleText, { color: item.status === "sold" ? "#fff" : "#64748b" }]}>
-                    {item.status === "sold" ? "Sold Out" : "Mark Sold"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          );
-        })}
+        {items.map((item: any) => (
+          <ProductCard
+            key={item.id}
+            item={item}
+            theme={theme}
+            isFavorite={false}
+            onToggleFavorite={() => {}}
+            showManagement={true}
+            onEdit={() => router.push({ pathname: "/product/edit-product", params: { id: item.id } })}
+            onDelete={() => deleteProduct(item.id)}
+            onToggleStatus={toggleStatus}
+          />
+        ))}
       </View>
 
       {items.length === 0 && (
@@ -642,10 +579,10 @@ const s = StyleSheet.create({
   productBody: { padding: 9 },
   productTitle: { fontSize: 13, fontWeight: "600", marginBottom: 2 },
   productPrice: { fontSize: 14, fontWeight: "700", color: "#2563eb", marginBottom: 8 },
-  productActions: { 
-    flexDirection: "row", 
-    gap: 6, 
-    marginBottom: 6 
+  productActions: {
+    flexDirection: "row",
+    gap: 6,
+    marginBottom: 6
   },
   actionBtn: {
     flex: 1,
@@ -657,9 +594,9 @@ const s = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1.5,
   },
-  actionBtnText: { 
-    fontSize: 11, 
-    fontWeight: "700" 
+  actionBtnText: {
+    fontSize: 11,
+    fontWeight: "700"
   },
   soldToggle: {
     flexDirection: "row",
@@ -671,13 +608,13 @@ const s = StyleSheet.create({
     borderWidth: 1.5,
     backgroundColor: "transparent",
   },
-  soldToggleActive: { 
-    backgroundColor: "#16a34a", 
-    borderColor: "#16a34a" 
+  soldToggleActive: {
+    backgroundColor: "#16a34a",
+    borderColor: "#16a34a"
   },
-  soldToggleText: { 
-    fontSize: 11, 
-    fontWeight: "700" 
+  soldToggleText: {
+    fontSize: 11,
+    fontWeight: "700"
   },
   sellHeaderBtn: {
     flexDirection: "row",

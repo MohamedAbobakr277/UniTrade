@@ -24,6 +24,8 @@ import {
   addDoc, serverTimestamp,
 } from "firebase/firestore";
 import { db, auth } from "../services/firebase";
+import { Stars } from "../../components/Stars";
+import { useSellerRating } from "../services/rating";
 
 const { width } = Dimensions.get("window");
 
@@ -149,18 +151,6 @@ export function highlightSearchTerms(
 /* ─────────────────────────────────────────────
    ⭐  STARS COMPONENT
 ───────────────────────────────────────────── */
-const Stars = ({ value, size = 13 }: { value: number; size?: number }) => (
-  <View style={{ flexDirection: "row", gap: 1 }}>
-    {[1, 2, 3, 4, 5].map((i) => (
-      <Text
-        key={i}
-        style={{ fontSize: size, color: i <= Math.round(value) ? "#f59e0b" : "#d1d5db" }}
-      >
-        ★
-      </Text>
-    ))}
-  </View>
-);
 
 export default function ProductDetails() {
   const { theme } = useTheme();
@@ -179,18 +169,18 @@ export default function ProductDetails() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   // ── Seller rating state ──
-  const [sellerRating, setSellerRating] = useState<{
-    average: number;
-    count: number;
-  } | null>(null);
+  const { rating: sellerRating } = useSellerRating(sellerId);
 
-  /* ─── Fetch product ─── */
+  /* ─── Fetch product & Listen to Seller ─── */
   useEffect(() => {
+    let unsubSeller: () => void;
+
     const fetchProduct = async () => {
       try {
         if (!id) return;
         const docId = Array.isArray(id) ? id[0] : id;
         const snap = await getDoc(doc(db, "products", docId));
+
         if (snap.exists()) {
           const data: any = snap.data();
           setProduct({ id: snap.id, ...data });
@@ -198,31 +188,20 @@ export default function ProductDetails() {
           if (data.userId) {
             setSellerId(data.userId);
 
-            // بيانات الـ seller
-            const uSnap = await getDoc(doc(db, "users", data.userId));
-            if (uSnap.exists()) {
-              const u: any = uSnap.data();
-              setSellerPhoto(
-                u.profilePhoto || u.photoURL || u.photo ||
-                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-              );
-              setSellerPhone(u.phoneNumber || u.phone || "");
-            }
+            // Listen to seller data in real-time (includes rating)
+            unsubSeller = onSnapshot(doc(db, "users", data.userId), (uSnap) => {
+              if (uSnap.exists()) {
+                const u: any = uSnap.data();
+                setSellerPhoto(
+                  u.profilePhoto || u.photoURL || u.photo ||
+                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                );
+                setSellerPhone(u.phoneNumber || u.phone || "");
 
-            // تقييمات الـ seller
-            const ratingsSnap = await getDocs(
-              collection(db, "ratings", data.userId, "userRatings")
-            );
-            if (!ratingsSnap.empty) {
-              let total = 0;
-              ratingsSnap.forEach((d) => {
-                total += d.data().rating as number;
-              });
-              setSellerRating({
-                average: total / ratingsSnap.size,
-                count: ratingsSnap.size,
-              });
-            }
+                // Seller data handled by onSnapshot here for phone/photo
+                // Rating is now handled by useSellerRating hook
+              }
+            });
           }
         }
       } catch (e) {
@@ -231,7 +210,9 @@ export default function ProductDetails() {
         setLoading(false);
       }
     };
+
     fetchProduct();
+    return () => unsubSeller && unsubSeller();
   }, [id]);
 
   /* ─── AI-Powered Similar Items ─── */
@@ -335,7 +316,7 @@ export default function ProductDetails() {
       cleaned = "20" + cleaned;
     }
     const message = `Hello! 👋\n\nI want to buy ${selectedQuantity} item${selectedQuantity > 1 ? 's' : ''} of this product on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
-    
+
     const waUrl = `whatsapp://send?phone=${cleaned}&text=${encodeURIComponent(message)}`;
     const webUrl = `https://api.whatsapp.com/send?phone=${cleaned}&text=${encodeURIComponent(message)}`;
 
@@ -455,7 +436,7 @@ export default function ProductDetails() {
                 const stock = product.quantityAvailable ?? 1;
                 const isOutOfStock = stock === 0 || product.status === "sold";
                 const isLowStock = stock > 0 && stock < 5;
-                
+
                 let bg = "#dcfce7";
                 let text = "#16a34a";
                 let label = `In Stock: ${stock}`;
@@ -509,16 +490,16 @@ export default function ProductDetails() {
                   {product.quantityAvailable} available
                 </Text>
               </View>
-              
+
               <View style={s.quantityRow}>
-                <TouchableOpacity 
-                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]} 
+                <TouchableOpacity
+                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]}
                   onPress={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
                   activeOpacity={0.7}
                 >
                   <Feather name="minus" size={18} color={selectedQuantity <= 1 ? "#cbd5e1" : "#2563eb"} />
                 </TouchableOpacity>
-                
+
                 <TextInput
                   keyboardType="numeric"
                   value={String(selectedQuantity)}
@@ -527,7 +508,7 @@ export default function ProductDetails() {
                     if (!isNaN(val)) {
                       setSelectedQuantity(Math.min(product.quantityAvailable || 1, Math.max(1, val)));
                     } else if (t === "") {
-                      setSelectedQuantity(0); 
+                      setSelectedQuantity(0);
                     }
                   }}
                   onBlur={() => {
@@ -536,8 +517,8 @@ export default function ProductDetails() {
                   style={[s.qtyInput, { color: theme.text, backgroundColor: theme.background, borderColor: theme.border }]}
                 />
 
-                <TouchableOpacity 
-                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]} 
+                <TouchableOpacity
+                  style={[s.qtyBtn, { backgroundColor: theme.background, borderColor: theme.border }]}
                   onPress={() => setSelectedQuantity(Math.min(product.quantityAvailable || 1, selectedQuantity + 1))}
                   activeOpacity={0.7}
                 >

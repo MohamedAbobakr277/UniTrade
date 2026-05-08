@@ -23,6 +23,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 import styles from "./my-favoriyes.styles";
+import { ProductCard } from "../../components/ProductCard";
 
 const PLACEHOLDER = "https://via.placeholder.com/150";
 const AVATAR_PLACEHOLDER = "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=80&q=80";
@@ -119,101 +120,18 @@ export default function MyFavorites() {
   };
 
   const renderItem = ({ item }: any) => {
-    const imageUri =
-      Array.isArray(item.images) && item.images.length > 0
-        ? item.images[0]
-        : PLACEHOLDER;
-    
     const seller = users[item.userId];
-    const sellerName = seller?.firstName ?? "Unknown";
-    const sellerPhoto = seller?.profilePhoto ?? AVATAR_PLACEHOLDER;
-    const createdAt = item.createdAt?.toDate?.();
     const isFav = favoriteIds.includes(item.id);
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={[styles.card, { backgroundColor: theme.card }]}
-        onPress={() => router.push({
-          pathname: "/product/[id]",
-          params: { id: item.id }
-        })}
-      >
-        <View style={styles.imageWrapper}>
-          <Image source={{ uri: imageUri }} style={styles.image} />
-          {item.status === "sold" || (item.quantityAvailable !== undefined && item.quantityAvailable === 0) ? (
-            <View style={styles.soldOutBadge}>
-              <Text style={styles.soldOutText}>Sold Out</Text>
-            </View>
-          ) : item.condition ? (
-            <View style={[styles.conditionBadge, { 
-              backgroundColor: item.condition === "New" ? "#dcfce7" : 
-                              item.condition === "Like New" ? "#dbeafe" :
-                              item.condition === "Good" ? "#fef9c3" :
-                              item.condition === "Fair" ? "#fee2e2" : "#fce7f3"
-            }]}>
-              <Text style={[styles.conditionText, { 
-                color: item.condition === "New" ? "#166534" : 
-                       item.condition === "Like New" ? "#1e40af" :
-                       item.condition === "Good" ? "#854d0e" :
-                       item.condition === "Fair" ? "#991b1b" : "#9d174d"
-              }]}>{item.condition}</Text>
-            </View>
-          ) : null}
-          <TouchableOpacity
-            style={[styles.favBtn, isFav && styles.favBtnActive]}
-            onPress={() => toggleFavorite(item.id)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Feather
-              name="heart"
-              size={16}
-              color={isFav ? "#ef4444" : "#fff"}
-              style={isFav ? { opacity: 1 } : { opacity: 0.85 }}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.cardBody}>
-          <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
-            {item.title}
-          </Text>
-          <Text style={styles.price}>{item.price} EGP</Text>
-          <Text style={styles.university} numberOfLines={1}>
-            {item.university}
-          </Text>
-          
-          {item.quantityAvailable !== undefined && item.quantityAvailable > 0 && item.status !== "sold" && (
-            <Text style={{ 
-              fontSize: 11, 
-              color: item.quantityAvailable < 5 ? "#d97706" : "#16a34a", 
-              fontWeight: "600", 
-              marginTop: 2, 
-              marginBottom: 4 
-            }}>
-              {item.quantityAvailable < 5 ? "Low Stock: " : "In stock: "}{item.quantityAvailable}
-            </Text>
-          )}
-
-          <View style={styles.sellerRow}>
-            <View style={styles.sellerInfo}>
-              <Image source={{ uri: sellerPhoto }} style={styles.avatar} />
-              <Text
-                style={[styles.sellerName, { color: theme.text }]}
-                numberOfLines={1}
-              >
-                {sellerName}
-              </Text>
-            </View>
-            {createdAt && (
-              <View style={styles.timeRow}>
-                <Feather name="clock" size={12} color="#94a3b8" />
-                <Text style={styles.timeText}>{timeAgo(createdAt)}</Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
+      <ProductCard
+        item={item}
+        theme={theme}
+        isFavorite={isFav}
+        onToggleFavorite={toggleFavorite}
+        sellerName={seller?.firstName}
+        sellerPhoto={seller?.profilePhoto}
+      />
     );
   };
 

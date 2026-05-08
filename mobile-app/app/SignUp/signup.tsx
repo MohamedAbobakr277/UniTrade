@@ -19,8 +19,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import styles from "./signup.styles";
-
 import { signUp } from "../services/auth";
+import PasswordRequirements, { validatePassword } from "../../components/PasswordRequirements";
 
 const SignUpScreen: React.FC = () => {
   const router = useRouter();
@@ -78,6 +78,9 @@ const SignUpScreen: React.FC = () => {
   const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.edu\.eg$/;
   const phoneRegex: RegExp = /^(010|011|012|015)[0-9]{8}$/;
 
+  const passReqs = validatePassword(password);
+  const isPassValid = passReqs.length && passReqs.uppercase && passReqs.lowercase && passReqs.number;
+
   const isFormValid =
     firstName.length > 0 &&
     lastName.length > 0 &&
@@ -85,7 +88,7 @@ const SignUpScreen: React.FC = () => {
     university.length > 0 &&
     faculty.length > 0 &&
     phoneRegex.test(phone) &&
-    password.length >= 6 &&
+    isPassValid &&
     confirmPassword === password;
 
   const handleSignUp = async () => {
@@ -367,11 +370,7 @@ const SignUpScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {password.length > 0 && password.length < 6 && (
-            <Text style={localStyles.errorHint}>
-              Password must be at least 6 characters
-            </Text>
-          )}
+          <PasswordRequirements password={password} />
 
           {/* Confirm Password */}
           <View style={styles.inputBox}>

@@ -32,6 +32,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 import BottomNav from "../../components/BottomNav";
+import { ProductCard } from "../../components/ProductCard";
 
 interface Product {
   id: string;
@@ -66,15 +67,15 @@ const AVATAR_PLACEHOLDER =
   "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=80&q=80";
 
 const CATEGORIES = [
-  { name: "All",                icon: "home",        color: "#2563eb", bg: "#dbeafe" },
-  { name: "Books & Notes",      icon: "book",        color: "#d97706", bg: "#fef3c7" },
-  { name: "Calculators",        icon: "hash",        color: "#16a34a", bg: "#dcfce7" },
-  { name: "Electronics",        icon: "headphones",  color: "#0891b2", bg: "#cffafe" },
-  { name: "Engineering Tools",  icon: "tool",        color: "#ea580c", bg: "#ffedd5" },
-  { name: "Medical Tools",      icon: "plus-square", color: "#0284c7", bg: "#e0f2fe" },
-  { name: "Lab Equipment",      icon: "activity",    color: "#65a30d", bg: "#ecfccb" },
-  { name: "Stationery",         icon: "edit-3",      color: "#c026d3", bg: "#fae8ff" },
-  { name: "Bags & Accessories", icon: "briefcase",   color: "#b45309", bg: "#fef9c3" },
+  { name: "All", icon: "home", color: "#2563eb", bg: "#dbeafe" },
+  { name: "Books & Notes", icon: "book", color: "#d97706", bg: "#fef3c7" },
+  { name: "Calculators", icon: "hash", color: "#16a34a", bg: "#dcfce7" },
+  { name: "Electronics", icon: "headphones", color: "#0891b2", bg: "#cffafe" },
+  { name: "Engineering Tools", icon: "tool", color: "#ea580c", bg: "#ffedd5" },
+  { name: "Medical Tools", icon: "plus-square", color: "#0284c7", bg: "#e0f2fe" },
+  { name: "Lab Equipment", icon: "activity", color: "#65a30d", bg: "#ecfccb" },
+  { name: "Stationery", icon: "edit-3", color: "#c026d3", bg: "#fae8ff" },
+  { name: "Bags & Accessories", icon: "briefcase", color: "#b45309", bg: "#fef9c3" },
 ];
 
 const CONDITIONS = ["New", "Like New", "Good", "Fair", "Poor"];
@@ -262,12 +263,12 @@ export default function HomeScreen() {
     !isFocused
       ? "none"
       : search.trim().length < 2
-      ? recentSearches.length > 0
-        ? "recent"
-        : "none"
-      : suggestions.length > 0
-      ? "suggestions"
-      : "none";
+        ? recentSearches.length > 0
+          ? "recent"
+          : "none"
+        : suggestions.length > 0
+          ? "suggestions"
+          : "none";
 
   const toggleFavorite = async (productId: string) => {
     const uid = auth.currentUser?.uid;
@@ -341,10 +342,10 @@ export default function HomeScreen() {
     const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
     const matchesCondition = !selectedCondition || item.condition === selectedCondition;
     const matchesUni = !selectedUniversity || item.university === selectedUniversity;
-    const matchesSearch = !submittedSearch || 
+    const matchesSearch = !submittedSearch ||
       item.title.toLowerCase().includes(submittedSearch.toLowerCase()) ||
       item.category.toLowerCase().includes(submittedSearch.toLowerCase());
-    
+
     return matchesCategory && matchesCondition && matchesUni && matchesSearch;
   }).sort((a, b) => {
     const getT = (val: any) => {
@@ -402,97 +403,18 @@ export default function HomeScreen() {
   };
 
   const renderItem = ({ item }: { item: Product }) => {
-    const imageUri =
-      Array.isArray(item.images) && item.images.length > 0
-        ? item.images[0]
-        : PLACEHOLDER;
     const seller = users[item.userId];
-    const sellerName = seller?.firstName ?? "Unknown";
-    const sellerPhoto = seller?.profilePhoto ?? AVATAR_PLACEHOLDER;
-    const createdAt = item.createdAt?.toDate?.();
     const isFav = favorites.includes(item.id);
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={[s.card, { backgroundColor: theme.card }]}
-        onPress={() =>
-          router.push({ pathname: "/product/[id]", params: { id: item.id } })
-        }
-      >
-        <View style={s.imageWrapper}>
-          <Image source={{ uri: imageUri }} style={s.image} />
-          {item.status === "sold" || item.quantityAvailable === 0 ? (
-            <View style={s.soldOutBadge}>
-              <Text style={s.soldOutText}>Sold Out</Text>
-            </View>
-          ) : item.condition ? (
-            <View style={[s.conditionBadge, { 
-              backgroundColor: item.condition === "New" ? "#dcfce7" : 
-                              item.condition === "Like New" ? "#dbeafe" :
-                              item.condition === "Good" ? "#fef9c3" :
-                              item.condition === "Fair" ? "#fee2e2" : "#fce7f3"
-            }]}>
-              <Text style={[s.conditionText, { 
-                color: item.condition === "New" ? "#166534" : 
-                       item.condition === "Like New" ? "#1e40af" :
-                       item.condition === "Good" ? "#854d0e" :
-                       item.condition === "Fair" ? "#991b1b" : "#9d174d"
-              }]}>{item.condition}</Text>
-            </View>
-          ) : null}
-          <TouchableOpacity
-            style={[s.favBtn, isFav && s.favBtnActive]}
-            onPress={() => toggleFavorite(item.id)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Feather
-              name="heart"
-              size={16}
-              color={isFav ? "#ef4444" : "#fff"}
-              style={isFav ? { opacity: 1 } : { opacity: 0.85 }}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={s.cardBody}>
-          <Text style={[s.itemTitle, { color: theme.text }]} numberOfLines={1}>
-            {item.title}
-          </Text>
-          <Text style={s.price}>{item.price} EGP</Text>
-          <Text style={s.university} numberOfLines={1}>
-            {item.university}
-          </Text>
-          {item.quantityAvailable !== undefined && item.quantityAvailable > 0 && item.status !== "sold" && (
-            <Text style={{ 
-              fontSize: 11, 
-              color: item.quantityAvailable < 5 ? "#d97706" : "#16a34a", 
-              fontWeight: "600", 
-              marginTop: 2, 
-              marginBottom: 4 
-            }}>
-              {item.quantityAvailable < 5 ? "Low Stock: " : "In stock: "}{item.quantityAvailable}
-            </Text>
-          )}
-          <View style={s.sellerRow}>
-            <View style={s.sellerInfo}>
-              <Image source={{ uri: sellerPhoto }} style={s.avatar} />
-              <Text
-                style={[s.sellerName, { color: theme.text }]}
-                numberOfLines={1}
-              >
-                {sellerName}
-              </Text>
-            </View>
-            {createdAt && (
-              <View style={s.timeRow}>
-                <Feather name="clock" size={12} color="#94a3b8" />
-                <Text style={s.timeText}>{timeAgo(createdAt)}</Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
+      <ProductCard
+        item={item}
+        theme={theme}
+        isFavorite={isFav}
+        onToggleFavorite={toggleFavorite}
+        sellerName={seller?.firstName}
+        sellerPhoto={seller?.profilePhoto}
+      />
     );
   };
 
@@ -507,7 +429,7 @@ export default function HomeScreen() {
           />
           <Text style={[s.headerTitle, { color: theme.text }]}>UniTrade</Text>
         </View>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => router.push("/notifications/notifications")}
           style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: theme.card, alignItems: "center", justifyContent: "center" }}
         >
@@ -526,8 +448,8 @@ export default function HomeScreen() {
             { backgroundColor: theme.card },
             isFocused && s.searchBoxFocused,
             isFocused &&
-              dropdownMode !== "none" &&
-              s.searchBoxFocusedWithDropdown,
+            dropdownMode !== "none" &&
+            s.searchBoxFocusedWithDropdown,
           ]}
         >
           {isFocused ? (
