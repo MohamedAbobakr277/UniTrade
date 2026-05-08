@@ -251,20 +251,21 @@ export default function Sell() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView 
       style={{ flex: 1, backgroundColor: theme.background }}
+      edges={["top"]}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView 
-          style={{ flex: 1, backgroundColor: theme.background }}
-          edges={["top", "bottom"]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView 
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, padding: 16 }} 
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+          showsVerticalScrollIndicator={false}
         >
-          <ScrollView 
-            style={{ flex: 1, backgroundColor: theme.background }}
-            contentContainerStyle={[s.scroll, { backgroundColor: theme.background, paddingBottom: 100 }]} 
-            keyboardShouldPersistTaps="handled"
-          >
           <Text style={[s.pageTitle, { color: theme.text }]}>Sell Your Item</Text>
 
           <View style={[s.imageSection, { backgroundColor: theme.card, borderColor: border }]}>
@@ -357,16 +358,17 @@ export default function Sell() {
           <TouchableOpacity style={[s.postBtn, loading && { opacity: 0.7 }]} onPress={handlePost} disabled={loading}>
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.postBtnText}>Post Item</Text>}
           </TouchableOpacity>
+
+          {/* Spacer to safely push content above BottomNav without causing ScrollView padding jumping */}
+          <View style={{ height: 100 }} />
         </ScrollView>
-        <BottomNav />
-      </SafeAreaView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+      <BottomNav />
+    </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  scroll: { padding: 16, paddingBottom: 60 },
   pageTitle: { fontSize: 24, fontWeight: "700", marginBottom: 20 },
   imageSection: { borderRadius: 16, borderWidth: 1, overflow: "hidden", marginBottom: 12 },
   imagePlaceholder: { alignItems: "center", justifyContent: "center", paddingVertical: 40, gap: 8 },

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard
+  View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert, KeyboardAvoidingView, Platform, Keyboard
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -90,17 +91,21 @@ export default function EditProduct() {
   const border = theme.card === "#1e293b" ? "#1e293b" : "#e2e8f0";
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView 
       style={{ flex: 1, backgroundColor: theme.background }}
+      edges={["top"]}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={{ flex: 1 }}>
-          <ScrollView 
-            style={[styles.container, { backgroundColor: theme.background, flex: 1 }]}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 100, backgroundColor: theme.background }}
-          >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView 
+          style={{ flex: 1, backgroundColor: theme.background }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+          contentContainerStyle={{ flexGrow: 1, padding: 16, backgroundColor: theme.background }}
+          showsVerticalScrollIndicator={false}
+        >
         <Text style={[styles.title, { color: theme.text }]}>Edit Product</Text>
 
         {/* Title */}
@@ -221,10 +226,12 @@ export default function EditProduct() {
         <TouchableOpacity style={styles.button} onPress={updateProduct}>
           <Text style={styles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
+
+        {/* Spacer to safely push content above BottomNav without causing ScrollView padding jumping */}
+        <View style={{ height: 100 }} />
           </ScrollView>
-          <BottomNav />
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+      <BottomNav />
+    </SafeAreaView>
   );
 }
