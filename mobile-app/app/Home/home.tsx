@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "../../constants/ThemeContext";
+import { useNotifications } from "../../constants/NotificationContext";
 import {
   View,
   Text,
@@ -29,8 +30,6 @@ import {
   arrayRemove,
   addDoc,
   serverTimestamp,
-  query,
-  where,
 } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 import BottomNav from "../../components/BottomNav";
@@ -98,7 +97,7 @@ const ALL_UNIVERSITIES = [
 export default function HomeScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-
+  const { unreadCount } = useNotifications();
   const [search, setSearch] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -118,7 +117,6 @@ export default function HomeScreen() {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const inputRef = useRef<TextInput>(null);
   const sheetY = useRef(new Animated.Value(0)).current;
@@ -206,19 +204,6 @@ export default function HomeScreen() {
     if (!uid) return;
     const unsub = onSnapshot(doc(db, "users", uid), (snap) => {
       if (snap.exists()) setFavorites(snap.data().favourites || []);
-    });
-    return unsub;
-  }, []);
-
-  useEffect(() => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-    const q = query(
-      collection(db, "users", uid, "notifications"),
-      where("read", "==", false)
-    );
-    const unsub = onSnapshot(q, (snap) => {
-      setUnreadCount(snap.size);
     });
     return unsub;
   }, []);
@@ -433,11 +418,15 @@ export default function HomeScreen() {
         </View>
         <TouchableOpacity
           onPress={() => router.push("/notifications/notifications")}
-          style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: theme.card, alignItems: "center", justifyContent: "center" }}
+          style={s.notifBtn}
         >
           <Feather name="bell" size={20} color={theme.text} />
           {unreadCount > 0 && (
-            <View style={{ position: "absolute", top: 8, right: 8, width: 10, height: 10, borderRadius: 5, backgroundColor: "#ef4444", borderWidth: 1.5, borderColor: theme.card }} />
+            <View style={s.notifBadge}>
+              <Text style={s.notifBadgeText}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
       </View>
@@ -920,6 +909,34 @@ const s = StyleSheet.create({
   },
   headerTitle: { fontSize: 24, fontWeight: "700" },
   logo: { width: 36, height: 36, resizeMode: "contain" },
+  notifBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  notifBadge: {
+    position: "absolute",
+    top: -2,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#ef4444",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+    borderWidth: 1.5,
+    borderColor: "#ffffff",
+  },
+  notifBadgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "700",
+    lineHeight: 12,
+  },
 
   searchSection: {
     paddingHorizontal: 16,
