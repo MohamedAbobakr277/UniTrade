@@ -335,13 +335,15 @@ export default function ProductDetails() {
       cleaned = "20" + cleaned;
     }
     const message = `Hello! 👋\n\nI want to buy ${selectedQuantity} item${selectedQuantity > 1 ? 's' : ''} of this product on UniTrade:\n\n📦 *${product.title}*\n💰 Price: EGP ${Number(product.price).toLocaleString()}\n✅ Condition: ${product.condition}\n📍 University: ${product.university || "N/A"}\n\nIs it still available? 😊`;
-    const url = `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (supported) return Linking.openURL(url);
-        Alert.alert("Error", "WhatsApp is not installed on this device");
-      })
-      .catch(() => Alert.alert("Error", "Could not open WhatsApp"));
+    
+    const waUrl = `whatsapp://send?phone=${cleaned}&text=${encodeURIComponent(message)}`;
+    const webUrl = `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
+
+    Linking.openURL(waUrl).catch(() => {
+      Linking.openURL(webUrl).catch(() => {
+        Alert.alert("Error", "Could not open WhatsApp. Please make sure it is installed.");
+      });
+    });
   };
 
 
