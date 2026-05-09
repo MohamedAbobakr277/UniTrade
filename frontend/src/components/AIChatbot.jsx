@@ -206,7 +206,7 @@ export default function AIChatbot() {
                         sx={{
                             position: 'fixed',
                             bottom: { xs: 16, sm: 24 },
-                            right: { xs: 16, sm: 24 },
+                            left: { xs: 16, sm: 24 },
                             zIndex: 9999,
                             width: { xs: 50, sm: 60 },
                             height: { xs: 50, sm: 60 },
@@ -230,7 +230,7 @@ export default function AIChatbot() {
                     sx={{
                         position: 'fixed',
                         bottom: { xs: 24, sm: 34 },
-                        right: { xs: 76, sm: 100 },
+                        left: { xs: 76, sm: 100 },
                         zIndex: 9998,
                         maxWidth: 260,
                         p: 2,
@@ -273,7 +273,7 @@ export default function AIChatbot() {
                     sx={{
                         position: 'fixed',
                         bottom: { xs: 16, sm: 24 },
-                        right: { xs: 16, sm: 24 },
+                        left: { xs: 16, sm: 24 },
                         width: { xs: 'calc(100% - 32px)', sm: 400 },
                         height: 650,
                         maxHeight: 'calc(100vh - 48px)',
