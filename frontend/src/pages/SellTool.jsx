@@ -42,7 +42,7 @@ export default function SellTool() {
 
     const [images, setImages] = useState([]);
     const [customUniversity, setCustomUniversity] = useState("");
-    const [setUploadProgress] = useState(0);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
     const [aiLoading, setAiLoading] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -160,6 +160,7 @@ export default function SellTool() {
         } catch (err) {
             console.error(err);
             setError("Error posting item");
+            setUploadProgress(0);
         }
     };
 
@@ -214,6 +215,14 @@ export default function SellTool() {
                         )}
 
                         {aiLoading && <LinearProgress sx={{ mb: 3 }} />}
+                        {uploadProgress > 0 && uploadProgress < 100 && (
+                            <Box sx={{ mb: 3 }}>
+                                <LinearProgress variant="determinate" value={uploadProgress} />
+                                <Typography variant="caption" sx={{ mt: 1, display: 'block', textAlign: 'center' }}>
+                                    Uploading Item... {uploadProgress}%
+                                </Typography>
+                            </Box>
+                        )}
 
                         {qualityFeedback && !aiLoading && (
                             <Box sx={{
@@ -304,6 +313,7 @@ export default function SellTool() {
                             fullWidth
                             variant="contained"
                             onClick={handleSubmit}
+                            disabled={aiLoading || (uploadProgress > 0 && uploadProgress < 100)}
                             sx={{
                                 py: 1.8,
                                 borderRadius: 3,
