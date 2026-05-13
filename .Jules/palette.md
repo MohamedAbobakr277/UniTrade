@@ -1,0 +1,3 @@
+## 2024-05-13 - Missing Tooltips and ARIA Labels on Icon-Only Buttons
+**Learning:** Icon-only buttons (like the favorite button) across the app components lack tooltips and `aria-label` attributes, which reduces accessibility for screen readers and makes the UX confusing since users don't get immediate visual feedback about the action.
+**Action:** Always wrap `IconButton` components with `@mui/material/Tooltip` and apply a descriptive `aria-label` matching the tooltip text (e.g., dynamically handling states like 'Add to favorites' or 'Remove from favorites').
