@@ -18,7 +18,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { createNotification } from "../services/notifications";
 
 export default function ItemCard({ item }) {
@@ -243,23 +243,26 @@ export default function ItemCard({ item }) {
           />
         )}
 
-        <IconButton
-          onClick={toggleFavorite}
-          sx={{
-            position: "absolute",
-            bottom: 14,
-            right: 14,
-            backgroundColor: "background.paper",
-            color: isFavorite ? "#ef4444" : "text.secondary",
-            "&:hover": { backgroundColor: "background.subtle" },
-            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
-            border: "1px solid",
-            borderColor: "divider",
-            zIndex: 20,
-          }}
-        >
-          {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-        </IconButton>
+        <Tooltip title={isFavorite ? "Remove from Favorites" : "Add to Favorites"} placement="top">
+          <IconButton
+            onClick={toggleFavorite}
+            aria-label={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            sx={{
+              position: "absolute",
+              bottom: 14,
+              right: 14,
+              backgroundColor: "background.paper",
+              color: isFavorite ? "#ef4444" : "text.secondary",
+              "&:hover": { backgroundColor: "background.subtle" },
+              boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
+              border: "1px solid",
+              borderColor: "divider",
+              zIndex: 20,
+            }}
+          >
+            {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <CardContent
