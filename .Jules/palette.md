@@ -1,0 +1,3 @@
+## 2025-02-18 - Tooltips on Absolute Icon Buttons
+**Learning:** Material-UI's `<Tooltip>` component clones its direct child to inject event handlers and refs without adding extra wrapper DOM elements by default. This makes it extremely useful and safe for wrapping absolutely positioned elements (like an `<IconButton>` in an image overlay) without disrupting their calculated absolute layout coordinates.
+**Action:** When adding accessible labels to absolutely positioned icon-only buttons overlaying images or media, confidently wrap them in `<Tooltip>` components instead of using `title` attributes or custom wrapper `div`s, ensuring both sighted users get visual context and the layout remains perfectly intact.
