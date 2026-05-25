@@ -1,0 +1,3 @@
+## 2024-05-18 - Tooltips and ARIA Labels on Icon Buttons
+**Learning:** Icon-only buttons (like those found in AppBars or Navbars) without tooltips or ARIA labels fail WCAG accessibility guidelines and leave users guessing their functionality. In Material-UI, `Tooltip` natively handles the cloning of elements to supply event handlers, making wrapping icon buttons seamless and straightforward.
+**Action:** Consistently wrap all icon-only `IconButton` components in `<Tooltip>` with descriptive titles, and append explicit `aria-label`s to them for screen reader accessibility, particularly within main navigation components.
