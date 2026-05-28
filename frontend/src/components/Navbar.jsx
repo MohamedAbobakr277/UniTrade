@@ -573,51 +573,60 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         Sell
                     </Button>
 
-                    <IconButton
-                        onClick={() => navigate("/sell")}
-                        sx={{
-                            display: { xs: "flex", sm: "none" },
-                            width: 42, height: 42,
-                            borderRadius: "12px",
-                            backgroundColor: (theme) => theme.palette.mode === 'light' ? "primary.main" : "primary.light",
-                            color: "white",
-                            "&:hover": { backgroundColor: (theme) => theme.palette.mode === 'light' ? "primary.dark" : "primary.main" },
-                        }}
-                    >
-                        <AddIcon />
-                    </IconButton>
+                    <Tooltip title="Sell an item">
+                        <IconButton
+                            aria-label="Sell an item"
+                            onClick={() => navigate("/sell")}
+                            sx={{
+                                display: { xs: "flex", sm: "none" },
+                                width: 42, height: 42,
+                                borderRadius: "12px",
+                                backgroundColor: (theme) => theme.palette.mode === 'light' ? "primary.main" : "primary.light",
+                                color: "white",
+                                "&:hover": { backgroundColor: (theme) => theme.palette.mode === 'light' ? "primary.dark" : "primary.main" },
+                            }}
+                        >
+                            <AddIcon />
+                        </IconButton>
+                    </Tooltip>
 
-                    <IconButton
-                        onClick={toggleColorMode}
-                        sx={{
-                            width: 42, height: 42,
-                            borderRadius: "12px",
-                            backgroundColor: isDark ? "#1e293b" : "#ffffff",
-                            border: "1px solid",
-                            borderColor: isDark ? "#334155" : "#e2e8f0",
-                            transition: "all 0.25s ease",
-                            "&:hover": { backgroundColor: isDark ? "#334155" : "#eef4ff", borderColor: isDark ? "#475569" : "#bfdbfe", transform: "translateY(-1px)" },
-                        }}
-                    >
-                        {isDark ? <LightModeIcon sx={{ color: "warning.main" }} /> : <DarkModeIcon sx={{ color: "text.primary" }} />}
-                    </IconButton>
+                    <Tooltip title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
+                        <IconButton
+                            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                            onClick={toggleColorMode}
+                            sx={{
+                                width: 42, height: 42,
+                                borderRadius: "12px",
+                                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                                border: "1px solid",
+                                borderColor: isDark ? "#334155" : "#e2e8f0",
+                                transition: "all 0.25s ease",
+                                "&:hover": { backgroundColor: isDark ? "#334155" : "#eef4ff", borderColor: isDark ? "#475569" : "#bfdbfe", transform: "translateY(-1px)" },
+                            }}
+                        >
+                            {isDark ? <LightModeIcon sx={{ color: "warning.main" }} /> : <DarkModeIcon sx={{ color: "text.primary" }} />}
+                        </IconButton>
+                    </Tooltip>
 
-                    <IconButton
-                        onClick={handleNotifClick}
-                        sx={{
-                            width: 42, height: 42,
-                            borderRadius: "12px",
-                            backgroundColor: "background.paper",
-                            border: "1px solid",
-                            borderColor: "divider",
-                            transition: "all 0.25s ease",
-                            "&:hover": { backgroundColor: "background.subtle", borderColor: "primary.main", transform: "translateY(-1px)" },
-                        }}
-                    >
-                        <Badge badgeContent={unreadCount} color="error" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-                            <NotificationsNoneIcon sx={{ color: "text.primary" }} />
-                        </Badge>
-                    </IconButton>
+                    <Tooltip title="Notifications">
+                        <IconButton
+                            aria-label="Notifications"
+                            onClick={handleNotifClick}
+                            sx={{
+                                width: 42, height: 42,
+                                borderRadius: "12px",
+                                backgroundColor: "background.paper",
+                                border: "1px solid",
+                                borderColor: "divider",
+                                transition: "all 0.25s ease",
+                                "&:hover": { backgroundColor: "background.subtle", borderColor: "primary.main", transform: "translateY(-1px)" },
+                            }}
+                        >
+                            <Badge badgeContent={unreadCount} color="error" overlap="circular" anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+                                <NotificationsNoneIcon sx={{ color: "text.primary" }} />
+                            </Badge>
+                        </IconButton>
+                    </Tooltip>
 
                     <Popover
                         open={isNotifOpen}
@@ -793,9 +802,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 sx={{ py: 0.8, fontSize: "0.9rem", fontWeight: 500 }}
                             />
                             {inputValue && (
-                                <IconButton size="small" onClick={handleClear} sx={{ mr: 1 }}>
-                                    <ClearIcon sx={{ fontSize: "1.1rem" }} />
-                                </IconButton>
+                                <Tooltip title="Clear search">
+                                    <IconButton aria-label="Clear search" size="small" onClick={handleClear} sx={{ mr: 1 }}>
+                                        <ClearIcon sx={{ fontSize: "1.1rem" }} />
+                                    </IconButton>
+                                </Tooltip>
                             )}
                         </Box>
 
