@@ -1,0 +1,3 @@
+## 2024-06-01 - Accessible IconButton with Tooltips
+**Learning:** Icon-only buttons (like the favorite button in ItemCard) often lack screen reader support and context for sighted users. In Material UI, using `<Tooltip>` around the `<IconButton>` and supplying an `aria-label` attribute directly to the button provides comprehensive context for both visual and non-visual users safely.
+**Action:** Always wrap `IconButton` components that only contain icons in a `<Tooltip>` with a descriptive title, and apply a corresponding `aria-label` to the `IconButton` itself to adhere to accessibility guidelines.
