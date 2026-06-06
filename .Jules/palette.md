@@ -1,0 +1,3 @@
+## 2025-10-23 - Material UI Tooltip Wrapper
+**Learning:** Material-UI's `<Tooltip>` component clones its direct child to inject event handlers and refs without adding extra wrapper DOM elements. This makes it safe and straightforward to wrap absolutely positioned elements (like `<IconButton>` with absolute positioning) without disrupting their intended layout or z-index context.
+**Action:** Always wrap icon-only buttons (`<IconButton>`) in `<Tooltip>` components to provide contextual visual feedback for sighted users while also ensuring `aria-label` is set for screen readers, knowing that it won't break position styling.
