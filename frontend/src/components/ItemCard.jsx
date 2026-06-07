@@ -18,7 +18,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { createNotification } from "../services/notifications";
 
 export default function ItemCard({ item }) {
@@ -243,23 +243,26 @@ export default function ItemCard({ item }) {
           />
         )}
 
-        <IconButton
-          onClick={toggleFavorite}
-          sx={{
-            position: "absolute",
-            bottom: 14,
-            right: 14,
-            backgroundColor: "background.paper",
-            color: isFavorite ? "#ef4444" : "text.secondary",
-            "&:hover": { backgroundColor: "background.subtle" },
-            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
-            border: "1px solid",
-            borderColor: "divider",
-            zIndex: 20,
-          }}
-        >
-          {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-        </IconButton>
+        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"}>
+          <IconButton
+            onClick={toggleFavorite}
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            sx={{
+              position: "absolute",
+              bottom: 14,
+              right: 14,
+              backgroundColor: "background.paper",
+              color: isFavorite ? "#ef4444" : "text.secondary",
+              "&:hover": { backgroundColor: "background.subtle" },
+              boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
+              border: "1px solid",
+              borderColor: "divider",
+              zIndex: 20,
+            }}
+          >
+            {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <CardContent
@@ -275,7 +278,7 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             fontWeight: 800,
-            fontSize: "1.1rem",
+            fontSize: { xs: "0.85rem", sm: "1.1rem" },
             color: "text.primary",
             lineHeight: 1.35,
             height: { xs: "42px", sm: "58px" },
@@ -284,7 +287,6 @@ export default function ItemCard({ item }) {
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             mb: 0.5,
-            fontSize: { xs: "0.85rem", sm: "1.1rem" },
           }}
         >
           {item.title || "Untitled Item"}

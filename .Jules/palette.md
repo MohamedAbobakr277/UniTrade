@@ -1,0 +1,3 @@
+## 2024-05-15 - Material-UI Tooltip on Absolutely Positioned IconButton
+**Learning:** In the UniTrade app's `ItemCard` component, the favorite `IconButton` is layered absolutely over the image. The lack of an explicit `aria-label` or tooltip caused an accessibility issue for screen readers. Wrapping the `IconButton` directly in a Material-UI `<Tooltip>` works gracefully even with absolute positioning because Tooltip doesn't inject extra DOM wrappers by default.
+**Action:** When working with absolutely positioned icon buttons in UniTrade's card components, safely wrap them in `<Tooltip>` without fear of breaking layout.
