@@ -35,6 +35,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { useNavigate, useParams } from "react-router-dom";
+import { Tooltip } from "@mui/material";
 import { useEffect, useState, forwardRef } from "react";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, query, where, collection, getDocs, limit } from "firebase/firestore";
 import { db, auth } from "../firebase";
@@ -465,23 +466,26 @@ export default function ItemDetails() {
                                         </>
                                     )}
 
-                                    <IconButton
-                                        onClick={toggleFavorite}
-                                        sx={{
-                                            position: "absolute",
-                                            bottom: 18,
-                                            right: 18,
-                                            backgroundColor: "background.paper",
-                                            color: isFavorite ? "#ef4444" : "text.secondary",
-                                            "&:hover": { backgroundColor: "background.subtle", transform: "scale(1.1)" },
-                                            boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
-                                            transition: "all 0.2s ease",
-                                            width: 48,
-                                            height: 48,
-                                        }}
-                                    >
-                                        {isFavorite ? <FavoriteIcon sx={{ fontSize: 26 }} /> : <FavoriteBorderIcon sx={{ fontSize: 26 }} />}
-                                    </IconButton>
+                                    <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} placement="top">
+                                        <IconButton
+                                            onClick={toggleFavorite}
+                                            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                            sx={{
+                                                position: "absolute",
+                                                bottom: 18,
+                                                right: 18,
+                                                backgroundColor: "background.paper",
+                                                color: isFavorite ? "#ef4444" : "text.secondary",
+                                                "&:hover": { backgroundColor: "background.subtle", transform: "scale(1.1)" },
+                                                boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
+                                                transition: "all 0.2s ease",
+                                                width: 48,
+                                                height: 48,
+                                            }}
+                                        >
+                                            {isFavorite ? <FavoriteIcon sx={{ fontSize: 26 }} /> : <FavoriteBorderIcon sx={{ fontSize: 26 }} />}
+                                        </IconButton>
+                                    </Tooltip>
                                 </Paper>
 
                                 {/* Thumbnails */}
