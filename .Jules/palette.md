@@ -1,0 +1,3 @@
+## 2024-06-18 - Material-UI Tooltips on IconButtons
+**Learning:** Material-UI`s `<Tooltip>` component successfully clones its direct child to inject event handlers without adding extra wrapper DOM elements. This makes it a perfect, clean way to wrap absolutely positioned `<IconButton>` elements (like favorite toggles) without disrupting their existing layout or breaking accessibility standards.
+**Action:** Consistently use `<Tooltip>` wrappers for `<IconButton>` elements throughout the application to ensure visual context is provided for sighted users, alongside dynamic `aria-label` attributes for screen readers.
