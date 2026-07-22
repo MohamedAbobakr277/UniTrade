@@ -7,6 +7,7 @@ import {
   Chip,
   Avatar,
   Divider,
+  Tooltip
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -243,8 +244,10 @@ export default function ItemCard({ item }) {
           />
         )}
 
+        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} placement="top" arrow>
         <IconButton
           onClick={toggleFavorite}
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           sx={{
             position: "absolute",
             bottom: 14,
@@ -260,6 +263,7 @@ export default function ItemCard({ item }) {
         >
           {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
         </IconButton>
+        </Tooltip>
       </Box>
 
       <CardContent
@@ -275,7 +279,7 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             fontWeight: 800,
-            fontSize: "1.1rem",
+
             color: "text.primary",
             lineHeight: 1.35,
             height: { xs: "42px", sm: "58px" },
