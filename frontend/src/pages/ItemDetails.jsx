@@ -16,7 +16,8 @@ import {
     Slide,
     Snackbar,
     Alert,
-    TextField
+    TextField,
+    Tooltip
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -465,23 +466,26 @@ export default function ItemDetails() {
                                         </>
                                     )}
 
-                                    <IconButton
-                                        onClick={toggleFavorite}
-                                        sx={{
-                                            position: "absolute",
-                                            bottom: 18,
-                                            right: 18,
-                                            backgroundColor: "background.paper",
-                                            color: isFavorite ? "#ef4444" : "text.secondary",
-                                            "&:hover": { backgroundColor: "background.subtle", transform: "scale(1.1)" },
-                                            boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
-                                            transition: "all 0.2s ease",
-                                            width: 48,
-                                            height: 48,
-                                        }}
-                                    >
-                                        {isFavorite ? <FavoriteIcon sx={{ fontSize: 26 }} /> : <FavoriteBorderIcon sx={{ fontSize: 26 }} />}
-                                    </IconButton>
+                                    <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow placement="top">
+                                        <IconButton
+                                            onClick={toggleFavorite}
+                                            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                            sx={{
+                                                position: "absolute",
+                                                bottom: 18,
+                                                right: 18,
+                                                backgroundColor: "background.paper",
+                                                color: isFavorite ? "#ef4444" : "text.secondary",
+                                                "&:hover": { backgroundColor: "background.subtle", transform: "scale(1.1)" },
+                                                boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
+                                                transition: "all 0.2s ease",
+                                                width: 48,
+                                                height: 48,
+                                            }}
+                                        >
+                                            {isFavorite ? <FavoriteIcon sx={{ fontSize: 26 }} /> : <FavoriteBorderIcon sx={{ fontSize: 26 }} />}
+                                        </IconButton>
+                                    </Tooltip>
                                 </Paper>
 
                                 {/* Thumbnails */}
