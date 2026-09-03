@@ -1,0 +1,3 @@
+## 2024-05-25 - Dynamic Tooltip and ARIA for IconButton State
+**Learning:** For Material UI icon-only toggle buttons (like Favorite/Unfavorite), static tooltips or ARIA labels aren't sufficient. They must dynamically reflect the *action* that will happen next, not just the state, to be genuinely accessible and helpful.
+**Action:** When wrapping an `IconButton` that represents a toggle state with a `Tooltip`, use ternary operators tied to the state for both the `title` (Tooltip) and `aria-label` (IconButton), e.g., `title={isFavorite ? "Remove from favorites" : "Add to favorites"}`. Also, remove duplicate responsive properties that override each other in MUI `sx` to satisfy both ESLint and accurate layout rules.
