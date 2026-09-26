@@ -1,0 +1,13 @@
+🎨 Palette: Added tooltip and ARIA label to ItemCard favorite button
+
+**💡 What:**
+Added a `Tooltip` component and an `aria-label` attribute to the favorite (`IconButton`) on the `ItemCard` component. The tooltip and label dynamically switch between "Add to favorites" and "Remove from favorites" based on the `isFavorite` state.
+
+**🎯 Why:**
+The favorite button relied solely on a heart icon (filled or outlined) without any descriptive text. This made its purpose ambiguous for some users and completely inaccessible to screen readers. Adding a tooltip provides an explicit visual hint, and the ARIA label ensures accessibility.
+
+**📸 Before/After:**
+*(See visual verification screenshot for the hover state with the tooltip).*
+
+**♿ Accessibility:**
+- Added a dynamic `aria-label` to inform screen reader users of the exact action the button performs.
