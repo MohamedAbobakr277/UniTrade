@@ -1,0 +1,3 @@
+## 2023-10-25 - Icon-Only Button Accessibility
+**Learning:** Icon-only buttons (like Favorite, Theme Toggle, Notifications, Add Item) consistently lack accessible labels and context for screen readers in Material UI components when only icons are nested. While they look clean visually, they are completely opaque to accessibility tools without explicit `aria-label`s.
+**Action:** Always wrap Material UI `IconButton`s containing only an icon in a `<Tooltip>` (to provide visual context on hover for sighted users) and ensure the `IconButton` itself has a matching or descriptive `aria-label` for screen readers. Make sure dynamic states (e.g., 'Add to favorites' vs 'Remove from favorites') are reflected in both properties.
