@@ -1,0 +1,3 @@
+## 2024-10-11 - ItemCard Favorite IconButton Needs Tooltip and ARIA Label
+**Learning:** The `IconButton` for toggling favorites on `ItemCard` is an icon-only button without an accessible `aria-label` or `Tooltip`, making it inaccessible to screen readers and potentially unclear to sighted users. When implementing toggleable states (favorite/unfavorite), both the label and tooltip must dynamically reflect the current state.
+**Action:** Add `Tooltip` (from `@mui/material`) around the `IconButton` and an `aria-label` on the `IconButton` itself, dynamically setting the text to "Remove from favorites" or "Add to favorites" based on the `isFavorite` state.
