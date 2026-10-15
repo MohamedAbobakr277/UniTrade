@@ -18,7 +18,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { createNotification } from "../services/notifications";
 
 export default function ItemCard({ item }) {
@@ -243,7 +243,9 @@ export default function ItemCard({ item }) {
           />
         )}
 
+        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"}>
         <IconButton
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           onClick={toggleFavorite}
           sx={{
             position: "absolute",
@@ -260,6 +262,7 @@ export default function ItemCard({ item }) {
         >
           {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
         </IconButton>
+        </Tooltip>
       </Box>
 
       <CardContent
@@ -275,7 +278,6 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             fontWeight: 800,
-            fontSize: "1.1rem",
             color: "text.primary",
             lineHeight: 1.35,
             height: { xs: "42px", sm: "58px" },
@@ -376,6 +378,7 @@ export default function ItemCard({ item }) {
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Avatar
+              alt={sellerName || "Seller avatar"}
               src={editData?.profilePhoto || "/default-avatar.png"}
               sx={{ width: { xs: 28, sm: 42 }, height: { xs: 28, sm: 42 }, border: "2px solid", borderColor: "divider" }}
             />
