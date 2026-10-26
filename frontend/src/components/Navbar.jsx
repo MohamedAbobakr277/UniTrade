@@ -573,7 +573,9 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                         Sell
                     </Button>
 
+                    <Tooltip title="Sell an item">
                     <IconButton
+                        aria-label="Sell an item"
                         onClick={() => navigate("/sell")}
                         sx={{
                             display: { xs: "flex", sm: "none" },
@@ -586,8 +588,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     >
                         <AddIcon />
                     </IconButton>
+                    </Tooltip>
 
+                    <Tooltip title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
                     <IconButton
+                        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                         onClick={toggleColorMode}
                         sx={{
                             width: 42, height: 42,
@@ -601,8 +606,11 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                     >
                         {isDark ? <LightModeIcon sx={{ color: "warning.main" }} /> : <DarkModeIcon sx={{ color: "text.primary" }} />}
                     </IconButton>
+                    </Tooltip>
 
+                    <Tooltip title="Notifications">
                     <IconButton
+                        aria-label="View notifications"
                         onClick={handleNotifClick}
                         sx={{
                             width: 42, height: 42,
@@ -618,6 +626,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                             <NotificationsNoneIcon sx={{ color: "text.primary" }} />
                         </Badge>
                     </IconButton>
+                    </Tooltip>
 
                     <Popover
                         open={isNotifOpen}
