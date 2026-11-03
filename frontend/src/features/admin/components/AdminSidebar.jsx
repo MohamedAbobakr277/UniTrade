@@ -43,9 +43,11 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const width = collapsed ? COLLAPSED_WIDTH : FULL_WIDTH;
 
   /* ── helper: nav button ── */
+  // eslint-disable-next-line no-unused-vars
   const NavBtn = ({ label, isActive, onClick, Icon }) => {
     const btn = (
       <ListItemButton
@@ -91,6 +93,7 @@ export default function AdminSidebar({ activeTab, onTabChange, collapsed, onTogg
   };
 
   /* ── helper: bottom action button ── */
+  // eslint-disable-next-line no-unused-vars
   const ActionBtn = ({ label, onClick, color, hoverBg, Icon }) => {
     const defaultColor = theme.palette.text.secondary;
     const btnColor = color || defaultColor;
