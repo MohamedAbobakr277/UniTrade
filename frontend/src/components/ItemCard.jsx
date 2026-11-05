@@ -7,6 +7,7 @@ import {
   Chip,
   Avatar,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -243,23 +244,26 @@ export default function ItemCard({ item }) {
           />
         )}
 
-        <IconButton
-          onClick={toggleFavorite}
-          sx={{
-            position: "absolute",
-            bottom: 14,
-            right: 14,
-            backgroundColor: "background.paper",
-            color: isFavorite ? "#ef4444" : "text.secondary",
-            "&:hover": { backgroundColor: "background.subtle" },
-            boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
-            border: "1px solid",
-            borderColor: "divider",
-            zIndex: 20,
-          }}
-        >
-          {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-        </IconButton>
+        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"}>
+          <IconButton
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            onClick={toggleFavorite}
+            sx={{
+              position: "absolute",
+              bottom: 14,
+              right: 14,
+              backgroundColor: "background.paper",
+              color: isFavorite ? "#ef4444" : "text.secondary",
+              "&:hover": { backgroundColor: "background.subtle" },
+              boxShadow: (theme) => theme.palette.mode === 'light' ? "0 6px 18px rgba(0,0,0,0.1)" : "none",
+              border: "1px solid",
+              borderColor: "divider",
+              zIndex: 20,
+            }}
+          >
+            {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <CardContent
@@ -275,7 +279,6 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             fontWeight: 800,
-            fontSize: "1.1rem",
             color: "text.primary",
             lineHeight: 1.35,
             height: { xs: "42px", sm: "58px" },
