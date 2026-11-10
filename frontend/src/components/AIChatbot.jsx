@@ -76,6 +76,7 @@ export default function AIChatbot() {
     const handleSend = () => {
         if (!inputValue.trim()) return;
 
+        // eslint-disable-next-line react-hooks/purity
         const newMsg = { id: Date.now(), text: inputValue, sender: 'user' };
         setMessages(prev => [...prev, newMsg]);
         setInputValue('');

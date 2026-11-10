@@ -575,6 +575,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
 
                     <IconButton
                         onClick={() => navigate("/sell")}
+                        aria-label="Add new item to sell"
                         sx={{
                             display: { xs: "flex", sm: "none" },
                             width: 42, height: 42,
@@ -589,6 +590,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
 
                     <IconButton
                         onClick={toggleColorMode}
+                        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                         sx={{
                             width: 42, height: 42,
                             borderRadius: "12px",
@@ -604,6 +606,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
 
                     <IconButton
                         onClick={handleNotifClick}
+                        aria-label="View notifications"
                         sx={{
                             width: 42, height: 42,
                             borderRadius: "12px",
@@ -793,7 +796,7 @@ export default function Navbar({ search = "", setSearch, items = [], onSearch })
                                 sx={{ py: 0.8, fontSize: "0.9rem", fontWeight: 500 }}
                             />
                             {inputValue && (
-                                <IconButton size="small" onClick={handleClear} sx={{ mr: 1 }}>
+                                <IconButton size="small" onClick={handleClear} aria-label="Clear search" sx={{ mr: 1 }}>
                                     <ClearIcon sx={{ fontSize: "1.1rem" }} />
                                 </IconButton>
                             )}

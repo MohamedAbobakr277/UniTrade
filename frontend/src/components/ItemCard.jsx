@@ -245,6 +245,7 @@ export default function ItemCard({ item }) {
 
         <IconButton
           onClick={toggleFavorite}
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           sx={{
             position: "absolute",
             bottom: 14,
@@ -275,7 +276,6 @@ export default function ItemCard({ item }) {
           variant="h6"
           sx={{
             fontWeight: 800,
-            fontSize: "1.1rem",
             color: "text.primary",
             lineHeight: 1.35,
             height: { xs: "42px", sm: "58px" },
